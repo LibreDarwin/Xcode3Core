@@ -1,0 +1,223 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1A2B3C4D0000000000000021 /* agvtool.c in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000011 /* agvtool.c */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		1A2B3C4D0000000000000011 /* agvtool.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = agvtool.c; sourceTree = "<group>"; };
+		1A2B3C4D0000000000000018 /* agvtool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = agvtool; sourceTree = BUILT_PRODUCTS_DIR; };
+		1A2B3C4D0000000000000019 /* agvtool.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = agvtool.1; sourceTree = "<group>"; };
+		1A2B3C4D000000000000001A /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		1A2B3C4D000000000000001B /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		1A2B3C4D0000000000000002 = {
+			isa = PBXGroup;
+			children = (
+				1A2B3C4D0000000000000004 /* Sources */,
+				1A2B3C4D0000000000000007 /* man */,
+				1A2B3C4D000000000000001A /* README.md */,
+				1A2B3C4D000000000000001B /* Makefile */,
+				1A2B3C4D0000000000000003 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		1A2B3C4D0000000000000003 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1A2B3C4D0000000000000018 /* agvtool */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		1A2B3C4D0000000000000004 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				1A2B3C4D0000000000000005 /* DevToolsCore */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		1A2B3C4D0000000000000005 /* DevToolsCore */ = {
+			isa = PBXGroup;
+			children = (
+				1A2B3C4D0000000000000006 /* agvtool */,
+			);
+			path = DevToolsCore;
+			sourceTree = "<group>";
+		};
+		1A2B3C4D0000000000000006 /* agvtool */ = {
+			isa = PBXGroup;
+			children = (
+				1A2B3C4D0000000000000011 /* agvtool.c */,
+			);
+			path = agvtool;
+			sourceTree = "<group>";
+		};
+		1A2B3C4D0000000000000007 /* man */ = {
+			isa = PBXGroup;
+			children = (
+				1A2B3C4D0000000000000019 /* agvtool.1 */,
+			);
+			path = man;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		1A2B3C4D0000000000000031 /* agvtool */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1A2B3C4D0000000000000033 /* Build configuration list for PBXNativeTarget "agvtool" */;
+			buildPhases = (
+				1A2B3C4D0000000000000032 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = agvtool;
+			productName = agvtool;
+			productReference = 1A2B3C4D0000000000000018 /* agvtool */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		1A2B3C4D0000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1600;
+			};
+			buildConfigurationList = 1A2B3C4D0000000000000034 /* Build configuration list for PBXProject "Xcode3Core" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				base,
+			);
+			mainGroup = 1A2B3C4D0000000000000002;
+			productRefGroup = 1A2B3C4D0000000000000003 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				1A2B3C4D0000000000000031 /* agvtool */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1A2B3C4D0000000000000032 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1A2B3C4D0000000000000021 /* agvtool.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		1A2B3C4D0000000000000035 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				EXECUTABLE_PREFIX = "";
+				GCC_C_LANGUAGE_STANDARD = c11;
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/Sources";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(CONFIGURATION_BUILD_DIR)",
+					"/System/Library/PrivateFrameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				OTHER_CFLAGS = (
+					"-D_DARWIN_C_SOURCE",
+					"-Wall",
+					"-Wextra",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		1A2B3C4D0000000000000036 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				EXECUTABLE_PREFIX = "";
+				GCC_C_LANGUAGE_STANDARD = c11;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/Sources";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(CONFIGURATION_BUILD_DIR)",
+					"/System/Library/PrivateFrameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				OTHER_CFLAGS = (
+					"-D_DARWIN_C_SOURCE",
+					"-Wall",
+					"-Wextra",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		1A2B3C4D0000000000000037 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CONFIGURATION_BUILD_DIR = "$(SRCROOT)/build/debug";
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/Sources";
+				OBJROOT = "$(SRCROOT)/build/obj/debug";
+				SDKROOT = macosx;
+				SYMROOT = "$(SRCROOT)/build";
+			};
+			name = Debug;
+		};
+		1A2B3C4D0000000000000038 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CONFIGURATION_BUILD_DIR = "$(SRCROOT)/build/release";
+				GCC_OPTIMIZATION_LEVEL = 3;
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/Sources";
+				OBJROOT = "$(SRCROOT)/build/obj/release";
+				SDKROOT = macosx;
+				SYMROOT = "$(SRCROOT)/build";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1A2B3C4D0000000000000033 /* Build configuration list for PBXNativeTarget "agvtool" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1A2B3C4D0000000000000035 /* Debug */,
+				1A2B3C4D0000000000000036 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1A2B3C4D0000000000000034 /* Build configuration list for PBXProject "Xcode3Core" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1A2B3C4D0000000000000037 /* Debug */,
+				1A2B3C4D0000000000000038 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 1A2B3C4D0000000000000001 /* Project object */;
+}

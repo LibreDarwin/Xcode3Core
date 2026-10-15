@@ -1,0 +1,347 @@
+.\" Copyright (C) 2026, LibreDarwin
+.\" SPDX-License-Identifier: BSD-3-Clause
+.\"
+.\" to preview: mandoc agvtool.1 | less
+.\"
+.Dd October 15, 2026
+.Dt AGVTOOL 1
+.Os
+.\"
+.Sh NAME
+.Nm agvtool
+.Nd Apple-generic versioning tool for Xcode projects
+.\"
+.Sh SYNOPSIS
+.Nm
+.Li what-version
+|
+.Li vers
+.Op Fl terse
+.Nm
+.Op Fl noscm | Fl usecvs | Fl usesvn
+.Li next-version
+|
+.Li bump
+.Op Fl all
+.Nm
+.Op Fl noscm | Fl usecvs | Fl usesvn
+.Li new-version
+.Op Fl all
+.Ar versionNumber
+.Nm
+.Op Fl noscm | Fl usecvs | Fl usesvn
+.Li tag
+.Op Fl force | Fl F
+.Op Fl noupdatecheck | Fl Q
+.Op Fl baseurlfortag
+.Nm
+.Op Fl noscm | Fl usecvs | Fl usesvn
+.Li submit
+.Op Fl bytag | Fl notbytag
+.Op Fl baseurlfortag
+.Ar release ...
+.Nm
+.Li what-marketing-version
+|
+.Li mvers
+.Op Fl terse | Fl terse1
+.Nm
+.Op Fl noscm | Fl usecvs | Fl usesvn
+.Li new-marketing-version
+.Ar version
+.\"
+.Sh DESCRIPTION
+.Nm
+speeds up common operations for Xcode projects that use the Apple-generic
+versioning system.
+.Pp
+Versioning support is enabled by setting some build settings in your project.
+.\"
+.Ss Build Settings
+.Bl -tag -width "VERSION_INFO_EXPORT_DECL"
+.It Li VERSIONING_SYSTEM
+Must be set to
+.Dq apple-generic
+at the project level to enable versioning.
+.It Li CURRENT_PROJECT_VERSION
+The current version of the project. The value must be an integer or floating
+point number such as 57 or 365.8.
+.It Li DYLIB_CURRENT_VERSION
+The current version of any framework built by the project. Like
+.Li CURRENT_PROJECT_VERSION
+the value must be an integer or floating point number. By default it is set to
+.Dq $(CURRENT_PROJECT_VERSION) Ns .
+.It Li VERSION_INFO_PREFIX
+A prefix for the name of the version info symbol in the generated versioning
+source file.
+.It Li VERSION_INFO_SUFFIX
+A suffix for the name of the version info symbol. This is rarely used.
+.It Li VERSION_INFO_BUILDER
+A reference to the user performing a build to be included in the generated
+stub; defaults to the value of the
+.Ev USER
+environment variable.
+.It Li VERSION_INFO_EXPORT_DECL
+A prefix string for the version info symbol declaration in the generated stub.
+This should rarely be changed.
+.It Li VERSION_INFO_FILE
+The name of the source file that is generated and compiled into your product.
+By default this is
+.Dq $(PRODUCT_NAME)_vers.c Ns .
+.El
+.Pp
+To enable Apple-generic versioning you must set up at least the
+.Li VERSIONING_SYSTEM
+and
+.Li CURRENT_PROJECT_VERSION
+project build settings for each project you want to be versioned.
+.Pp
+Projects with multiple targets are required to have the same
+.Li CURRENT_PROJECT_VERSION
+for each target. The easiest way to achieve this is to set
+.Li CURRENT_PROJECT_VERSION
+at the project level.
+.\"
+.Ss Usage
+.Nm
+should be invoked with the working directory set to your project directory
+(the folder containing your .xcodeproj project file).
+.Pp
+.Nm
+pays attention to the following defaults for CVS usage:
+.Li CVSEnabled ,
+.Li CVSSubmitByTag ,
+and
+.Li CVSToolPath .
+.Pp
+If
+.Li CVSEnabled
+is set to
+.Li YES
+then
+.Nm
+performs certain CVS operations such as committing modified project files and
+performing tagging operations. The sense of this default can be overridden by
+supplying an explicit
+.Fl noscm
+(turns off CVS and Subversion usage),
+.Fl usecvs
+(turns on CVS usage and turns off Subversion usage),
+or
+.Fl usesvn
+(turns off CVS usage and turns on Subversion usage).
+.Pp
+If
+.Li CVSSubmitByTag
+is set to
+.Li YES
+then
+.Nm
+submits your project by CVS tag using the same version as the tag operation.
+The sense of this default can be overridden with
+.Fl bytag
+or
+.Fl notbytag
+on the submit operation.
+.Pp
+Set
+.Li CVSToolPath
+to point to the location of the cvs tool to use. If this default is not set
+then
+.Nm
+uses
+.Pa /usr/bin/ocvs
+if it exists, otherwise
+.Pa /usr/bin/cvs .
+.Pp
+.Nm
+pays attention to the following defaults for Subversion usage:
+.Li SVNEnabled ,
+.Li SVNSubmitByTag ,
+and
+.Li SVNToolPath .
+.Pp
+If
+.Li SVNEnabled
+is set to
+.Li YES
+then
+.Nm
+performs certain Subversion operations such as committing modified project
+files and performing tagging operations. The sense of this default can be
+overridden as described above.
+.Pp
+If
+.Li SVNSubmitByTag
+is set to
+.Li YES
+then
+.Nm
+submits your project by Subversion URL using the same version as that created
+by the tag operation.
+.Pp
+Set
+.Li SVNToolPath
+to point to the location of the svn tool to use. If this default is not set
+then
+.Nm
+uses
+.Pa /usr/local/bin/svn
+if it exists.
+.\"
+.Ss Commands And Options
+.Bl -tag -width 4n
+.It Li what-version No | Li vers Op Fl terse
+Prints out the current version number of the project.
+.Pp
+The
+.Fl terse
+option limits the output to the version number only.
+.It Li next-version No | Li bump Op Fl all
+Increments the version numbers of all versioned targets to the next highest
+integral value. For example, 54 changes to 55 and 234.6 changes to 235.
+.Pp
+The
+.Li CURRENT_PROJECT_VERSION
+and the
+.Li DYLIB_CURRENT_VERSION
+are updated. The
+.Fl all
+option also updates the
+.Li CFBundleVersion
+Info.plist key.
+.Pp
+If CVS support is enabled, the modified project file is committed.
+.It Li new-version Op Fl all Ar version
+Sets the version numbers of all targets to the given version.
+.Pp
+The
+.Li CURRENT_PROJECT_VERSION
+and the
+.Li DYLIB_CURRENT_VERSION
+are updated. The
+.Fl all
+option also updates the
+.Li CFBundleVersion
+Info.plist key.
+.Pp
+If CVS support is enabled, the modified project file is committed.
+.It Li tag Oo Fl force | Fl F Oc Oo Fl noupdatecheck | Fl Q Oc Oo Fl baseurlfortag Oc
+Creates a new tag
+.Ar projectname Ns - Ns Ar currentversion
+where
+.Ar projectname
+is the name of the Xcode project file (without the extension) and
+.Ar currentversion
+is the
+.Li CURRENT_PROJECT_VERSION
+with any
+.Sq \&.
+transformed into
+.Sq ~
+(since CVS does not allow dots in tag names).
+.Pp
+The
+.Fl force
+or
+.Fl F
+option adds a
+.Fl F
+to the tag operation.
+.Pp
+The
+.Fl noupdatecheck
+or
+.Fl Q
+option skips the cvs update usually done prior to tagging to ensure that there
+are no uncommitted changes.
+.Pp
+The
+.Fl baseurlfortag
+option provides a URL that points to the directory to place the tag in when
+using Subversion. This overrides the
+.Li SVNBaseTagURL
+default and is ignored if Subversion is not being used.
+.Pp
+.Em Note:
+This command only functions if CVS or Subversion support is enabled.
+.It Li submit Oo Fl bytag | Fl notbytag Oc Oo Fl baseurlfortag Oc Ar release ...
+Submits your project to the specified releases in Build & Integration.
+.Pp
+The
+.Fl bytag
+option performs the submission by tag instead of submitting from the project
+source directly. The
+.Fl notbytag
+option submits from the project source.
+.Pp
+If
+.Li CVSSubmitByTag
+is set,
+.Fl bytag
+is the default; otherwise
+.Fl notbytag
+is the default.
+.Pp
+The
+.Fl baseurlfortag
+option provides a URL that points to the directory to find tags in when using
+Subversion. This overrides the
+.Li SVNBaseTagURL
+default and is ignored if Subversion is not being used.
+.Pp
+.Em Note:
+This command is relevant only for Apple employees.
+.It Li what-marketing-version No | Li mvers Op Fl terse | Fl terse1
+Prints the current marketing version of the project. For native targets, a
+marketing version is listed for each Info.plist file found.
+.Pp
+The marketing version is the
+.Li CFBundleShortVersionString
+Info.plist key. This is often a totally different version determined by
+product marketing.
+.Pp
+The
+.Fl terse
+option limits the output to the version number only.
+.Pp
+The
+.Fl terse1
+option limits the output to the first version number found, and only displays
+the version number.
+.It Li new-marketing-version Ar version
+Sets the marketing version numbers of all versioned targets to the given
+version number.
+.Pp
+The marketing version is the
+.Li CFBundleShortVersionString
+Info.plist key.
+.Pp
+If CVS support is enabled, the modified project file is committed.
+.Pp
+Do not use this command on a project with targets that track different
+marketing versions.
+.El
+.\"
+.Sh EXIT STATUS
+.Nm
+exits with one of the following values:
+.Bl -tag -width 4n -offset indent
+.It 0
+Success.
+.It 2
+A command was given an invalid argument or option.
+.It 3
+.Nm
+was not run from a directory containing exactly one Xcode project.
+.It 7
+The requested version could not be set.
+.El
+.\"
+.Sh SEE ALSO
+.Xr defaults 1
+.\"
+.Sh AUTHORS
+This is an open source reimplementation by LibreDarwin of Apple's
+.Nm
+tool.
