@@ -91,6 +91,19 @@ run_case() {
 		noplist)
 			mkproject "$ROOT/a"
 			sed -i '' '/INFOPLIST_FILE/d' "$ROOT/a/MyApp.xcodeproj/project.pbxproj" ;;
+		plistnokey)
+			mkproject "$ROOT/a"
+			cat > "$ROOT/a/MyApp/Info.plist" <<'PLIST'
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleVersion</key>
+	<string>42</string>
+</dict>
+</plist>
+PLIST
+			;;
 		noplproj) mkdir -p "$ROOT/a" ;;
 		twoproj)
 			mkproject "$ROOT/a"
@@ -181,6 +194,66 @@ run_case "flag-first-bad"     modern -terse vers
 run_case "unknownflag-global" modern -bytag vers
 run_case "bump-all-noplist"   noplist bump -all
 run_case "oldproj"            oldproj vers
+
+# A native Info.plist that has no CFBundleShortVersionString key: mvers still
+# prints a "Found ... of \"\"" line and exits 0; new-marketing-version still
+# rewrites the (unchanged) file and reports success.
+run_case "mvers-plistnokey"        plistnokey mvers
+run_case "mvers-plistnokey-terse"  plistnokey mvers -terse
+run_case "mvers-plistnokey-terse1" plistnokey mvers -terse1
+run_case "nmv-plistnokey"          plistnokey new-marketing-version 2.0
+run_case "bump-all-plistnokey"     plistnokey bump -all
+
+# -noscm with nothing after it: the operation specifier becomes empty and the
+# dispatch falls through to "Unrecognized operation specifier \"\"" (exit 2),
+# or to the no-project exit (3) outside a project directory.
+run_case "noscm-alone"             modern -noscm
+run_case "noscm-alone-nodir"       noplproj -noscm
+run_case "noscm-vers"              modern -noscm vers
+run_case "noscm-vers-terse"        modern -noscm vers -terse
+run_case "noscm-bump-all"          modern -noscm bump -all
+run_case "noscm-new-version-all"   modern -noscm new-version -all 99
+run_case "noscm-tag"               modern -noscm tag
+run_case "noscm-mvers"             modern -noscm mvers
+run_case "noscm-nmv"               modern -noscm new-marketing-version 2.0
+
+# The other global SCM selectors, on operations that never invoke the SCM tool.
+run_case "usecvs-vers"             modern -usecvs vers
+run_case "usesvn-vers"             modern -usesvn vers
+
+# tag option parsing.  With no SCM enabled the operation always ends in the
+# "supported only if CVS or SVN support is enabled" usage/exit 4, but the
+# option scanner must still accept/reject the same arguments.
+run_case "tag-force"               modern tag -force
+run_case "tag-F"                   modern tag -F
+run_case "tag-noupdatecheck"       modern tag -noupdatecheck
+run_case "tag-Q"                   modern tag -Q
+run_case "tag-baseurlfortag"       modern tag -baseurlfortag
+run_case "tag-baseurlfortag-url"   modern tag -baseurlfortag http://x/y
+run_case "tag-force-Q"             modern tag -F -Q
+run_case "tag-badarg"              modern tag -bogus
+
+# submit option parsing and release-name accumulation (execs ~rc/bin/submitproject).
+run_case "submit-notbytag"         modern submit -notbytag rel
+run_case "submit-two-releases"     modern submit rel1 rel2
+run_case "submit-baseurlfortag"    modern submit -baseurlfortag rel
+run_case "submit-bytag-baseurl"    modern submit -bytag -baseurlfortag rel
+run_case "submit-baseurlfortag-alone" modern submit -baseurlfortag
+
+# apple-built accepts only -all.
+run_case "apple-built-all"         modern apple-built -all
+run_case "apple-built-badarg"      modern apple-built -bogus
+
+# bump accepts -all and -increment-minor-version in any order.
+run_case "bump-all-incr-minor"     modern bump -all -increment-minor-version
+run_case "bump-incr-minor-all"     modern bump -increment-minor-version -all
+
+# Legacy project and multiple-project cases for other operations.
+run_case "oldproj-mvers"           oldproj mvers
+run_case "oldproj-mvers-terse"     oldproj mvers -terse
+run_case "twoproj-bump"            twoproj bump
+run_case "twoproj-mvers"           twoproj mvers
+run_case "twoproj-tag"             twoproj tag
 
 echo "=== $FAIL failure(s) ==="
 exit $FAIL

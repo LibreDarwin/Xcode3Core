@@ -1885,15 +1885,14 @@ main(int argc, char **argv)
 			} else if (strcmp(rest[0], "-baseurlfortag") == 0) {
 				rest++;
 				restn--;
-				if (restn > 0) {
-					if (g_svn != NULL &&
-					    strcmp(g_svn, "YES") == 0)
+				if (g_svn != NULL &&
+				    strcmp(g_svn, "YES") == 0) {
+					if (restn > 0)
 						base = rest[0];
-					else
-						pr_line("The -baseurlfortag "
-						    "optional argument is not valid "
-						    "when using CVS. Ignoring "
-						    "option.");
+				} else {
+					pr_line("The -baseurlfortag "
+					    "optional argument is not valid "
+					    "when using CVS. Ignoring option.");
 				}
 			} else {
 				pr_line("The tag operation takes accepts "
@@ -1930,17 +1929,16 @@ main(int argc, char **argv)
 				    == 0) {
 					rest++;
 					restn--;
-					if (restn > 0) {
-						if (g_svn != NULL &&
-						    strcmp(g_svn, "YES") == 0)
+					if (g_svn != NULL &&
+					    strcmp(g_svn, "YES") == 0) {
+						if (restn > 0)
 							arg2 = rest[0];
-						else
-							pr_line("The "
-							    "-baseurlfortag "
-							    "optional argument is "
-							    "not valid when using "
-							    "CVS. Ignoring "
-							    "option.");
+					} else {
+						pr_line("The "
+						    "-baseurlfortag "
+						    "optional argument is "
+						    "not valid when using "
+						    "CVS. Ignoring option.");
 					}
 				} else {
 					if (names.len > 0)
