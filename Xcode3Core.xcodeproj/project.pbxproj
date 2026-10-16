@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		1A2B3C4D0000000000000021 /* agvtool.c in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000011 /* agvtool.c */; };
+		1A2B3C4D0000000000000045 /* pbxproj.c in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000041 /* pbxproj.c */; };
+		1A2B3C4D0000000000000046 /* pbxtool.c in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000043 /* pbxtool.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -16,6 +18,10 @@
 		1A2B3C4D0000000000000019 /* agvtool.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = agvtool.1; sourceTree = "<group>"; };
 		1A2B3C4D000000000000001A /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		1A2B3C4D000000000000001B /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		1A2B3C4D0000000000000041 /* pbxproj.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = pbxproj.c; sourceTree = "<group>"; };
+		1A2B3C4D0000000000000042 /* pbxproj.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = pbxproj.h; sourceTree = "<group>"; };
+		1A2B3C4D0000000000000043 /* pbxtool.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = pbxtool.c; sourceTree = "<group>"; };
+		1A2B3C4D0000000000000044 /* pbxtool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = pbxtool; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -34,6 +40,7 @@
 			isa = PBXGroup;
 			children = (
 				1A2B3C4D0000000000000018 /* agvtool */,
+				1A2B3C4D0000000000000044 /* pbxtool */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -50,6 +57,8 @@
 			isa = PBXGroup;
 			children = (
 				1A2B3C4D0000000000000006 /* agvtool */,
+				1A2B3C4D000000000000004A /* ProjectModel */,
+				1A2B3C4D000000000000004B /* pbxtool */,
 			);
 			path = DevToolsCore;
 			sourceTree = "<group>";
@@ -60,6 +69,23 @@
 				1A2B3C4D0000000000000011 /* agvtool.c */,
 			);
 			path = agvtool;
+			sourceTree = "<group>";
+		};
+		1A2B3C4D000000000000004A /* ProjectModel */ = {
+			isa = PBXGroup;
+			children = (
+				1A2B3C4D0000000000000041 /* pbxproj.c */,
+				1A2B3C4D0000000000000042 /* pbxproj.h */,
+			);
+			path = ProjectModel;
+			sourceTree = "<group>";
+		};
+		1A2B3C4D000000000000004B /* pbxtool */ = {
+			isa = PBXGroup;
+			children = (
+				1A2B3C4D0000000000000043 /* pbxtool.c */,
+			);
+			path = pbxtool;
 			sourceTree = "<group>";
 		};
 		1A2B3C4D0000000000000007 /* man */ = {
@@ -88,6 +114,21 @@
 			productReference = 1A2B3C4D0000000000000018 /* agvtool */;
 			productType = "com.apple.product-type.tool";
 		};
+		1A2B3C4D0000000000000047 /* pbxtool */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1A2B3C4D0000000000000049 /* Build configuration list for PBXNativeTarget "pbxtool" */;
+			buildPhases = (
+				1A2B3C4D0000000000000048 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = pbxtool;
+			productName = pbxtool;
+			productReference = 1A2B3C4D0000000000000044 /* pbxtool */;
+			productType = "com.apple.product-type.tool";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -111,6 +152,7 @@
 			projectRoot = "";
 			targets = (
 				1A2B3C4D0000000000000031 /* agvtool */,
+				1A2B3C4D0000000000000047 /* pbxtool */,
 			);
 		};
 /* End PBXProject section */
@@ -121,6 +163,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				1A2B3C4D0000000000000021 /* agvtool.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1A2B3C4D0000000000000048 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1A2B3C4D0000000000000045 /* pbxproj.c in Sources */,
+				1A2B3C4D0000000000000046 /* pbxtool.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -196,6 +247,39 @@
 			};
 			name = Release;
 		};
+		1A2B3C4D000000000000004C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				EXECUTABLE_PREFIX = "";
+				GCC_C_LANGUAGE_STANDARD = c11;
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/Sources";
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				OTHER_CFLAGS = (
+					"-D_DARWIN_C_SOURCE",
+					"-Wall",
+					"-Wextra",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		1A2B3C4D000000000000004D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				EXECUTABLE_PREFIX = "";
+				GCC_C_LANGUAGE_STANDARD = c11;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/Sources";
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				OTHER_CFLAGS = (
+					"-D_DARWIN_C_SOURCE",
+					"-Wall",
+					"-Wextra",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -213,6 +297,15 @@
 			buildConfigurations = (
 				1A2B3C4D0000000000000037 /* Debug */,
 				1A2B3C4D0000000000000038 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1A2B3C4D0000000000000049 /* Build configuration list for PBXNativeTarget "pbxtool" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1A2B3C4D000000000000004C /* Debug */,
+				1A2B3C4D000000000000004D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -19,6 +19,8 @@ typedef struct {
 	char *key;
 	char *key_raw;			/* source token, incl. quotes if quoted */
 	char *key_comment;
+	char *indent;			/* source leading whitespace, or NULL */
+	char *lead;			/* blank line(s) (ws + '\n') before, or NULL */
 	OPPValue *value;
 	char *value_comment;
 } OPPDictEntry;
@@ -26,6 +28,8 @@ typedef struct {
 typedef struct {
 	OPPValue *value;
 	char *comment;
+	char *indent;			/* source leading whitespace, or NULL */
+	char *lead;			/* blank line(s) (ws + '\n') before, or NULL */
 } OPPArrayElem;
 
 /*
@@ -45,6 +49,8 @@ typedef struct {
 	size_t index;			/* OPP_LAYOUT_ENTRY: entry index */
 	char *text;			/* SECTION: name; LINE_COMMENT: "//...";
 				   BLANK: leading whitespace of the blank line */
+	char *indent;			/* source leading whitespace, or NULL */
+	int glued;			/* marker began on the previous line */
 } OPPLayoutItem;
 
 struct OPPValue {
@@ -62,6 +68,10 @@ struct OPPValue {
 	int inline_form;		/* written without newlines in source */
 	int inline_join;		/* array: join form "(a, b)" vs trailing "(a, b, )" */
 	int inline_lead_space;		/* dict: "{ k = v; }" vs "{k = v; }" */
+	/* OPP_DICT / OPP_ARRAY: source leading whitespace of the close token */
+	char *close_indent;
+	char *close_lead;		/* blank line(s) (ws + '\n') before close */
+	int inline_tight;		/* dict: "{a = b;}" (no space before '}') */
 	/* OPP_DICT: "objects" layout, when present */
 	OPPLayoutItem *layout;
 	size_t nlayout;
