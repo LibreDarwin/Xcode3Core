@@ -879,6 +879,9 @@ parse_array(Cursor *c)
 			continue;
 		}
 		if (*c->p == ')') {
+			/* Closed directly after an element: the last element had
+			 * no trailing comma ("(a, b)" rather than "(a, b,)"). */
+			a->no_trailing_comma = 1;
 			a->close_indent = capture_indent(c);
 			a->close_lead = blanks;
 			c->p++;
@@ -1341,7 +1344,10 @@ emit_array(SB *sb, const OPPValue *a, int depth)
 		emit_indent(sb, depth + 1, a->elems[i].indent);
 		emit_value(sb, a->elems[i].value, depth + 1, 0);
 		emit_comment(sb, a->elems[i].comment);
-		sb_puts(sb, ",\n");
+		if (a->no_trailing_comma && i + 1 == a->nelem)
+			sb_putc(sb, '\n');
+		else
+			sb_puts(sb, ",\n");
 	}
 	if (a->close_lead != NULL)
 		sb_puts(sb, a->close_lead);

@@ -67,6 +67,7 @@ struct OPPValue {
 	size_t nentry;
 	int inline_form;		/* written without newlines in source */
 	int inline_join;		/* array: join form "(a, b)" vs trailing "(a, b, )" */
+	int no_trailing_comma;		/* multi-line array: last element has no ',' */
 	int inline_lead_space;		/* dict: "{ k = v; }" vs "{k = v; }" */
 	/* OPP_DICT / OPP_ARRAY: source leading whitespace of the close token */
 	char *close_indent;
