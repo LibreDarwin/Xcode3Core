@@ -10,8 +10,9 @@ in current Xcode as `Xcode3Core.ideplugin`, alongside its private
 its components — and the command-line tools that ship next to them —
 from observable behavior.
 
-The project is built up one component at a time.  The first, complete
-component is `agvtool`.
+The project is built up one component at a time.  The first complete
+component is `agvtool`; the OpenStep `project.pbxproj` reader/writer
+(`pbxtool`) and its typed object graph (`pbxmodel`) follow on top of it.
 
 ## Why clean-room
 
@@ -36,6 +37,8 @@ it makes to `project.pbxproj`, `Info.plist` and related files.
 
     # Alternative build system (Xcode):
     xcodebuild -project Xcode3Core.xcodeproj -target agvtool build
+    xcodebuild -project Xcode3Core.xcodeproj -target pbxtool build
+    xcodebuild -project Xcode3Core.xcodeproj -target pbxmodel build
 
 Both writers place products in `build/$(CONFIG)`.
 
@@ -43,10 +46,13 @@ Both writers place products in `build/$(CONFIG)`.
 
     Sources/DevToolsCore/
         agvtool/        the agvtool command
-        ProjectModel/   (planned) the project model
+        ProjectModel/   OpenStep project.pbxproj reader/writer + object graph
+        pbxtool/        the pbxtool command
+        pbxmodel/       the pbxmodel command
         DataModel/      (planned) the data model
         BuildSystem/    (planned) the build system
         RuntimeSupport/ (planned) runtime support
+    Headers/DevToolsCore/  public headers of the project-model object graph
     Sources/DevToolsSupport/  (planned) DevToolsSupport
     Sources/XcodePlugIns/     (planned) IDE plug-ins
     tools/          conformance tests
@@ -65,6 +71,27 @@ man/agvtool.1.
 `make test` runs `tools/difftest.sh`, which runs Apple's shipped
 `agvtool` and ours side by side over a matrix of projects and arguments
 and requires identical stdout, stderr, exit status and resulting files.
+
+## pbxtool
+
+`pbxtool` reads and writes `project.pbxproj` at the OpenStep-property-list
+layer.  `pbxtool roundtrip <file>` re-emits the file and requires a
+byte-identical result; `pbxtool cat <file>` prints the re-emitted text;
+`pbxtool dump <file>` prints the parsed value tree.
+
+## pbxmodel
+
+`pbxmodel` loads `project.pbxproj` into the typed `PBX*` / `XC*` object
+graph (`DevToolsCore`'s `PBXProjectModel`).  `pbxmodel roundtrip <file>`
+loads the graph, re-archives it, and verifies that re-parsing the result
+yields the same project (semantic equality), that archiving the same model
+is byte-stable, and that the archive is idempotent.  `pbxmodel cat <file>`
+prints the canonical archive; `pbxmodel dump <file>` summarizes the object
+graph by class.
+
+The conformance bar over the corpus is that every `project.pbxproj` in the
+tree survives `pbxmodel roundtrip` semantically (order, formatting and
+comments ignored), and that Xcode-written files round-trip byte-exactly.
 
 ## License
 

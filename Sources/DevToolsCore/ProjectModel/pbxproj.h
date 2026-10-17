@@ -89,8 +89,27 @@ OPPValue *opp_dict_get(const OPPValue *dict, const char *key);
 const char *opp_scalar_get(const OPPValue *dict, const char *key);
 void opp_free(OPPValue *v);
 
+/* Construction / mutation (used by the object model). New values are
+ * heap-owned; opp_dict_set/opp_array_append take ownership of their value. */
+OPPValue *opp_string_new(const char *utf8);	/* computes quoting + raw token */
+OPPValue *opp_dict_new(void);
+OPPValue *opp_array_new(void);
+void opp_dict_set(OPPValue *dict, const char *key, OPPValue *value);
+void opp_dict_append(OPPValue *dict, const char *key, OPPValue *value);
+void opp_dict_set_comment(OPPValue *dict, const char *key,
+    const char *key_comment, const char *value_comment);
+void opp_dict_remove(OPPValue *dict, const char *key);
+size_t opp_array_count(const OPPValue *arr);
+OPPValue *opp_array_get(const OPPValue *arr, size_t idx);
+void opp_array_append(OPPValue *arr, OPPValue *value);
+void opp_string_set(OPPValue *str, const char *utf8);
+const char *opp_string_value(const OPPValue *str);
+int opp_kind(const OPPValue *v);
+
 OPPDocument *opp_parse_buffer(const char *buf, size_t len, char **errp);
 OPPDocument *opp_parse_file(const char *path, char **errp);
+OPPDocument *opp_document_new(OPPValue *root);
+void opp_document_free(OPPDocument *doc);
 char *opp_write_document(const OPPDocument *doc, size_t *lenp, char **errp);
 
 #endif	/* PBXPROJ_H */

@@ -10,6 +10,16 @@
 		1A2B3C4D0000000000000021 /* agvtool.c in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000011 /* agvtool.c */; };
 		1A2B3C4D0000000000000045 /* pbxproj.c in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000041 /* pbxproj.c */; };
 		1A2B3C4D0000000000000046 /* pbxtool.c in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000043 /* pbxtool.c */; };
+		1A2B3C4D0000000000000070 /* pbxmodel.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000050 /* pbxmodel.m */; };
+		1A2B3C4D0000000000000071 /* pbxproj.c in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000041 /* pbxproj.c */; };
+		1A2B3C4D0000000000000072 /* PBXBuild.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000051 /* PBXBuild.m */; };
+		1A2B3C4D0000000000000073 /* PBXObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000052 /* PBXObject.m */; };
+		1A2B3C4D0000000000000074 /* PBXPListCoding.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000054 /* PBXPListCoding.m */; };
+		1A2B3C4D0000000000000075 /* PBXProject.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000055 /* PBXProject.m */; };
+		1A2B3C4D0000000000000076 /* PBXProjectModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000056 /* PBXProjectModel.m */; };
+		1A2B3C4D0000000000000077 /* PBXReference.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000057 /* PBXReference.m */; };
+		1A2B3C4D0000000000000078 /* PBXTarget.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000058 /* PBXTarget.m */; };
+		1A2B3C4D0000000000000079 /* XCBuildConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000059 /* XCBuildConfiguration.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,6 +32,24 @@
 		1A2B3C4D0000000000000042 /* pbxproj.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = pbxproj.h; sourceTree = "<group>"; };
 		1A2B3C4D0000000000000043 /* pbxtool.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = pbxtool.c; sourceTree = "<group>"; };
 		1A2B3C4D0000000000000044 /* pbxtool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = pbxtool; sourceTree = BUILT_PRODUCTS_DIR; };
+		1A2B3C4D0000000000000050 /* pbxmodel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = pbxmodel.m; sourceTree = "<group>"; };
+		1A2B3C4D0000000000000051 /* PBXBuild.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PBXBuild.m; sourceTree = "<group>"; };
+		1A2B3C4D0000000000000052 /* PBXObject.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PBXObject.m; sourceTree = "<group>"; };
+		1A2B3C4D0000000000000053 /* PBXPListCoding.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PBXPListCoding.h; sourceTree = "<group>"; };
+		1A2B3C4D0000000000000054 /* PBXPListCoding.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PBXPListCoding.m; sourceTree = "<group>"; };
+		1A2B3C4D0000000000000055 /* PBXProject.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PBXProject.m; sourceTree = "<group>"; };
+		1A2B3C4D0000000000000056 /* PBXProjectModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PBXProjectModel.m; sourceTree = "<group>"; };
+		1A2B3C4D0000000000000057 /* PBXReference.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PBXReference.m; sourceTree = "<group>"; };
+		1A2B3C4D0000000000000058 /* PBXTarget.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PBXTarget.m; sourceTree = "<group>"; };
+		1A2B3C4D0000000000000059 /* XCBuildConfiguration.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XCBuildConfiguration.m; sourceTree = "<group>"; };
+		1A2B3C4D000000000000005A /* pbxmodel */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = pbxmodel; sourceTree = BUILT_PRODUCTS_DIR; };
+		1A2B3C4D000000000000005B /* PBXBuild.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PBXBuild.h; sourceTree = "<group>"; };
+		1A2B3C4D000000000000005C /* PBXObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PBXObject.h; sourceTree = "<group>"; };
+		1A2B3C4D000000000000005D /* PBXProject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PBXProject.h; sourceTree = "<group>"; };
+		1A2B3C4D000000000000005E /* PBXProjectModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PBXProjectModel.h; sourceTree = "<group>"; };
+		1A2B3C4D000000000000005F /* PBXReference.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PBXReference.h; sourceTree = "<group>"; };
+		1A2B3C4D0000000000000060 /* PBXTarget.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PBXTarget.h; sourceTree = "<group>"; };
+		1A2B3C4D0000000000000061 /* XCBuildConfiguration.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XCBuildConfiguration.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -29,6 +57,7 @@
 			isa = PBXGroup;
 			children = (
 				1A2B3C4D0000000000000004 /* Sources */,
+				1A2B3C4D0000000000000086 /* Headers */,
 				1A2B3C4D0000000000000007 /* man */,
 				1A2B3C4D000000000000001A /* README.md */,
 				1A2B3C4D000000000000001B /* Makefile */,
@@ -41,6 +70,7 @@
 			children = (
 				1A2B3C4D0000000000000018 /* agvtool */,
 				1A2B3C4D0000000000000044 /* pbxtool */,
+				1A2B3C4D000000000000005A /* pbxmodel */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -58,6 +88,7 @@
 			children = (
 				1A2B3C4D0000000000000006 /* agvtool */,
 				1A2B3C4D000000000000004A /* ProjectModel */,
+				1A2B3C4D0000000000000085 /* pbxmodel */,
 				1A2B3C4D000000000000004B /* pbxtool */,
 			);
 			path = DevToolsCore;
@@ -76,8 +107,47 @@
 			children = (
 				1A2B3C4D0000000000000041 /* pbxproj.c */,
 				1A2B3C4D0000000000000042 /* pbxproj.h */,
+				1A2B3C4D0000000000000051 /* PBXBuild.m */,
+				1A2B3C4D0000000000000052 /* PBXObject.m */,
+				1A2B3C4D0000000000000053 /* PBXPListCoding.h */,
+				1A2B3C4D0000000000000054 /* PBXPListCoding.m */,
+				1A2B3C4D0000000000000055 /* PBXProject.m */,
+				1A2B3C4D0000000000000056 /* PBXProjectModel.m */,
+				1A2B3C4D0000000000000057 /* PBXReference.m */,
+				1A2B3C4D0000000000000058 /* PBXTarget.m */,
+				1A2B3C4D0000000000000059 /* XCBuildConfiguration.m */,
 			);
 			path = ProjectModel;
+			sourceTree = "<group>";
+		};
+		1A2B3C4D0000000000000085 /* pbxmodel */ = {
+			isa = PBXGroup;
+			children = (
+				1A2B3C4D0000000000000050 /* pbxmodel.m */,
+			);
+			path = pbxmodel;
+			sourceTree = "<group>";
+		};
+		1A2B3C4D0000000000000086 /* Headers */ = {
+			isa = PBXGroup;
+			children = (
+				1A2B3C4D0000000000000087 /* DevToolsCore */,
+			);
+			path = Headers;
+			sourceTree = "<group>";
+		};
+		1A2B3C4D0000000000000087 /* DevToolsCore */ = {
+			isa = PBXGroup;
+			children = (
+				1A2B3C4D000000000000005B /* PBXBuild.h */,
+				1A2B3C4D000000000000005C /* PBXObject.h */,
+				1A2B3C4D000000000000005D /* PBXProject.h */,
+				1A2B3C4D000000000000005E /* PBXProjectModel.h */,
+				1A2B3C4D000000000000005F /* PBXReference.h */,
+				1A2B3C4D0000000000000060 /* PBXTarget.h */,
+				1A2B3C4D0000000000000061 /* XCBuildConfiguration.h */,
+			);
+			path = DevToolsCore;
 			sourceTree = "<group>";
 		};
 		1A2B3C4D000000000000004B /* pbxtool */ = {
@@ -129,6 +199,21 @@
 			productReference = 1A2B3C4D0000000000000044 /* pbxtool */;
 			productType = "com.apple.product-type.tool";
 		};
+		1A2B3C4D0000000000000080 /* pbxmodel */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1A2B3C4D0000000000000082 /* Build configuration list for PBXNativeTarget "pbxmodel" */;
+			buildPhases = (
+				1A2B3C4D0000000000000081 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = pbxmodel;
+			productName = pbxmodel;
+			productReference = 1A2B3C4D000000000000005A /* pbxmodel */;
+			productType = "com.apple.product-type.tool";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -153,6 +238,7 @@
 			targets = (
 				1A2B3C4D0000000000000031 /* agvtool */,
 				1A2B3C4D0000000000000047 /* pbxtool */,
+				1A2B3C4D0000000000000080 /* pbxmodel */,
 			);
 		};
 /* End PBXProject section */
@@ -172,6 +258,23 @@
 			files = (
 				1A2B3C4D0000000000000045 /* pbxproj.c in Sources */,
 				1A2B3C4D0000000000000046 /* pbxtool.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1A2B3C4D0000000000000081 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1A2B3C4D0000000000000070 /* pbxmodel.m in Sources */,
+				1A2B3C4D0000000000000071 /* pbxproj.c in Sources */,
+				1A2B3C4D0000000000000072 /* PBXBuild.m in Sources */,
+				1A2B3C4D0000000000000073 /* PBXObject.m in Sources */,
+				1A2B3C4D0000000000000074 /* PBXPListCoding.m in Sources */,
+				1A2B3C4D0000000000000075 /* PBXProject.m in Sources */,
+				1A2B3C4D0000000000000076 /* PBXProjectModel.m in Sources */,
+				1A2B3C4D0000000000000077 /* PBXReference.m in Sources */,
+				1A2B3C4D0000000000000078 /* PBXTarget.m in Sources */,
+				1A2B3C4D0000000000000079 /* XCBuildConfiguration.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -280,6 +383,55 @@
 			};
 			name = Release;
 		};
+		1A2B3C4D0000000000000083 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = YES;
+				EXECUTABLE_PREFIX = "";
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/Headers",
+					"$(SRCROOT)/Sources",
+					"$(SRCROOT)/Sources/DevToolsCore/ProjectModel",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				OTHER_CFLAGS = (
+					"-D_DARWIN_C_SOURCE",
+					"-Wall",
+					"-Wextra",
+				);
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		1A2B3C4D0000000000000084 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = YES;
+				EXECUTABLE_PREFIX = "";
+				GCC_OPTIMIZATION_LEVEL = 3;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/Headers",
+					"$(SRCROOT)/Sources",
+					"$(SRCROOT)/Sources/DevToolsCore/ProjectModel",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				OTHER_CFLAGS = (
+					"-D_DARWIN_C_SOURCE",
+					"-Wall",
+					"-Wextra",
+				);
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -306,6 +458,15 @@
 			buildConfigurations = (
 				1A2B3C4D000000000000004C /* Debug */,
 				1A2B3C4D000000000000004D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1A2B3C4D0000000000000082 /* Build configuration list for PBXNativeTarget "pbxmodel" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1A2B3C4D0000000000000083 /* Debug */,
+				1A2B3C4D0000000000000084 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

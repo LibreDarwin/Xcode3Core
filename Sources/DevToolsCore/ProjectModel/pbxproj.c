@@ -231,6 +231,238 @@ opp_layout_add(OPPValue *d, OPPLayoutKind kind, size_t index, char *text,
 }
 
 /* ------------------------------------------------------------------ */
+/* public construction API                                             */
+/* ------------------------------------------------------------------ */
+
+/* Bare tokens may contain only this set (notably NOT '-'). */
+static int
+opp_token_needs_quote(const char *s)
+{
+	const unsigned char *p = (const unsigned char *)s;
+
+	if (s == NULL || s[0] == '\0')
+		return (1);
+	while (*p != '\0') {
+		unsigned char c = *p;
+		int bare = (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') ||
+		    (c >= '0' && c <= '9') || c == '_' || c == '$' ||
+		    c == '+' || c == '/' || c == ':' || c == '.';
+
+		if (!bare)
+			return (1);
+		/* A slash that opens a comment (two slashes, or slash
+		 * followed by star) must be quoted, or the token would
+		 * be truncated when the text is re-read as a comment. */
+		if (c == '/' && (p[1] == '/' || p[1] == '*'))
+			return (1);
+		p++;
+	}
+	return (0);
+}
+
+static char *
+opp_quote_token(const char *s)
+{
+	SB sb;
+
+	sb_init(&sb);
+	sb_putc(&sb, '"');
+	for (; s != NULL && *s != '\0'; s++) {
+		switch (*s) {
+		case '"': sb_puts(&sb, "\\\""); break;
+		case '\\': sb_puts(&sb, "\\\\"); break;
+		case '\n': sb_puts(&sb, "\\n"); break;
+		case '\t': sb_puts(&sb, "\\t"); break;
+		case '\r': sb_puts(&sb, "\\r"); break;
+		default: sb_putc(&sb, *s); break;
+		}
+	}
+	sb_putc(&sb, '"');
+	return (sb.p);
+}
+
+OPPValue *
+opp_string_new(const char *utf8)
+{
+	OPPValue *v = opp_new(OPP_STRING);
+
+	v->str = xstrdup(utf8 != NULL ? utf8 : "");
+	v->quoted = opp_token_needs_quote(v->str);
+	v->raw = NULL;
+	return (v);
+}
+
+void
+opp_string_set(OPPValue *str, const char *utf8)
+{
+	if (str == NULL || str->kind != OPP_STRING)
+		return;
+	free(str->str);
+	free(str->raw);
+	str->raw = NULL;
+	str->str = xstrdup(utf8 != NULL ? utf8 : "");
+	str->quoted = opp_token_needs_quote(str->str);
+}
+
+const char *
+opp_string_value(const OPPValue *str)
+{
+	if (str == NULL || str->kind != OPP_STRING)
+		return (NULL);
+	return (str->str);
+}
+
+OPPValue *
+opp_dict_new(void)
+{
+	return (opp_new(OPP_DICT));
+}
+
+OPPValue *
+opp_array_new(void)
+{
+	return (opp_new(OPP_ARRAY));
+}
+
+void
+opp_dict_set(OPPValue *dict, const char *key, OPPValue *value)
+{
+	size_t i;
+
+	if (dict == NULL || dict->kind != OPP_DICT || key == NULL)
+		return;
+	if (dict->nentry < 8192) {
+		for (i = 0; i < dict->nentry; i++) {
+			if (dict->entries[i].key != NULL &&
+			    strcmp(dict->entries[i].key, key) == 0) {
+				opp_free(dict->entries[i].value);
+				dict->entries[i].value = value;
+				return;
+			}
+		}
+	}
+	opp_dict_add_raw(dict, xstrdup(key), value);
+	if (opp_token_needs_quote(key)) {
+		OPPDictEntry *e = &dict->entries[dict->nentry - 1];
+		free(e->key_raw);
+		e->key_raw = opp_quote_token(key);
+	}
+}
+
+void
+opp_dict_append(OPPValue *dict, const char *key, OPPValue *value)
+{
+	if (dict == NULL || dict->kind != OPP_DICT || key == NULL)
+		return;
+	opp_dict_add_raw(dict, xstrdup(key), value);
+	if (opp_token_needs_quote(key)) {
+		OPPDictEntry *e = &dict->entries[dict->nentry - 1];
+		free(e->key_raw);
+		e->key_raw = opp_quote_token(key);
+	}
+}
+
+void
+opp_dict_set_comment(OPPValue *dict, const char *key, const char *key_comment,
+    const char *value_comment)
+{
+	size_t i;
+
+	if (dict == NULL || dict->kind != OPP_DICT || key == NULL)
+		return;
+	for (i = 0; i < dict->nentry; i++) {
+		OPPDictEntry *e = &dict->entries[i];
+
+		if (strcmp(e->key, key) != 0)
+			continue;
+		free(e->key_comment);
+		e->key_comment = (key_comment != NULL) ? xstrdup(key_comment) : NULL;
+		free(e->value_comment);
+		e->value_comment =
+		    (value_comment != NULL) ? xstrdup(value_comment) : NULL;
+		return;
+	}
+}
+
+void
+opp_dict_remove(OPPValue *dict, const char *key)
+{
+	size_t i;
+
+	if (dict == NULL || dict->kind != OPP_DICT || key == NULL)
+		return;
+	for (i = 0; i < dict->nentry; i++) {
+		if (strcmp(dict->entries[i].key, key) != 0)
+			continue;
+		free(dict->entries[i].key);
+		free(dict->entries[i].key_raw);
+		free(dict->entries[i].key_comment);
+		free(dict->entries[i].indent);
+		free(dict->entries[i].lead);
+		opp_free(dict->entries[i].value);
+		free(dict->entries[i].value_comment);
+		if (i + 1 < dict->nentry)
+			memmove(&dict->entries[i], &dict->entries[i + 1],
+			    (dict->nentry - i - 1) * sizeof (OPPDictEntry));
+		dict->nentry--;
+		return;
+	}
+}
+
+size_t
+opp_array_count(const OPPValue *arr)
+{
+	if (arr == NULL || arr->kind != OPP_ARRAY)
+		return (0);
+	return (arr->nelem);
+}
+
+OPPValue *
+opp_array_get(const OPPValue *arr, size_t idx)
+{
+	if (arr == NULL || arr->kind != OPP_ARRAY || idx >= arr->nelem)
+		return (NULL);
+	return (arr->elems[idx].value);
+}
+
+void
+opp_array_append(OPPValue *arr, OPPValue *value)
+{
+	if (arr == NULL || arr->kind != OPP_ARRAY)
+		return;
+	opp_array_add_raw(arr, value);
+}
+
+int
+opp_kind(const OPPValue *v)
+{
+	if (v == NULL)
+		return (0);
+	return ((int)v->kind);
+}
+
+OPPDocument *
+opp_document_new(OPPValue *root)
+{
+	OPPDocument *doc = xmalloc(sizeof (*doc));
+
+	doc->header = xstrdup("// !$*UTF8*$!");
+	doc->root = root;
+	doc->no_trailing_newline = 0;
+	return (doc);
+}
+
+void
+opp_document_free(OPPDocument *doc)
+{
+	if (doc == NULL)
+		return;
+	free(doc->header);
+	opp_free(doc->root);
+	free(doc);
+}
+
+/* ------------------------------------------------------------------ */
 /* parser                                                              */
 /* ------------------------------------------------------------------ */
 
@@ -1233,7 +1465,7 @@ emit_objects(SB *sb, const OPPValue *d, int depth)
 	if (cur != NULL) {
 		sb_puts(sb, "/* End ");
 		sb_puts(sb, cur);
-		sb_puts(sb, " section */\n");
+		sb_puts(sb, " section */\n\n");
 	}
 	emit_indent(sb, depth, d->close_indent);
 	sb_puts(sb, "}");
