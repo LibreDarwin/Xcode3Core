@@ -87,7 +87,17 @@
 
 - (NSString *)classNameForPListArchive
 {
-	return ([[self class] classNameForPListArchive]);
+	return (_archiveClassName ?: [[self class] classNameForPListArchive]);
+}
+
+- (NSString *)archiveClassName
+{
+	return (_archiveClassName);
+}
+
+- (void)setArchiveClassName:(NSString *)name
+{
+	_archiveClassName = [name copy];
 }
 
 - (NSString *)archiveComment

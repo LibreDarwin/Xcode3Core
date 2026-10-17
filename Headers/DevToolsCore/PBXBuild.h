@@ -70,6 +70,17 @@
 @interface PBXResourcesBuildPhase : PBXBuildPhase @end
 @interface PBXRezBuildPhase : PBXBuildPhase @end
 
+/* AppleScript build phase (has context name / shared-context flag). */
+@interface PBXAppleScriptBuildPhase : PBXBuildPhase
+{
+	NSString *_contextName;
+	NSNumber *_isSharedContext;
+}
+@end
+
+/* Java archive build phase (no phase-specific keys). */
+@interface PBXJavaArchiveBuildPhase : PBXBuildPhase @end
+
 /* A user-defined build rule. */
 @interface PBXBuildRule : PBXProjectItem
 {

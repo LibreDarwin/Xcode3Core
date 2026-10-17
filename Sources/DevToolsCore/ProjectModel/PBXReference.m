@@ -149,6 +149,40 @@
 
 @end
 
+@implementation XCVersionGroup
+
++ (NSArray *)archivableAttributes
+{
+	return (@[@"versionGroupType"]);
+}
+
++ (NSArray *)archivableRelationships
+{
+	return (@[@"currentVersion"]);
+}
+
+- (NSString *)versionGroupType
+{
+	return (_versionGroupType);
+}
+
+- (void)setVersionGroupType:(NSString *)type
+{
+	_versionGroupType = [type copy];
+}
+
+- (PBXFileReference *)currentVersion
+{
+	return (_currentVersion);
+}
+
+- (void)setCurrentVersion:(PBXFileReference *)reference
+{
+	_currentVersion = reference;
+}
+
+@end
+
 @implementation PBXFrameworkReference
 
 + (NSString *)classNameForPListArchive
@@ -215,6 +249,46 @@
 	return (@"PBXFileSystemSynchronizedRootGroup");
 }
 
++ (NSArray *)archivableAttributes
+{
+	return (@[@"explicitFileTypes", @"explicitFolders"]);
+}
+
++ (NSArray *)archivableRelationships
+{
+	return (@[@"exceptions"]);
+}
+
+- (NSArray *)exceptions
+{
+	return (_exceptions);
+}
+
+- (void)setExceptions:(NSArray *)exceptions
+{
+	_exceptions = (exceptions != nil) ? [exceptions mutableCopy] : nil;
+}
+
+- (NSMutableDictionary *)explicitFileTypes
+{
+	return (_explicitFileTypes);
+}
+
+- (void)setExplicitFileTypes:(NSDictionary *)types
+{
+	_explicitFileTypes = (types != nil) ? [types mutableCopy] : nil;
+}
+
+- (NSArray *)explicitFolders
+{
+	return (_explicitFolders);
+}
+
+- (void)setExplicitFolders:(NSArray *)folders
+{
+	_explicitFolders = (folders != nil) ? [folders mutableCopy] : nil;
+}
+
 @end
 
 @implementation PBXFileSystemSynchronizedGroupAbstractMembershipExceptionSet
@@ -222,6 +296,21 @@
 + (NSString *)classNameForPListArchive
 {
 	return (@"PBXFileSystemSynchronizedGroupAbstractMembershipExceptionSet");
+}
+
++ (NSArray *)archivableAttributes
+{
+	return (@[@"membershipExceptions"]);
+}
+
+- (NSArray *)membershipExceptions
+{
+	return (_membershipExceptions);
+}
+
+- (void)setMembershipExceptions:(NSArray *)exceptions
+{
+	_membershipExceptions = (exceptions != nil) ? [exceptions mutableCopy] : nil;
 }
 
 @end
@@ -233,6 +322,49 @@
 	return (@"PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet");
 }
 
++ (NSArray *)archivableAttributes
+{
+	return (@[@"additionalCompilerFlagsByRelativePath",
+	    @"attributesByRelativePath"]);
+}
+
++ (NSArray *)archivableRelationships
+{
+	return (@[@"buildPhase"]);
+}
+
+- (PBXBuildPhase *)buildPhase
+{
+	return (_buildPhase);
+}
+
+- (void)setBuildPhase:(PBXBuildPhase *)phase
+{
+	_buildPhase = phase;
+}
+
+- (NSMutableDictionary *)additionalCompilerFlagsByRelativePath
+{
+	return (_additionalCompilerFlagsByRelativePath);
+}
+
+- (void)setAdditionalCompilerFlagsByRelativePath:(NSDictionary *)flags
+{
+	_additionalCompilerFlagsByRelativePath =
+	    (flags != nil) ? [flags mutableCopy] : nil;
+}
+
+- (NSMutableDictionary *)attributesByRelativePath
+{
+	return (_attributesByRelativePath);
+}
+
+- (void)setAttributesByRelativePath:(NSDictionary *)attributes
+{
+	_attributesByRelativePath =
+	    (attributes != nil) ? [attributes mutableCopy] : nil;
+}
+
 @end
 
 @implementation PBXFileSystemSynchronizedBuildFileExceptionSet
@@ -240,6 +372,36 @@
 + (NSString *)classNameForPListArchive
 {
 	return (@"PBXFileSystemSynchronizedBuildFileExceptionSet");
+}
+
++ (NSArray *)archivableAttributes
+{
+	return (@[@"membershipExceptions"]);
+}
+
++ (NSArray *)archivableRelationships
+{
+	return (@[@"target"]);
+}
+
+- (NSArray *)membershipExceptions
+{
+	return (_membershipExceptions);
+}
+
+- (void)setMembershipExceptions:(NSArray *)exceptions
+{
+	_membershipExceptions = (exceptions != nil) ? [exceptions mutableCopy] : nil;
+}
+
+- (PBXTarget *)target
+{
+	return (_target);
+}
+
+- (void)setTarget:(PBXTarget *)target
+{
+	_target = target;
 }
 
 @end

@@ -1,0 +1,60 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXGroup section */
+		2B0000000000000000000002 = {
+			isa = PBXGroup;
+			children = (
+				2B0000000000000000000003 /* NotARealThing */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXProject section */
+		2B0000000000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 2B0000000000000000000004;
+			compatibilityVersion = "Xcode 15.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 2B0000000000000000000002;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+			);
+		};
+/* End PBXProject section */
+
+/* Begin XCConfigurationList section */
+		2B0000000000000000000004 /* Build configuration list for PBXProject "App" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCSomethingUnknown section */
+		2B0000000000000000000003 /* NotARealThing */ = {
+			isa = XCSomethingUnknown;
+			aNumber = 3;
+			aString = hello;
+			aNested = {
+				inner = (one, two, three);
+			};
+		};
+/* End XCSomethingUnknown section */
+	};
+	rootObject = 2B0000000000000000000001 /* Project object */;
+}

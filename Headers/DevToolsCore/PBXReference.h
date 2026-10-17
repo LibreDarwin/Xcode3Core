@@ -8,6 +8,7 @@
 #import "DevToolsCore/PBXProject.h"
 
 @class PBXFileReference;
+@class PBXBuildPhase, PBXTarget;
 
 /* A named node in the project's reference tree. */
 @interface PBXReference : PBXContainerItem
@@ -63,6 +64,21 @@
 @end
 
 /*
+ * A versioned group, e.g. an .xcdatamodeld, whose children are the individual
+ * .xcdatamodel versions; currentVersion points at the active one.
+ */
+@interface XCVersionGroup : PBXGroup
+{
+	NSString *_versionGroupType;
+	PBXFileReference *_currentVersion;
+}
+- (NSString *)versionGroupType;
+- (void)setVersionGroupType:(NSString *)type;
+- (PBXFileReference *)currentVersion;
+- (void)setCurrentVersion:(PBXFileReference *)reference;
+@end
+
+/*
  * Project Builder era concrete product references.  Retained as thin
  * subclasses so their isa names round-trip from older archives.
  */
@@ -81,18 +97,54 @@
 
 @interface PBXFileSystemSynchronizedRootGroup
     : PBXFileSystemSynchronizedAbstractGroup
+{
+	NSMutableArray *_exceptions;
+	NSMutableDictionary *_explicitFileTypes;
+	NSMutableArray *_explicitFolders;
+}
+- (NSArray *)exceptions;
+- (void)setExceptions:(NSArray *)exceptions;
+- (NSMutableDictionary *)explicitFileTypes;
+- (void)setExplicitFileTypes:(NSDictionary *)types;
+- (NSArray *)explicitFolders;
+- (void)setExplicitFolders:(NSArray *)folders;
 @end
 
 /* Membership exception sets used by synchronized groups. */
 @interface PBXFileSystemSynchronizedGroupAbstractMembershipExceptionSet
     : PBXObject
+{
+	NSMutableArray *_membershipExceptions;
+}
+- (NSArray *)membershipExceptions;
+- (void)setMembershipExceptions:(NSArray *)exceptions;
 @end
 
 @interface PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet
     : PBXFileSystemSynchronizedGroupAbstractMembershipExceptionSet
+{
+	PBXBuildPhase *_buildPhase;
+	NSMutableDictionary *_additionalCompilerFlagsByRelativePath;
+	NSMutableDictionary *_attributesByRelativePath;
+}
+- (PBXBuildPhase *)buildPhase;
+- (void)setBuildPhase:(PBXBuildPhase *)phase;
+- (NSMutableDictionary *)additionalCompilerFlagsByRelativePath;
+- (void)setAdditionalCompilerFlagsByRelativePath:(NSDictionary *)flags;
+- (NSMutableDictionary *)attributesByRelativePath;
+- (void)setAttributesByRelativePath:(NSDictionary *)attributes;
 @end
 
-@interface PBXFileSystemSynchronizedBuildFileExceptionSet : PBXObject @end
+@interface PBXFileSystemSynchronizedBuildFileExceptionSet : PBXObject
+{
+	NSMutableArray *_membershipExceptions;
+	PBXTarget *_target;
+}
+- (NSArray *)membershipExceptions;
+- (void)setMembershipExceptions:(NSArray *)exceptions;
+- (PBXTarget *)target;
+- (void)setTarget:(PBXTarget *)target;
+@end
 
 /* A proxy for a reference in an external (referenced) project. */
 @interface PBXReferenceProxy : PBXReference

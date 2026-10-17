@@ -38,6 +38,9 @@ static NSDictionary *PBXProjectModelClassRegistry(void)
 		    @"PBXFrameworksBuildPhase" : [PBXFrameworksBuildPhase class],
 		    @"PBXResourcesBuildPhase" : [PBXResourcesBuildPhase class],
 		    @"PBXRezBuildPhase" : [PBXRezBuildPhase class],
+		    @"PBXAppleScriptBuildPhase" : [PBXAppleScriptBuildPhase class],
+		    @"PBXJavaArchiveBuildPhase"
+		    : [PBXJavaArchiveBuildPhase class],
 		    @"PBXBuildRule" : [PBXBuildRule class],
 		    @"PBXBuildStyle" : [PBXBuildStyle class],
 		    @"PBXContainerItemProxy" : [PBXContainerItemProxy class],
@@ -70,11 +73,13 @@ static NSDictionary *PBXProjectModelClassRegistry(void)
 		    class],
 		    @"PBXFileSystemSynchronizedBuildFileExceptionSet"
 		    : [PBXFileSystemSynchronizedBuildFileExceptionSet class],
-		    @"XCSwiftPackageReference" : [XCSwiftPackageReference class],
+		    @"XCRemoteSwiftPackageReference"
+		    : [XCRemoteSwiftPackageReference class],
 		    @"XCLocalSwiftPackageReference"
 		    : [XCLocalSwiftPackageReference class],
 		    @"XCSwiftPackageProductDependency"
 		    : [XCSwiftPackageProductDependency class],
+		    @"XCVersionGroup" : [XCVersionGroup class],
 		    @"XCBuildConfiguration" : [XCBuildConfiguration class],
 		    @"XCConfigurationList" : [XCConfigurationList class],
 		};
@@ -185,6 +190,9 @@ static NSDictionary *PBXProjectModelClassRegistry(void)
 			object = [[cls alloc] init];
 			[object setObjectID:
 			    [NSString stringWithUTF8String:objects->entries[i].key]];
+			if (isaName != NULL)
+				[object setArchiveClassName:
+				    [NSString stringWithUTF8String:isaName]];
 			_objects[[object objectID]] = object;
 		}
 

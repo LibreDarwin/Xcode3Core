@@ -23,6 +23,7 @@
 	NSString *_globalID;
 	PBXContainer *_container;
 	NSMutableDictionary *_extra;
+	NSString *_archiveClassName;
 }
 
 /* Class name written as the "isa" value (defaults to the class name). */
@@ -46,6 +47,11 @@
 - (void)setContainer:(PBXContainer *)container;
 
 - (NSString *)classNameForPListArchive;
+
+/* The exact "isa" read from the archive.  When set, it is written back
+ * verbatim so that classes we do not model still round-trip losslessly. */
+- (NSString *)archiveClassName;
+- (void)setArchiveClassName:(NSString *)name;
 
 /* Comment Xcode writes after a reference to this object (may be nil). */
 - (NSString *)archiveComment;

@@ -93,6 +93,21 @@ The conformance bar over the corpus is that every `project.pbxproj` in the
 tree survives `pbxmodel roundtrip` semantically (order, formatting and
 comments ignored), and that Xcode-written files round-trip byte-exactly.
 
+The object graph covers the classic container/build/target/reference
+classes plus the modern ones Xcode emits: Swift packages
+(`XCRemoteSwiftPackageReference`, `XCLocalSwiftPackageReference`,
+`XCSwiftPackageProductDependency`), file-system-synchronized groups
+(`PBXFileSystemSynchronized*`), `XCVersionGroup`,
+`PBXAppleScriptBuildPhase` and `PBXJavaArchiveBuildPhase`.  An `isa` with no
+modeled class is preserved verbatim rather than renamed to `PBXObject`.
+
+`make test` also runs `tools/pbxroundtrip.sh` over `tools/fixtures/*.pbxproj`,
+which exercise the modern classes, an unknown `isa`, `classes = {}` and
+objectVersion 77.  It checks the semantic round-trip, the byte-exact
+round-trip and that every `isa` in the source survives to the archive.  Point
+it at a corpus list to widen coverage, e.g.
+`bash tools/pbxroundtrip.sh /path/to/list`.
+
 ## License
 
 BSD 3-Clause, Copyright (c) 2026 LibreDarwin.  See LICENSE.

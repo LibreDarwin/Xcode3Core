@@ -103,7 +103,10 @@ $(OBJDIR)/XCBuildConfiguration.o: $(PROJECTMODEL)/XCBuildConfiguration.m
 	$(CC) $(OBJCFLAGS) -c -o $@ $(PROJECTMODEL)/XCBuildConfiguration.m
 
 test: all
-	bash tools/difftest.sh $(AGVTOOL)
+	@ok=0; \
+	bash tools/difftest.sh $(AGVTOOL) || ok=1; \
+	PBXMODEL=$(PBXMODEL) PBXTOOL=$(PBXTOOL) bash tools/pbxroundtrip.sh || ok=1; \
+	exit $$ok
 
 install: all
 	install -d $(DESTDIR)$(PREFIX)/bin $(DESTDIR)$(PREFIX)/share/man/man1

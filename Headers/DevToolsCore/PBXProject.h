@@ -34,14 +34,35 @@
 @end
 
 /* A Swift package reference and its local (path-based) variant. */
-@interface XCSwiftPackageReference : PBXProjectItem
+@interface XCRemoteSwiftPackageReference : PBXProjectItem
+{
+	NSString *_repositoryURL;
+	NSMutableDictionary *_requirement;
+}
+- (NSString *)repositoryURL;
+- (void)setRepositoryURL:(NSString *)url;
+- (NSMutableDictionary *)requirement;
+- (void)setRequirement:(NSDictionary *)requirement;
 @end
 
-@interface XCLocalSwiftPackageReference : XCSwiftPackageReference
+@interface XCLocalSwiftPackageReference : XCRemoteSwiftPackageReference
+{
+	NSString *_relativePath;
+}
+- (NSString *)relativePath;
+- (void)setRelativePath:(NSString *)path;
 @end
 
 /* A concrete dependency on a product vended by a package. */
 @interface XCSwiftPackageProductDependency : PBXProductDependency
+{
+	NSString *_productName;
+	XCRemoteSwiftPackageReference *_package;
+}
+- (NSString *)productName;
+- (void)setProductName:(NSString *)name;
+- (XCRemoteSwiftPackageReference *)package;
+- (void)setPackage:(XCRemoteSwiftPackageReference *)package;
 @end
 
 /*

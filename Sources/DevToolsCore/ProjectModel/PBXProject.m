@@ -38,13 +38,86 @@
 @implementation PBXProductDependency
 @end
 
-@implementation XCSwiftPackageReference
+@implementation XCRemoteSwiftPackageReference
+
++ (NSArray *)archivableAttributes
+{
+	return (@[@"repositoryURL", @"requirement"]);
+}
+
+- (NSString *)repositoryURL
+{
+	return (_repositoryURL);
+}
+
+- (void)setRepositoryURL:(NSString *)url
+{
+	_repositoryURL = [url copy];
+}
+
+- (NSMutableDictionary *)requirement
+{
+	return (_requirement);
+}
+
+- (void)setRequirement:(NSDictionary *)requirement
+{
+	_requirement = (requirement != nil) ? [requirement mutableCopy] : nil;
+}
+
 @end
 
 @implementation XCLocalSwiftPackageReference
+
++ (NSArray *)archivableAttributes
+{
+	return (@[@"relativePath"]);
+}
+
+- (NSString *)relativePath
+{
+	return (_relativePath);
+}
+
+- (void)setRelativePath:(NSString *)path
+{
+	_relativePath = [path copy];
+}
+
 @end
 
 @implementation XCSwiftPackageProductDependency
+
++ (NSArray *)archivableAttributes
+{
+	return (@[@"productName"]);
+}
+
++ (NSArray *)archivableRelationships
+{
+	return (@[@"package"]);
+}
+
+- (NSString *)productName
+{
+	return (_productName);
+}
+
+- (void)setProductName:(NSString *)name
+{
+	_productName = [name copy];
+}
+
+- (XCRemoteSwiftPackageReference *)package
+{
+	return (_package);
+}
+
+- (void)setPackage:(XCRemoteSwiftPackageReference *)package
+{
+	_package = package;
+}
+
 @end
 
 @implementation PBXProject

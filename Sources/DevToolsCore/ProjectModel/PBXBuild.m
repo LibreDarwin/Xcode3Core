@@ -168,6 +168,24 @@
 + (NSString *)defaultName { return (@"Rez"); }
 @end
 
+@implementation PBXAppleScriptBuildPhase
+
++ (NSArray *)archivableAttributes
+{
+	return (@[@"contextName", @"isSharedContext"]);
+}
+
++ (NSString *)defaultName
+{
+	return (@"AppleScript");
+}
+
+@end
+
+@implementation PBXJavaArchiveBuildPhase
++ (NSString *)defaultName { return (@"JavaArchive"); }
+@end
+
 @implementation PBXBuildRule
 
 + (NSArray *)archivableAttributes
