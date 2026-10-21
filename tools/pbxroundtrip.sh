@@ -63,7 +63,14 @@ fi
 
 FAIL=0
 for f in "${files[@]}"; do
+	if [ ! -e "$f" ]; then
+		FAIL=$((FAIL+1))
+		printf 'FAIL  %s -- not found\n' "$f"
+		continue
+	fi
 	if [ ! -s "$f" ]; then
+		FAIL=$((FAIL+1))
+		printf 'FAIL  %s -- empty\n' "$f"
 		continue
 	fi
 	why=""
