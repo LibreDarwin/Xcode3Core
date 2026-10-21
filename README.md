@@ -103,10 +103,11 @@ modeled class is preserved verbatim rather than renamed to `PBXObject`.
 
 `make test` also runs `tools/pbxroundtrip.sh` over `tools/fixtures/*.pbxproj`,
 which exercise the modern classes, an unknown `isa`, `classes = {}` and
-objectVersion 77.  It checks the semantic round-trip, the byte-exact
-round-trip and that every `isa` in the source survives to the archive.  Point
-it at a corpus list to widen coverage, e.g.
-`bash tools/pbxroundtrip.sh /path/to/list`.
+objectVersion 77, plus a multi-line array with no trailing comma.  It checks
+the semantic round-trip, the byte-exact round-trip, isa losslessness and
+structural key-losslessness (exempting files with duplicate object IDs).
+It treats missing/empty inputs as failures (no silent skips).  Point it at
+a corpus list to widen coverage, e.g. `bash tools/pbxroundtrip.sh /path/to/list`.
 
 ## License
 

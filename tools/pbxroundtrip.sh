@@ -11,6 +11,14 @@
 #   3. isa losslessness    -- every `isa = X;` in the source survives to the
 #      archive.  This is what catches an unknown/new isa being silently
 #      renamed (e.g. to PBXObject) or dropped.
+#   4. key losslessness    -- the multiset of dictionary keys in the source
+#      equals that produced by re-archiving the object graph.  Catches an
+#      attribute being dropped by the typed model (which the semantic check
+#      cannot see, because a key dropped on both sides still compares equal).
+#      This uses `pbxtool dump` on the source and on `pbxmodel cat`, so it is
+#      immune to comments/inline-dict formatting.  Inputs that contain
+#      duplicate object IDs (invalid, but present in the wild) are reported
+#      and exempted: the ID-keyed model legitimately collapses them.
 #
 # Usage: bash tools/pbxroundtrip.sh [FILE_OR_LIST ...]
 #   No arguments : every tools/fixtures/*.pbxproj.
@@ -62,6 +70,26 @@ if [ ${#files[@]} -eq 0 ]; then
 fi
 
 FAIL=0
+tmpcat=""
+trap 'rm -f "$tmpcat"' EXIT
+if [ "$CHECK_BYTES" = 1 ]; then
+	dumpkeys() { "$PBXTOOL" dump "$1" 2>/dev/null | grep -oE '^[[:space:]]*[^[:space:]].*:$' | sed -E 's/^[[:space:]]+//; s/:$//' | sort | uniq -c; }
+	dupids() {
+		"$PBXTOOL" dump "$1" 2>/dev/null | awk '
+		/^[[:space:]]*objects:[[:space:]]*$/ {want=1; next}
+		want==1 && /^[[:space:]]*dict\[/ {match($0,/^[[:space:]]*/); base=RLENGTH; want=2; next}
+		want==2 {
+			if ($0 ~ /^[[:space:]]*$/) next
+			match($0,/^[[:space:]]*/); ind=RLENGTH
+			if (ind==base) {want=0; next}
+			if (ind==base+1 && $0 ~ /:$/) { k=$0; gsub(/^[[:space:]]+|:$/,"",k); print k }
+		}'
+	}
+else
+	dumpkeys() { :; }
+	dupids() { :; }
+fi
+
 for f in "${files[@]}"; do
 	if [ ! -e "$f" ]; then
 		FAIL=$((FAIL+1))
@@ -74,6 +102,12 @@ for f in "${files[@]}"; do
 		continue
 	fi
 	why=""
+	note=""
+	# detect duplicate object IDs (invalid; model collapses by ID)
+	if [ "$CHECK_BYTES" = 1 ]; then
+		ndup=$(dupids "$f" | sort | uniq -d | wc -l | tr -d ' ')
+		[ "$ndup" -gt 0 ] && note=" dup-id:$ndup"
+	fi
 	# 1. semantic round-trip
 	if ! "$PBXMODEL" roundtrip "$f" >/dev/null 2>&1; then
 		why="$why semantic"
@@ -93,9 +127,22 @@ for f in "${files[@]}"; do
 		esac
 	done < <(grep -oE 'isa = [A-Za-z0-9_]+' "$f" 2>/dev/null | sed 's/^isa = //' | sort -u)
 	[ -n "$missing" ] && why="$why isa:[$missing ]"
+	# 4. structural key losslessness (skipped if duplicate IDs: model collapses)
+	if [ "$CHECK_BYTES" = 1 ] && [ -z "$why" ] && [ "${ndup:-0}" -eq 0 ]; then
+		tmpcat=$(mktemp "${TMPDIR:-/tmp}/pbxrt.XXXXXX")
+		if ! "$PBXMODEL" cat "$f" > "$tmpcat" 2>/dev/null; then
+			why="$why keys:cat-fail"
+		elif ! diff -q <(dumpkeys "$f") <(dumpkeys "$tmpcat") >/dev/null; then
+			why="$why keys"
+		fi
+		rm -f "$tmpcat"
+		tmpcat=""
+	elif [ "$CHECK_BYTES" = 1 ] && [ "${ndup:-0}" -gt 0 ]; then
+		note="$note (keys:skipped-dup-id)"
+	fi
 
 	if [ -z "$why" ]; then
-		printf 'PASS  %s\n' "$f"
+		printf 'PASS  %s%s\n' "$f" "$note"
 	else
 		FAIL=$((FAIL+1))
 		printf 'FAIL  %s --%s\n' "$f" "$why"
