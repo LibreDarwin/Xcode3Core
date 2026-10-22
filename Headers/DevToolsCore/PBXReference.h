@@ -159,3 +159,12 @@
 @end
 
 #endif	/* DEVTOOLSCORE_PBXREFERENCE_H */
+
+@interface PBXFileSystemSynchronizedGroupTargetMembershipExceptionSet
+    : PBXFileSystemSynchronizedGroupAbstractMembershipExceptionSet
+{
+	PBXTarget *_target;
+}
+- (PBXTarget *)target;
+- (void)setTarget:(PBXTarget *)target;
+@end

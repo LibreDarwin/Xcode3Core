@@ -73,6 +73,8 @@ static NSDictionary *PBXProjectModelClassRegistry(void)
 		    class],
 		    @"PBXFileSystemSynchronizedBuildFileExceptionSet"
 		    : [PBXFileSystemSynchronizedBuildFileExceptionSet class],
+		    @"PBXFileSystemSynchronizedGroupTargetMembershipExceptionSet"
+		    : [PBXFileSystemSynchronizedGroupTargetMembershipExceptionSet class],
 		    @"XCRemoteSwiftPackageReference"
 		    : [XCRemoteSwiftPackageReference class],
 		    @"XCLocalSwiftPackageReference"

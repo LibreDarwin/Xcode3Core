@@ -439,3 +439,32 @@
 }
 
 @end
+
+@implementation PBXFileSystemSynchronizedGroupTargetMembershipExceptionSet
+
++ (NSString *)classNameForPListArchive
+{
+	return (@"PBXFileSystemSynchronizedGroupTargetMembershipExceptionSet");
+}
+
++ (NSArray *)archivableAttributes
+{
+	return (@[@"membershipExceptions"]);
+}
+
++ (NSArray *)archivableRelationships
+{
+	return (@[@"target"]);
+}
+
+- (PBXTarget *)target
+{
+	return (_target);
+}
+
+- (void)setTarget:(PBXTarget *)target
+{
+	_target = target;
+}
+
+@end
