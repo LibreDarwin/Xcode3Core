@@ -75,6 +75,8 @@
 	NSMutableArray *_targets;
 	NSMutableArray *_knownRegions;
 	NSMutableArray *_packageReferences;
+	NSMutableArray *_projectReferences;
+	NSMutableDictionary *_userBuildSettings;
 	PBXGroup *_mainGroup;
 	PBXGroup *_productRefGroup;
 	XCConfigurationList *_buildConfigurationList;
@@ -107,6 +109,10 @@
 - (void)setProjectRoot:(NSString *)root;
 - (NSArray *)packageReferences;
 - (void)setPackageReferences:(NSArray *)refs;
+- (NSArray *)projectReferences;
+- (void)setProjectReferences:(NSArray *)refs;
+- (NSMutableDictionary *)userBuildSettings;
+- (void)setUserBuildSettings:(NSDictionary *)settings;
 @end
 
 #endif	/* DEVTOOLSCORE_PBXPROJECT_H */

@@ -133,13 +133,13 @@
 	    @"compatibilityVersion", @"developmentRegion",
 	    @"hasScannedForEncodings", @"knownRegions",
 	    @"minimizedProjectReferenceProxies", @"preferredProjectObjectVersion",
-	    @"projectDirPath", @"projectRoot"]);
+	    @"projectDirPath", @"projectRoot", @"userBuildSettings"]);
 }
 
 + (NSArray *)archivableRelationships
 {
 	return (@[@"buildConfigurationList", @"mainGroup", @"packageReferences",
-	    @"productRefGroup", @"targets"]);
+	    @"productRefGroup", @"projectReferences", @"targets"]);
 }
 
 - (NSString *)archiveComment
@@ -256,6 +256,27 @@
 - (void)setPackageReferences:(NSArray *)refs
 {
 	_packageReferences = (refs != nil) ? [refs mutableCopy] : nil;
+}
+
+- (NSArray *)projectReferences
+{
+	return (_projectReferences);
+}
+
+- (void)setProjectReferences:(NSArray *)refs
+{
+	_projectReferences = (refs != nil) ? [refs mutableCopy] : nil;
+}
+
+- (NSMutableDictionary *)userBuildSettings
+{
+	return (_userBuildSettings);
+}
+
+- (void)setUserBuildSettings:(NSDictionary *)settings
+{
+	_userBuildSettings = (settings != nil) ?
+	    [settings mutableCopy] : nil;
 }
 
 @end
