@@ -55,6 +55,8 @@ static NSDictionary *PBXProjectModelClassRegistry(void)
 		    @"PBXBundleTarget" : [PBXBundleTarget class],
 		    @"PBXLibraryTarget" : [PBXLibraryTarget class],
 		    @"PBXToolTarget" : [PBXToolTarget class],
+		    @"PBXStandaloneTarget" : [PBXStandaloneTarget class],
+		    @"PBXExternalTarget" : [PBXExternalTarget class],
 		    @"PBXFrameworkReference" : [PBXFrameworkReference class],
 		    @"PBXLibraryReference" : [PBXLibraryReference class],
 		    @"PBXBundleReference" : [PBXBundleReference class],

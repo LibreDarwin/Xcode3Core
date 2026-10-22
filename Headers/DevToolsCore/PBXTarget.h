@@ -108,3 +108,6 @@
 @interface PBXToolTarget : PBXJambaseTarget @end
 
 #endif	/* DEVTOOLSCORE_PBXTARGET_H */
+
+@interface PBXStandaloneTarget : PBXJambaseTarget @end
+@interface PBXExternalTarget : PBXTarget @end

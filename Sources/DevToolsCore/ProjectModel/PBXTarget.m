@@ -322,3 +322,21 @@
 }
 
 @end
+
+@implementation PBXStandaloneTarget
+
++ (NSString *)classNameForPListArchive
+{
+	return (@"PBXStandaloneTarget");
+}
+
+@end
+
+@implementation PBXExternalTarget
+
++ (NSString *)classNameForPListArchive
+{
+	return (@"PBXExternalTarget");
+}
+
+@end
