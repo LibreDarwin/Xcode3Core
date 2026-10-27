@@ -25,6 +25,12 @@
 - (void)setProductRef:(PBXReference *)reference;
 - (NSMutableDictionary *)settings;
 - (void)setSettings:(NSDictionary *)settings;
+- (NSArray *)platformFilters;
+- (void)setPlatformFilters:(NSArray *)filters;
+- (NSString *)platformFilter;
+- (void)setPlatformFilter:(NSString *)filter;
+- (NSArray *)assetTags;
+- (void)setAssetTags:(NSArray *)tags;
 @end
 
 /* Base class for the build phases attached to a target. */
