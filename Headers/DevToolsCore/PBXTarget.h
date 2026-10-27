@@ -79,6 +79,22 @@
 - (void)setDependencies:(NSArray *)dependencies;
 - (NSArray *)buildRules;
 - (void)setBuildRules:(NSArray *)rules;
+- (NSString *)productInstallPath;
+- (void)setProductInstallPath:(NSString *)path;
+- (NSString *)buildArgumentsString;
+- (void)setBuildArgumentsString:(NSString *)string;
+- (NSString *)buildToolPath;
+- (void)setBuildToolPath:(NSString *)path;
+- (NSString *)buildWorkingDirectory;
+- (void)setBuildWorkingDirectory:(NSString *)path;
+- (NSNumber *)passBuildSettingsInEnvironment;
+- (void)setPassBuildSettingsInEnvironment:(NSNumber *)flag;
+- (PBXReference *)productReferenceProxy;
+- (void)setProductReferenceProxy:(PBXReference *)reference;
+- (NSArray *)packageProductDependencies;
+- (void)setPackageProductDependencies:(NSArray *)dependencies;
+- (NSArray *)fileSystemSynchronizedGroups;
+- (void)setFileSystemSynchronizedGroups:(NSArray *)groups;
 - (NSString *)displayName;
 @end
 

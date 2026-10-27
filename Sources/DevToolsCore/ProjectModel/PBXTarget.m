@@ -219,6 +219,86 @@
 	_buildRules = (rules != nil) ? [rules mutableCopy] : nil;
 }
 
+- (NSString *)productInstallPath
+{
+	return (_productInstallPath);
+}
+
+- (void)setProductInstallPath:(NSString *)path
+{
+	_productInstallPath = [path copy];
+}
+
+- (NSString *)buildArgumentsString
+{
+	return (_buildArgumentsString);
+}
+
+- (void)setBuildArgumentsString:(NSString *)string
+{
+	_buildArgumentsString = [string copy];
+}
+
+- (NSString *)buildToolPath
+{
+	return (_buildToolPath);
+}
+
+- (void)setBuildToolPath:(NSString *)path
+{
+	_buildToolPath = [path copy];
+}
+
+- (NSString *)buildWorkingDirectory
+{
+	return (_buildWorkingDirectory);
+}
+
+- (void)setBuildWorkingDirectory:(NSString *)path
+{
+	_buildWorkingDirectory = [path copy];
+}
+
+- (NSNumber *)passBuildSettingsInEnvironment
+{
+	return (_passBuildSettingsInEnvironment);
+}
+
+- (void)setPassBuildSettingsInEnvironment:(NSNumber *)flag
+{
+	_passBuildSettingsInEnvironment = flag;
+}
+
+- (PBXReference *)productReferenceProxy
+{
+	return (_productReferenceProxy);
+}
+
+- (void)setProductReferenceProxy:(PBXReference *)reference
+{
+	_productReferenceProxy = reference;
+}
+
+- (NSArray *)packageProductDependencies
+{
+	return (_packageProductDependencies);
+}
+
+- (void)setPackageProductDependencies:(NSArray *)dependencies
+{
+	_packageProductDependencies = (dependencies != nil) ? [dependencies mutableCopy] : nil;
+}
+
+- (NSArray *)fileSystemSynchronizedGroups
+{
+	return (_fileSystemSynchronizedGroups);
+}
+
+- (void)setFileSystemSynchronizedGroups:(NSArray *)groups
+{
+	_fileSystemSynchronizedGroups = (groups != nil) ? [groups mutableCopy] : nil;
+}
+
 - (NSString *)displayName
 {
 	if (_name != nil)
