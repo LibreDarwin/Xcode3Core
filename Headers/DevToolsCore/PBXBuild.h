@@ -34,6 +34,7 @@
 	NSNumber *_buildActionMask;
 	NSNumber *_runOnlyForDeploymentPostprocessing;
 	NSMutableArray *_files;
+	NSMutableArray *_customBuildRules;
 }
 + (NSString *)defaultName;
 - (NSString *)name;
@@ -41,6 +42,8 @@
 - (NSArray *)files;
 - (void)setFiles:(NSArray *)files;
 - (void)addFile:(PBXBuildFile *)file;
+- (NSArray *)customBuildRules;
+- (void)setCustomBuildRules:(NSArray *)rules;
 - (NSString *)displayName;
 @end
 

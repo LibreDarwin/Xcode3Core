@@ -104,6 +104,16 @@
 	[_files addObject:file];
 }
 
+- (NSArray *)customBuildRules
+{
+	return (_customBuildRules);
+}
+
+- (void)setCustomBuildRules:(NSArray *)rules
+{
+	_customBuildRules = (rules != nil) ? [rules mutableCopy] : nil;
+}
+
 - (NSString *)displayName
 {
 	if (_name != nil)
