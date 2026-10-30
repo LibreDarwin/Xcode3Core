@@ -112,6 +112,10 @@
 	NSString *_contextName;
 	NSNumber *_isSharedContext;
 }
+- (NSString *)contextName;
+- (void)setContextName:(NSString *)name;
+- (NSNumber *)isSharedContext;
+- (void)setIsSharedContext:(NSNumber *)flag;
 @end
 
 /* Java archive build phase (no phase-specific keys). */

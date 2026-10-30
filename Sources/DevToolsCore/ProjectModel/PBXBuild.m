@@ -350,6 +350,26 @@
 	return (@"AppleScript");
 }
 
+- (NSString *)contextName
+{
+	return (_contextName);
+}
+
+- (void)setContextName:(NSString *)name
+{
+	_contextName = [name copy];
+}
+
+- (NSNumber *)isSharedContext
+{
+	return (_isSharedContext);
+}
+
+- (void)setIsSharedContext:(NSNumber *)flag
+{
+	_isSharedContext = flag;
+}
+
 @end
 
 @implementation PBXJavaArchiveBuildPhase
