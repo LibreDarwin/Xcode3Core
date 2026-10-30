@@ -117,6 +117,26 @@
 	_name = [name copy];
 }
 
+- (NSNumber *)buildActionMask
+{
+	return (_buildActionMask);
+}
+
+- (void)setBuildActionMask:(NSNumber *)mask
+{
+	_buildActionMask = mask;
+}
+
+- (NSNumber *)runOnlyForDeploymentPostprocessing
+{
+	return (_runOnlyForDeploymentPostprocessing);
+}
+
+- (void)setRunOnlyForDeploymentPostprocessing:(NSNumber *)flag
+{
+	_runOnlyForDeploymentPostprocessing = flag;
+}
+
 - (NSArray *)files
 {
 	return (_files);

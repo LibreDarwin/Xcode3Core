@@ -45,6 +45,10 @@
 + (NSString *)defaultName;
 - (NSString *)name;
 - (void)setName:(NSString *)name;
+- (NSNumber *)buildActionMask;
+- (void)setBuildActionMask:(NSNumber *)mask;
+- (NSNumber *)runOnlyForDeploymentPostprocessing;
+- (void)setRunOnlyForDeploymentPostprocessing:(NSNumber *)flag;
 - (NSArray *)files;
 - (void)setFiles:(NSArray *)files;
 - (void)addFile:(PBXBuildFile *)file;
