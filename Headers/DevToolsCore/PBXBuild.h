@@ -82,6 +82,22 @@
 	NSNumber *_alwaysOutOfDate;
 	NSNumber *_showEnvVarsInLog;
 }
+- (NSString *)shellPath;
+- (void)setShellPath:(NSString *)path;
+- (NSString *)shellScript;
+- (void)setShellScript:(NSString *)script;
+- (NSArray *)inputPaths;
+- (void)setInputPaths:(NSArray *)paths;
+- (NSArray *)outputPaths;
+- (void)setOutputPaths:(NSArray *)paths;
+- (NSArray *)inputFileListPaths;
+- (void)setInputFileListPaths:(NSArray *)paths;
+- (NSArray *)outputFileListPaths;
+- (void)setOutputFileListPaths:(NSArray *)paths;
+- (NSNumber *)alwaysOutOfDate;
+- (void)setAlwaysOutOfDate:(NSNumber *)flag;
+- (NSNumber *)showEnvVarsInLog;
+- (void)setShowEnvVarsInLog:(NSNumber *)flag;
 @end
 
 @interface PBXHeadersBuildPhase : PBXBuildPhase @end

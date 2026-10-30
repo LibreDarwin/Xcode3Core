@@ -236,6 +236,86 @@
 	return (@"ShellScript");
 }
 
+- (NSString *)shellPath
+{
+	return (_shellPath);
+}
+
+- (void)setShellPath:(NSString *)path
+{
+	_shellPath = [path copy];
+}
+
+- (NSString *)shellScript
+{
+	return (_shellScript);
+}
+
+- (void)setShellScript:(NSString *)script
+{
+	_shellScript = [script copy];
+}
+
+- (NSArray *)inputPaths
+{
+	return (_inputPaths);
+}
+
+- (void)setInputPaths:(NSArray *)paths
+{
+	_inputPaths = (paths != nil) ? [paths mutableCopy] : nil;
+}
+
+- (NSArray *)outputPaths
+{
+	return (_outputPaths);
+}
+
+- (void)setOutputPaths:(NSArray *)paths
+{
+	_outputPaths = (paths != nil) ? [paths mutableCopy] : nil;
+}
+
+- (NSArray *)inputFileListPaths
+{
+	return (_inputFileListPaths);
+}
+
+- (void)setInputFileListPaths:(NSArray *)paths
+{
+	_inputFileListPaths = (paths != nil) ? [paths mutableCopy] : nil;
+}
+
+- (NSArray *)outputFileListPaths
+{
+	return (_outputFileListPaths);
+}
+
+- (void)setOutputFileListPaths:(NSArray *)paths
+{
+	_outputFileListPaths = (paths != nil) ? [paths mutableCopy] : nil;
+}
+
+- (NSNumber *)alwaysOutOfDate
+{
+	return (_alwaysOutOfDate);
+}
+
+- (void)setAlwaysOutOfDate:(NSNumber *)flag
+{
+	_alwaysOutOfDate = flag;
+}
+
+- (NSNumber *)showEnvVarsInLog
+{
+	return (_showEnvVarsInLog);
+}
+
+- (void)setShowEnvVarsInLog:(NSNumber *)flag
+{
+	_showEnvVarsInLog = flag;
+}
+
 @end
 
 @implementation PBXHeadersBuildPhase
