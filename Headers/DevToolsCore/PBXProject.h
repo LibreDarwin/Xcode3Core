@@ -86,6 +86,7 @@
 	NSString *_projectRoot;
 	NSNumber *_hasScannedForEncodings;
 	NSNumber *_minimizedProjectReferenceProxies;
+	NSNumber *_preferredProjectObjectVersion;
 }
 - (NSMutableDictionary *)attributes;
 - (void)setAttributes:(NSDictionary *)attributes;
@@ -107,6 +108,12 @@
 - (void)setProjectDirPath:(NSString *)path;
 - (NSString *)projectRoot;
 - (void)setProjectRoot:(NSString *)root;
+- (NSNumber *)hasScannedForEncodings;
+- (void)setHasScannedForEncodings:(NSNumber *)flag;
+- (NSNumber *)minimizedProjectReferenceProxies;
+- (void)setMinimizedProjectReferenceProxies:(NSNumber *)flag;
+- (NSNumber *)preferredProjectObjectVersion;
+- (void)setPreferredProjectObjectVersion:(NSNumber *)version;
 - (NSArray *)packageReferences;
 - (void)setPackageReferences:(NSArray *)refs;
 - (NSArray *)projectReferences;
