@@ -458,6 +458,11 @@
 
 @implementation PBXReferenceProxy
 
++ (NSString *)classNameForPListArchive
+{
+	return (@"PBXReferenceProxy");
+}
+
 + (NSArray *)archivableAttributes
 {
 	return (@[@"fileType"]);
