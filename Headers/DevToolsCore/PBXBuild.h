@@ -129,7 +129,28 @@
 	NSNumber *_runOncePerArchitecture;
 	NSString *_script;
 	NSNumber *_isEditable;
+	NSString *_name;
 }
+- (NSString *)compilerSpec;
+- (void)setCompilerSpec:(NSString *)spec;
+- (NSString *)filePatterns;
+- (void)setFilePatterns:(NSString *)patterns;
+- (NSString *)fileType;
+- (void)setFileType:(NSString *)type;
+- (NSArray *)inputFiles;
+- (void)setInputFiles:(NSArray *)files;
+- (NSArray *)outputFiles;
+- (void)setOutputFiles:(NSArray *)files;
+- (NSArray *)outputFilesCompilerFlags;
+- (void)setOutputFilesCompilerFlags:(NSArray *)flags;
+- (NSNumber *)runOncePerArchitecture;
+- (void)setRunOncePerArchitecture:(NSNumber *)flag;
+- (NSString *)script;
+- (void)setScript:(NSString *)script;
+- (NSNumber *)isEditable;
+- (void)setIsEditable:(NSNumber *)flag;
+- (NSString *)name;
+- (void)setName:(NSString *)name;
 @end
 
 /* Legacy build style (buildStyles list in old projects). */

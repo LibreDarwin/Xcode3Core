@@ -362,7 +362,107 @@
 {
 	return (@[@"compilerSpec", @"filePatterns", @"fileType", @"inputFiles",
 	    @"isEditable", @"outputFiles", @"outputFilesCompilerFlags",
-	    @"runOncePerArchitecture", @"script"]);
+	    @"runOncePerArchitecture", @"script", @"name"]);
+}
+
+- (NSString *)compilerSpec
+{
+	return (_compilerSpec);
+}
+
+- (void)setCompilerSpec:(NSString *)spec
+{
+	_compilerSpec = [spec copy];
+}
+
+- (NSString *)filePatterns
+{
+	return (_filePatterns);
+}
+
+- (void)setFilePatterns:(NSString *)patterns
+{
+	_filePatterns = [patterns copy];
+}
+
+- (NSString *)fileType
+{
+	return (_fileType);
+}
+
+- (void)setFileType:(NSString *)type
+{
+	_fileType = [type copy];
+}
+
+- (NSArray *)inputFiles
+{
+	return (_inputFiles);
+}
+
+- (void)setInputFiles:(NSArray *)files
+{
+	_inputFiles = (files != nil) ? [files mutableCopy] : nil;
+}
+
+- (NSArray *)outputFiles
+{
+	return (_outputFiles);
+}
+
+- (void)setOutputFiles:(NSArray *)files
+{
+	_outputFiles = (files != nil) ? [files mutableCopy] : nil;
+}
+
+- (NSArray *)outputFilesCompilerFlags
+{
+	return (_outputFilesCompilerFlags);
+}
+
+- (void)setOutputFilesCompilerFlags:(NSArray *)flags
+{
+	_outputFilesCompilerFlags = (flags != nil) ? [flags mutableCopy] : nil;
+}
+
+- (NSNumber *)runOncePerArchitecture
+{
+	return (_runOncePerArchitecture);
+}
+
+- (void)setRunOncePerArchitecture:(NSNumber *)flag
+{
+	_runOncePerArchitecture = flag;
+}
+
+- (NSString *)script
+{
+	return (_script);
+}
+
+- (void)setScript:(NSString *)script
+{
+	_script = [script copy];
+}
+
+- (NSNumber *)isEditable
+{
+	return (_isEditable);
+}
+
+- (void)setIsEditable:(NSNumber *)flag
+{
+	_isEditable = flag;
+}
+
+- (NSString *)name
+{
+	return (_name);
+}
+
+- (void)setName:(NSString *)name
+{
+	_name = [name copy];
 }
 
 @end
