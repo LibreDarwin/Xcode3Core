@@ -107,6 +107,56 @@
 	_fileEncoding = [encoding copy];
 }
 
+- (NSNumber *)includeInIndex
+{
+	return (_includeInIndex);
+}
+
+- (void)setIncludeInIndex:(NSNumber *)flag
+{
+	_includeInIndex = flag;
+}
+
+- (NSNumber *)usesTabs
+{
+	return (_usesTabs);
+}
+
+- (void)setUsesTabs:(NSNumber *)flag
+{
+	_usesTabs = flag;
+}
+
+- (NSNumber *)indentWidth
+{
+	return (_indentWidth);
+}
+
+- (void)setIndentWidth:(NSNumber *)width
+{
+	_indentWidth = width;
+}
+
+- (NSNumber *)tabWidth
+{
+	return (_tabWidth);
+}
+
+- (void)setTabWidth:(NSNumber *)width
+{
+	_tabWidth = width;
+}
+
+- (NSNumber *)wrapsLines
+{
+	return (_wrapsLines);
+}
+
+- (void)setWrapsLines:(NSNumber *)flag
+{
+	_wrapsLines = flag;
+}
+
 @end
 
 @implementation PBXGroup

@@ -47,6 +47,16 @@
 - (void)setExplicitFileType:(NSString *)type;
 - (NSString *)fileEncoding;
 - (void)setFileEncoding:(NSString *)encoding;
+- (NSNumber *)includeInIndex;
+- (void)setIncludeInIndex:(NSNumber *)flag;
+- (NSNumber *)usesTabs;
+- (void)setUsesTabs:(NSNumber *)flag;
+- (NSNumber *)indentWidth;
+- (void)setIndentWidth:(NSNumber *)width;
+- (NSNumber *)tabWidth;
+- (void)setTabWidth:(NSNumber *)width;
+- (NSNumber *)wrapsLines;
+- (void)setWrapsLines:(NSNumber *)flag;
 @end
 
 /* A group of references (a folder node). */
