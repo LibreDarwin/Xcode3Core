@@ -182,12 +182,42 @@
 
 + (NSArray *)archivableAttributes
 {
-	return (@[@"dstPath", @"dstSubfolderSpec"]);
+	return (@[@"dstPath", @"dstSubfolderSpec", @"dstSubfolderSpecName"]);
 }
 
 + (NSString *)defaultName
 {
 	return (@"CopyFiles");
+}
+
+- (NSString *)dstPath
+{
+	return (_dstPath);
+}
+
+- (void)setDstPath:(NSString *)path
+{
+	_dstPath = [path copy];
+}
+
+- (NSNumber *)dstSubfolderSpec
+{
+	return (_dstSubfolderSpec);
+}
+
+- (void)setDstSubfolderSpec:(NSNumber *)spec
+{
+	_dstSubfolderSpec = spec;
+}
+
+- (NSString *)dstSubfolderSpecName
+{
+	return (_dstSubfolderSpecName);
+}
+
+- (void)setDstSubfolderSpecName:(NSString *)name
+{
+	_dstSubfolderSpecName = [name copy];
 }
 
 @end

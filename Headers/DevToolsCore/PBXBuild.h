@@ -61,7 +61,14 @@
 {
 	NSString *_dstPath;
 	NSNumber *_dstSubfolderSpec;
+	NSString *_dstSubfolderSpecName;
 }
+- (NSString *)dstPath;
+- (void)setDstPath:(NSString *)path;
+- (NSNumber *)dstSubfolderSpec;
+- (void)setDstSubfolderSpec:(NSNumber *)spec;
+- (NSString *)dstSubfolderSpecName;
+- (void)setDstSubfolderSpecName:(NSString *)name;
 @end
 
 @interface PBXShellScriptBuildPhase : PBXBuildPhase
