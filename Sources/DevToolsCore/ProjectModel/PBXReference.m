@@ -55,6 +55,66 @@
 	return ([self displayName]);
 }
 
+- (PBXGroup *)group
+{
+	return (_group);
+}
+
+- (void)setGroup:(PBXGroup *)group
+{
+	_group = group;
+}
+
+- (void)removeFromGroup
+{
+	[_group removeItem:self];
+}
+
+- (BOOL)isGroup
+{
+	return (NO);
+}
+
+- (BOOL)isLeaf
+{
+	return (YES);
+}
+
+- (BOOL)isVariantGroup
+{
+	return (NO);
+}
+
+- (BOOL)isVersionGroup
+{
+	return (NO);
+}
+
+- (BOOL)isProductReference
+{
+	return (NO);
+}
+
+- (NSArray *)children
+{
+	return (nil);
+}
+
+- (void)flattenItemsIntoArray:(NSMutableArray *)array
+{
+	[array addObject:self];
+}
+
+- (BOOL)isAncestorOfItem:(PBXReference *)item
+{
+	return (NO);
+}
+
+- (NSComparisonResult)compareName:(NSString *)name
+{
+	return ([[self displayName] compare:name]);
+}
+
 @end
 
 @implementation PBXFileReference
@@ -62,8 +122,10 @@
 + (NSArray *)archivableAttributes
 {
 	return (@[@"fileEncoding", @"lastKnownFileType", @"explicitFileType",
-	    @"includeInIndex", @"usesTabs", @"indentWidth", @"tabWidth",
-	    @"wrapsLines"]);
+	    @"includeInIndex", @"languageSpecificationIdentifier",
+	    @"plistStructureDefinitionIdentifier", @"usesTabs", @"indentWidth",
+	    @"tabWidth", @"wrapsLines",
+	    @"xcLanguageSpecificationIdentifier"]);
 }
 
 - (NSString *)fileType
@@ -157,6 +219,41 @@
 	_wrapsLines = flag;
 }
 
+- (NSString *)languageSpecificationIdentifier
+{
+	return (_languageSpecificationIdentifier);
+}
+
+- (void)setLanguageSpecificationIdentifier:(NSString *)identifier
+{
+	_languageSpecificationIdentifier = [identifier copy];
+}
+
+- (NSString *)xcLanguageSpecificationIdentifier
+{
+	return (_xcLanguageSpecificationIdentifier);
+}
+
+- (void)setXcLanguageSpecificationIdentifier:(NSString *)identifier
+{
+	_xcLanguageSpecificationIdentifier = [identifier copy];
+}
+
+- (NSString *)plistStructureDefinitionIdentifier
+{
+	return (_plistStructureDefinitionIdentifier);
+}
+
+- (void)setPlistStructureDefinitionIdentifier:(NSString *)identifier
+{
+	_plistStructureDefinitionIdentifier = [identifier copy];
+}
+
+- (BOOL)isProductReference
+{
+	return ([_sourceTree isEqualToString:@"BUILT_PRODUCTS_DIR"]);
+}
+
 @end
 
 @implementation PBXGroup
@@ -173,7 +270,13 @@
 
 - (void)setChildren:(NSArray *)children
 {
+	PBXReference *child;
+
 	_children = (children != nil) ? [children mutableCopy] : nil;
+	for (child in _children) {
+		if ([child respondsToSelector:@selector(setGroup:)])
+			[child setGroup:self];
+	}
 }
 
 - (void)addChild:(PBXReference *)reference
@@ -181,6 +284,123 @@
 	if (_children == nil)
 		_children = [[NSMutableArray alloc] init];
 	[_children addObject:reference];
+	if ([reference respondsToSelector:@selector(setGroup:)])
+		[reference setGroup:self];
+}
+
+- (BOOL)isGroup
+{
+	return (YES);
+}
+
+- (BOOL)isLeaf
+{
+	return (NO);
+}
+
+- (BOOL)allowsSubgroups
+{
+	return (YES);
+}
+
+- (BOOL)containsItem:(PBXReference *)item
+{
+	return (_children != nil && [_children containsObject:item]);
+}
+
+- (BOOL)isAncestorOfItem:(PBXReference *)item
+{
+	PBXGroup *group = [item group];
+
+	while (group != nil) {
+		if (group == self)
+			return (YES);
+		group = [group group];
+	}
+	return (NO);
+}
+
+- (PBXReference *)itemAtIndex:(NSUInteger)index
+{
+	if (index >= [_children count])
+		return (nil);
+	return (_children[index]);
+}
+
+- (PBXReference *)itemNamed:(NSString *)name
+{
+	PBXReference *child;
+
+	for (child in _children) {
+		if (![child isKindOfClass:[PBXReference class]])
+			continue;
+		if ([[child displayName] isEqualToString:name] ||
+		    [[child name] isEqualToString:name])
+			return (child);
+	}
+	return (nil);
+}
+
+- (NSUInteger)itemCount
+{
+	return ([_children count]);
+}
+
+- (NSUInteger)indexOfItem:(PBXReference *)item
+{
+	NSUInteger index = [_children indexOfObject:item];
+
+	return (index == NSNotFound ? NSNotFound : index);
+}
+
+- (void)insertItem:(PBXReference *)item atIndex:(NSUInteger)index
+{
+	if (_children == nil)
+		_children = [[NSMutableArray alloc] init];
+	if (index > [_children count])
+		index = [_children count];
+	[_children insertObject:item atIndex:index];
+	if ([item respondsToSelector:@selector(setGroup:)])
+		[item setGroup:self];
+}
+
+- (void)addItem:(PBXReference *)item
+{
+	[self addChild:item];
+}
+
+- (void)removeItem:(PBXReference *)item
+{
+	if (_children == nil)
+		return;
+	if ([item respondsToSelector:@selector(group)] &&
+	    [item group] == self)
+		[item setGroup:nil];
+	[_children removeObject:item];
+}
+
+- (void)removeItems:(NSArray *)items
+{
+	PBXReference *item;
+
+	for (item in items)
+		[self removeItem:item];
+}
+
+- (NSArray *)_items
+{
+	return (_children);
+}
+
+- (void)flattenItemsIntoArray:(NSMutableArray *)array
+{
+	PBXReference *child;
+
+	[array addObject:self];
+	for (child in _children) {
+		if ([child isKindOfClass:[PBXReference class]])
+			[child flattenItemsIntoArray:array];
+	}
 }
 
 @end
@@ -195,6 +415,11 @@
 - (NSString *)archiveComment
 {
 	return ([self displayName]);
+}
+
+- (BOOL)isVariantGroup
+{
+	return (YES);
 }
 
 @end
@@ -229,6 +454,45 @@
 - (void)setCurrentVersion:(PBXFileReference *)reference
 {
 	_currentVersion = reference;
+}
+
+- (BOOL)isVersionGroup
+{
+	return (YES);
+}
+
+- (BOOL)allowsSubgroups
+{
+	return (NO);
+}
+
+- (NSString *)fileType
+{
+	return (_versionGroupType);
+}
+
+- (NSString *)versionedFileType
+{
+	return (_versionGroupType);
+}
+
+- (void)setVersionedFileType:(NSString *)type
+{
+	_versionGroupType = [type copy];
+}
+
+- (PBXFileReference *)versionForName:(NSString *)name
+{
+	PBXReference *child;
+
+	for (child in _children) {
+		if (![child isKindOfClass:[PBXReference class]])
+			continue;
+		if ([[child displayName] isEqualToString:name] ||
+		    [[child name] isEqualToString:name])
+			return ((PBXFileReference *)child);
+	}
+	return (nil);
 }
 
 @end

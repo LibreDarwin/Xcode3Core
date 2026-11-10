@@ -8,6 +8,7 @@
 #import "DevToolsCore/PBXProject.h"
 
 @class PBXFileReference;
+@class PBXGroup;
 @class PBXBuildPhase, PBXTarget;
 
 /* A named node in the project's reference tree. */
@@ -16,6 +17,7 @@
 	NSString *_name;
 	NSString *_path;
 	NSString *_sourceTree;
+	__weak PBXGroup *_group;
 }
 - (NSString *)name;
 - (void)setName:(NSString *)name;
@@ -26,6 +28,24 @@
 
 /* Display name used for archive comments (name, else the path's last part). */
 - (NSString *)displayName;
+
+/* Owning group (weak back-pointer; set when the group's children are bound). */
+- (PBXGroup *)group;
+- (void)setGroup:(PBXGroup *)group;
+- (void)removeFromGroup;
+
+/* Tree shape and traversal (overridden by PBXGroup). */
+- (BOOL)isGroup;
+- (BOOL)isLeaf;
+- (BOOL)isVariantGroup;
+- (BOOL)isVersionGroup;
+- (BOOL)isProductReference;
+- (NSArray *)children;
+- (void)flattenItemsIntoArray:(NSMutableArray *)array;
+- (BOOL)isAncestorOfItem:(PBXReference *)item;
+
+/* Name ordering used when sorting siblings. */
+- (NSComparisonResult)compareName:(NSString *)name;
 @end
 
 @interface PBXFileReference : PBXReference
@@ -33,6 +53,9 @@
 	NSString *_fileEncoding;
 	NSString *_lastKnownFileType;
 	NSString *_explicitFileType;
+	NSString *_languageSpecificationIdentifier;
+	NSString *_xcLanguageSpecificationIdentifier;
+	NSString *_plistStructureDefinitionIdentifier;
 	NSNumber *_includeInIndex;
 	NSNumber *_usesTabs;
 	NSNumber *_indentWidth;
@@ -57,6 +80,12 @@
 - (void)setTabWidth:(NSNumber *)width;
 - (NSNumber *)wrapsLines;
 - (void)setWrapsLines:(NSNumber *)flag;
+- (NSString *)languageSpecificationIdentifier;
+- (void)setLanguageSpecificationIdentifier:(NSString *)identifier;
+- (NSString *)xcLanguageSpecificationIdentifier;
+- (void)setXcLanguageSpecificationIdentifier:(NSString *)identifier;
+- (NSString *)plistStructureDefinitionIdentifier;
+- (void)setPlistStructureDefinitionIdentifier:(NSString *)identifier;
 @end
 
 /* A group of references (a folder node). */
@@ -67,6 +96,18 @@
 - (NSArray *)children;
 - (void)setChildren:(NSArray *)children;
 - (void)addChild:(PBXReference *)reference;
+
+- (BOOL)allowsSubgroups;
+- (BOOL)containsItem:(PBXReference *)item;
+- (PBXReference *)itemAtIndex:(NSUInteger)index;
+- (PBXReference *)itemNamed:(NSString *)name;
+- (NSUInteger)itemCount;
+- (NSUInteger)indexOfItem:(PBXReference *)item;
+- (void)insertItem:(PBXReference *)item atIndex:(NSUInteger)index;
+- (void)addItem:(PBXReference *)item;
+- (void)removeItem:(PBXReference *)item;
+- (void)removeItems:(NSArray *)items;
+- (NSArray *)_items;
 @end
 
 /* A localized variant group (children share one logical name). */
@@ -86,6 +127,10 @@
 - (void)setVersionGroupType:(NSString *)type;
 - (PBXFileReference *)currentVersion;
 - (void)setCurrentVersion:(PBXFileReference *)reference;
+- (NSString *)fileType;
+- (NSString *)versionedFileType;
+- (void)setVersionedFileType:(NSString *)type;
+- (PBXFileReference *)versionForName:(NSString *)name;
 @end
 
 /*
@@ -168,8 +213,6 @@
 - (void)setRemoteRef:(PBXReference *)reference;
 @end
 
-#endif	/* DEVTOOLSCORE_PBXREFERENCE_H */
-
 @interface PBXFileSystemSynchronizedGroupTargetMembershipExceptionSet
     : PBXFileSystemSynchronizedGroupAbstractMembershipExceptionSet
 {
@@ -178,3 +221,5 @@
 - (PBXTarget *)target;
 - (void)setTarget:(PBXTarget *)target;
 @end
+
+#endif	/* DEVTOOLSCORE_PBXREFERENCE_H */
