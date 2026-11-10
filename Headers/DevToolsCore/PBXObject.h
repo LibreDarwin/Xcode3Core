@@ -8,6 +8,7 @@
 #import <Foundation/Foundation.h>
 
 @class PBXContainer;
+@class PBXProjectModel;
 
 /*
  * PBXObject is the root of the archived object graph.  Subclasses declare
@@ -24,6 +25,7 @@
 	PBXContainer *_container;
 	NSMutableDictionary *_extra;
 	NSString *_archiveClassName;
+	__weak PBXProjectModel *_projectModel;
 }
 
 /* Class name written as the "isa" value (defaults to the class name). */
@@ -45,6 +47,10 @@
 /* Owning container (project), not archived. */
 - (PBXContainer *)container;
 - (void)setContainer:(PBXContainer *)container;
+
+/* Owning model (weak back-pointer), not archived. */
+- (PBXProjectModel *)projectModel;
+- (void)setProjectModel:(PBXProjectModel *)model;
 
 - (NSString *)classNameForPListArchive;
 

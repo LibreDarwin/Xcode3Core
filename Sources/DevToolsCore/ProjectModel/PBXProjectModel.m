@@ -238,8 +238,10 @@ static NSDictionary *PBXProjectModelClassRegistry(void)
 	if (v != NULL)
 		_rootObject = _objects[[NSString stringWithUTF8String:v]];
 
-	for (PBXObject *object in [_objects allValues])
+	for (PBXObject *object in [_objects allValues]) {
 		[object setContainer:(PBXContainer *)_rootObject];
+		[object setProjectModel:self];
+	}
 
 	for (i = 0; i < root->nentry; i++) {
 		const char *key = root->entries[i].key;

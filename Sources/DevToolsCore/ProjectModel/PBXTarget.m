@@ -4,6 +4,8 @@
 
 #import "DevToolsCore/PBXTarget.h"
 #import "DevToolsCore/PBXProject.h"
+#import "DevToolsCore/PBXReference.h"
+#import "DevToolsCore/PBXProjectModel.h"
 
 @implementation PBXContainerItemProxy
 
@@ -22,12 +24,32 @@
 	return (@[@"containerPortal"]);
 }
 
-- (PBXContainer *)containerPortal
+- (instancetype)initWithType:(NSInteger)type portal:(PBXObject *)portal
+    remoteGlobalIDString:(NSString *)idstring remoteInfo:(NSString *)info
+{
+	self = [self init];
+	if (self != nil) {
+		_proxyType = [@(type) stringValue];
+		_containerPortal = portal;
+		_remoteGlobalIDString = [idstring copy];
+		_remoteInfo = [info copy];
+	}
+	return (self);
+}
+
+- (instancetype)initWithType:(NSInteger)type portal:(PBXObject *)portal
+    remoteGlobalID:(PBXObject *)object remoteInfo:(NSString *)info
+{
+	return ([self initWithType:type portal:portal
+	    remoteGlobalIDString:[object objectID] remoteInfo:info]);
+}
+
+- (PBXObject *)containerPortal
 {
 	return (_containerPortal);
 }
 
-- (void)setContainerPortal:(PBXContainer *)container
+- (void)setContainerPortal:(PBXObject *)container
 {
 	_containerPortal = container;
 }
@@ -62,6 +84,36 @@
 	_remoteInfo = [info copy];
 }
 
+- (PBXContainer *)remoteContainer
+{
+	if ([_containerPortal isKindOfClass:[PBXContainer class]])
+		return ((PBXContainer *)_containerPortal);
+	return (nil);
+}
+
+- (PBXObject *)remoteContainerItem
+{
+	PBXProjectModel *model = [_containerPortal projectModel];
+
+	if (model == nil || _remoteGlobalIDString == nil)
+		return (nil);
+	return ([model objectForID:_remoteGlobalIDString]);
+}
+
+- (BOOL)isEqualToProxy:(PBXContainerItemProxy *)proxy
+{
+	if (proxy == nil)
+		return (NO);
+	return (_proxyType == [proxy proxyType] ||
+	    [_proxyType isEqualToString:[proxy proxyType]]) &&
+	    (_containerPortal == [proxy containerPortal] ||
+	    [_containerPortal isEqual:[proxy containerPortal]]) &&
+	    (_remoteGlobalIDString == [proxy remoteGlobalIDString] ||
+	    [_remoteGlobalIDString isEqualToString:[proxy remoteGlobalIDString]]) &&
+	    (_remoteInfo == [proxy remoteInfo] ||
+	    [_remoteInfo isEqualToString:[proxy remoteInfo]]);
+}
+
 - (NSString *)archiveComment
 {
 	return (_remoteInfo);
@@ -84,6 +136,43 @@
 + (NSArray *)archivableRelationships
 {
 	return (@[@"target", @"targetProxy"]);
+}
+
+- (instancetype)initWithLocalTarget:(PBXTarget *)target
+{
+	self = [self init];
+	if (self != nil) {
+		_target = target;
+		_targetProxy = [[PBXContainerItemProxy alloc]
+		    initWithType:1 portal:[target container]
+		    remoteGlobalIDString:[target objectID]
+		    remoteInfo:[target displayName]];
+	}
+	return (self);
+}
+
+- (instancetype)initWithProjectReference:(PBXReference *)reference
+    remoteTarget:(NSString *)target
+{
+	self = [self init];
+	if (self != nil) {
+		_targetProxy = [[PBXContainerItemProxy alloc]
+		    initWithType:2 portal:reference remoteGlobalIDString:target
+		    remoteInfo:nil];
+	}
+	return (self);
+}
+
+- (instancetype)initWithProductReference:(PBXObject *)reference
+{
+	self = [self init];
+	if (self != nil) {
+		_targetProxy = [[PBXContainerItemProxy alloc]
+		    initWithType:1 portal:[reference container]
+		    remoteGlobalIDString:[reference objectID]
+		    remoteInfo:[reference description]];
+	}
+	return (self);
 }
 
 - (PBXTarget *)target
@@ -114,6 +203,55 @@
 - (void)setName:(NSString *)name
 {
 	_name = [name copy];
+}
+
+- (PBXObject *)productReference
+{
+	PBXObject *remote = [_targetProxy remoteContainerItem];
+
+	if ([remote isKindOfClass:[PBXProductDependency class]])
+		return (remote);
+	return (nil);
+}
+
+- (NSArray *)orderedRecursiveDependencies
+{
+	NSMutableArray *result = [NSMutableArray array];
+	NSMutableSet *seen = [NSMutableSet set];
+	NSMutableArray *stack = [NSMutableArray arrayWithArray:
+	    ([_target dependencies] ?: @[])];
+
+	while ([stack count] > 0) {
+		PBXTargetDependency *dep = [stack objectAtIndex:0];
+
+		[stack removeObjectAtIndex:0];
+		if ([seen containsObject:dep])
+			continue;
+		[seen addObject:dep];
+		[result addObject:dep];
+		[stack addObjectsFromArray:([dep->_target dependencies] ?: @[])];
+	}
+	return (result);
+}
+
+- (PBXTarget *)owner
+{
+	return (_owner);
+}
+
+- (void)setOwner:(PBXTarget *)owner
+{
+	_owner = owner;
+}
+
+- (BOOL)needsSync
+{
+	return (_needsSync);
+}
+
+- (void)setNeedsSync:(BOOL)flag
+{
+	_needsSync = flag;
 }
 
 - (NSString *)archiveComment

@@ -85,6 +85,16 @@
 	_container = container;
 }
 
+- (PBXProjectModel *)projectModel
+{
+	return (_projectModel);
+}
+
+- (void)setProjectModel:(PBXProjectModel *)model
+{
+	_projectModel = model;
+}
+
 - (NSString *)classNameForPListArchive
 {
 	return (_archiveClassName ?: [[self class] classNameForPListArchive]);

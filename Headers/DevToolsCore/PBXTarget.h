@@ -13,19 +13,26 @@
 /* A proxy for an object in another container (used by cross-project deps). */
 @interface PBXContainerItemProxy : PBXProjectItem
 {
-	PBXContainer *_containerPortal;
+	PBXObject *_containerPortal;
 	NSString *_proxyType;
 	NSString *_remoteGlobalIDString;
 	NSString *_remoteInfo;
 }
-- (PBXContainer *)containerPortal;
-- (void)setContainerPortal:(PBXContainer *)container;
+- (instancetype)initWithType:(NSInteger)type portal:(PBXObject *)portal
+    remoteGlobalIDString:(NSString *)idstring remoteInfo:(NSString *)info;
+- (instancetype)initWithType:(NSInteger)type portal:(PBXObject *)portal
+    remoteGlobalID:(PBXObject *)object remoteInfo:(NSString *)info;
+- (PBXObject *)containerPortal;
+- (void)setContainerPortal:(PBXObject *)container;
 - (NSString *)proxyType;
 - (void)setProxyType:(NSString *)type;
 - (NSString *)remoteGlobalIDString;
 - (void)setRemoteGlobalIDString:(NSString *)identifier;
 - (NSString *)remoteInfo;
 - (void)setRemoteInfo:(NSString *)info;
+- (PBXContainer *)remoteContainer;
+- (PBXObject *)remoteContainerItem;
+- (BOOL)isEqualToProxy:(PBXContainerItemProxy *)proxy;
 @end
 
 /* A dependency of one target on another. */
@@ -34,13 +41,25 @@
 	PBXTarget *_target;
 	PBXContainerItemProxy *_targetProxy;
 	NSString *_name;
+	__weak PBXTarget *_owner;
+	BOOL _needsSync;
 }
+- (instancetype)initWithLocalTarget:(PBXTarget *)target;
+- (instancetype)initWithProjectReference:(PBXReference *)reference
+    remoteTarget:(NSString *)target;
+- (instancetype)initWithProductReference:(PBXObject *)reference;
 - (PBXTarget *)target;
 - (void)setTarget:(PBXTarget *)target;
 - (PBXContainerItemProxy *)targetProxy;
 - (void)setTargetProxy:(PBXContainerItemProxy *)proxy;
 - (NSString *)name;
 - (void)setName:(NSString *)name;
+- (PBXObject *)productReference;
+- (NSArray *)orderedRecursiveDependencies;
+- (PBXTarget *)owner;
+- (void)setOwner:(PBXTarget *)owner;
+- (BOOL)needsSync;
+- (void)setNeedsSync:(BOOL)flag;
 @end
 
 /* Base class for the buildable targets of a project. */
