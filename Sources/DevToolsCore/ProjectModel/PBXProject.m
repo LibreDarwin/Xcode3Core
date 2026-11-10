@@ -248,6 +248,36 @@
 	_projectRoot = [root copy];
 }
 
+- (NSNumber *)hasScannedForEncodings
+{
+	return (_hasScannedForEncodings);
+}
+
+- (void)setHasScannedForEncodings:(NSNumber *)flag
+{
+	_hasScannedForEncodings = flag;
+}
+
+- (NSNumber *)minimizedProjectReferenceProxies
+{
+	return (_minimizedProjectReferenceProxies);
+}
+
+- (void)setMinimizedProjectReferenceProxies:(NSNumber *)flag
+{
+	_minimizedProjectReferenceProxies = flag;
+}
+
+- (NSNumber *)preferredProjectObjectVersion
+{
+	return (_preferredProjectObjectVersion);
+}
+
+- (void)setPreferredProjectObjectVersion:(NSNumber *)version
+{
+	_preferredProjectObjectVersion = version;
+}
+
 - (NSArray *)packageReferences
 {
 	return (_packageReferences);
