@@ -330,6 +330,8 @@
 {
 	PBXBuildFile *file;
 
+	if (reference == nil)
+		return (nil);
 	for (file in _files) {
 		if (![file isKindOfClass:[PBXBuildFile class]])
 			continue;
@@ -343,6 +345,8 @@
 {
 	PBXBuildFile *file;
 
+	if (reference == nil)
+		return (nil);
 	for (file in _files) {
 		if (![file isKindOfClass:[PBXBuildFile class]])
 			continue;

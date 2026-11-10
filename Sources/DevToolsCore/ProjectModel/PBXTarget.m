@@ -332,9 +332,209 @@
 	return (_buildPhases);
 }
 
++ (NSArray *)standardBuildPhaseClasses
+{
+	return (@[[PBXHeadersBuildPhase class], [PBXSourcesBuildPhase class],
+	    [PBXFrameworksBuildPhase class], [PBXResourcesBuildPhase class],
+	    [PBXCopyFilesBuildPhase class], [PBXShellScriptBuildPhase class]]);
+}
+
 - (void)setBuildPhases:(NSArray *)phases
 {
+	PBXBuildPhase *phase;
+
 	_buildPhases = (phases != nil) ? [phases mutableCopy] : nil;
+	for (phase in _buildPhases) {
+		if ([phase isKindOfClass:[PBXBuildPhase class]])
+			[phase setTarget:self];
+	}
+}
+
+- (void)insertBuildPhase:(PBXBuildPhase *)phase atIndex:(NSUInteger)index
+{
+	if (phase == nil)
+		return;
+	if (_buildPhases == nil)
+		_buildPhases = [[NSMutableArray alloc] init];
+	if (index > [_buildPhases count])
+		index = [_buildPhases count];
+	[_buildPhases insertObject:phase atIndex:index];
+	[phase setTarget:self];
+}
+
+- (void)addBuildPhase:(PBXBuildPhase *)phase
+{
+	if (phase == nil)
+		return;
+	if (_buildPhases == nil)
+		_buildPhases = [[NSMutableArray alloc] init];
+	[_buildPhases addObject:phase];
+	[phase setTarget:self];
+}
+
+- (void)removeBuildPhase:(PBXBuildPhase *)phase
+{
+	if (phase == nil || _buildPhases == nil)
+		return;
+	if ([phase target] == self)
+		[phase setTarget:nil];
+	[_buildPhases removeObject:phase];
+}
+
+- (void)moveBuildPhase:(PBXBuildPhase *)phase toIndex:(NSUInteger)index
+{
+	NSUInteger current;
+
+	if (phase == nil || _buildPhases == nil)
+		return;
+	current = [_buildPhases indexOfObject:phase];
+	if (current == NSNotFound)
+		return;
+	[_buildPhases removeObjectAtIndex:current];
+	if (index > [_buildPhases count])
+		index = [_buildPhases count];
+	[_buildPhases insertObject:phase atIndex:index];
+}
+
+- (PBXBuildPhase *)buildPhaseNamed:(NSString *)name
+{
+	PBXBuildPhase *phase;
+
+	for (phase in _buildPhases) {
+		if ([phase isKindOfClass:[PBXBuildPhase class]] &&
+		    [[phase name] caseInsensitiveCompare:name] == NSOrderedSame)
+			return (phase);
+	}
+	return (nil);
+}
+
+- (PBXBuildPhase *)buildPhaseOfClass:(Class)aClass
+{
+	PBXBuildPhase *phase;
+
+	for (phase in _buildPhases) {
+		if ([phase isKindOfClass:aClass])
+			return (phase);
+	}
+	return (nil);
+}
+
+- (NSArray *)buildPhasesOfClass:(Class)aClass
+{
+	NSMutableArray *result = [NSMutableArray array];
+	PBXBuildPhase *phase;
+
+	for (phase in _buildPhases) {
+		if ([phase isKindOfClass:aClass])
+			[result addObject:phase];
+	}
+	return (result);
+}
+
+static PBXBuildPhase *DefaultBuildPhase(PBXTarget *target, Class aClass)
+{
+	PBXBuildPhase *phase = [target buildPhaseOfClass:aClass];
+
+	if (phase == nil) {
+		phase = [[aClass alloc] init];
+		[target addBuildPhase:phase];
+	}
+	return (phase);
+}
+
+- (PBXBuildPhase *)defaultHeaderBuildPhase
+{
+	return (DefaultBuildPhase(self, [PBXHeadersBuildPhase class]));
+}
+
+- (PBXBuildPhase *)defaultResourceBuildPhase
+{
+	return (DefaultBuildPhase(self, [PBXResourcesBuildPhase class]));
+}
+
+- (PBXBuildPhase *)defaultSourceCodeBuildPhase
+{
+	return (DefaultBuildPhase(self, [PBXSourcesBuildPhase class]));
+}
+
+- (PBXBuildPhase *)defaultLinkBuildPhase
+{
+	return (DefaultBuildPhase(self, [PBXFrameworksBuildPhase class]));
+}
+
+- (PBXBuildPhase *)defaultFrameworksBuildPhase
+{
+	return (DefaultBuildPhase(self, [PBXFrameworksBuildPhase class]));
+}
+
+- (PBXBuildPhase *)defaultRezBuildPhase
+{
+	return (DefaultBuildPhase(self, [PBXRezBuildPhase class]));
+}
+
+- (PBXBuildPhase *)defaultJavaArchiveBuildPhase
+{
+	return (DefaultBuildPhase(self, [PBXJavaArchiveBuildPhase class]));
+}
+
+- (NSArray *)copyFilesBuildPhases
+{
+	return ([self buildPhasesOfClass:[PBXCopyFilesBuildPhase class]]);
+}
+
+- (NSArray *)shellScriptBuildPhases
+{
+	return ([self buildPhasesOfClass:[PBXShellScriptBuildPhase class]]);
+}
+
+- (NSArray *)appleScriptBuildPhases
+{
+	return ([self buildPhasesOfClass:[PBXAppleScriptBuildPhase class]]);
+}
+
+- (BOOL)wantsTopLevelItemForBuildPhases
+{
+	return (YES);
+}
+
+- (BOOL)allowsBuildPhasesOfClass:(Class)aClass
+{
+	return (YES);
+}
+
+- (BOOL)allowsShellScriptBuildPhases
+{
+	return (YES);
+}
+
+- (BOOL)allowsCopyFilesBuildPhases
+{
+	return (YES);
+}
+
+- (BOOL)allowsZeroBuildPhases
+{
+	return (NO);
+}
+
+- (NSArray *)buildPhasesContainingReference:(PBXReference *)reference
+{
+	NSMutableArray *result = [NSMutableArray array];
+	PBXBuildPhase *phase;
+
+	for (phase in _buildPhases) {
+		if (![phase isKindOfClass:[PBXBuildPhase class]])
+			continue;
+		if ([phase buildFileForReference:reference] != nil)
+			[result addObject:phase];
+	}
+	return (result);
+}
+
+- (BOOL)containsBuildFileForReferenceIdenticalTo:(PBXReference *)reference
+    inBuildPhase:(PBXBuildPhase *)phase
+{
+	return ([phase buildFileForReference:reference] != nil);
 }
 
 - (NSArray *)dependencies
@@ -465,6 +665,11 @@
 + (NSString *)classNameForPListArchive
 {
 	return (@"PBXAggregateTarget");
+}
+
+- (BOOL)allowsZeroBuildPhases
+{
+	return (YES);
 }
 
 @end

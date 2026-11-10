@@ -94,6 +94,32 @@
 - (void)setBuildConfigurationList:(XCConfigurationList *)list;
 - (NSArray *)buildPhases;
 - (void)setBuildPhases:(NSArray *)phases;
++ (NSArray *)standardBuildPhaseClasses;
+- (void)insertBuildPhase:(PBXBuildPhase *)phase atIndex:(NSUInteger)index;
+- (void)addBuildPhase:(PBXBuildPhase *)phase;
+- (void)removeBuildPhase:(PBXBuildPhase *)phase;
+- (void)moveBuildPhase:(PBXBuildPhase *)phase toIndex:(NSUInteger)index;
+- (PBXBuildPhase *)buildPhaseNamed:(NSString *)name;
+- (PBXBuildPhase *)buildPhaseOfClass:(Class)aClass;
+- (NSArray *)buildPhasesOfClass:(Class)aClass;
+- (PBXBuildPhase *)defaultHeaderBuildPhase;
+- (PBXBuildPhase *)defaultResourceBuildPhase;
+- (PBXBuildPhase *)defaultSourceCodeBuildPhase;
+- (PBXBuildPhase *)defaultLinkBuildPhase;
+- (PBXBuildPhase *)defaultFrameworksBuildPhase;
+- (PBXBuildPhase *)defaultRezBuildPhase;
+- (PBXBuildPhase *)defaultJavaArchiveBuildPhase;
+- (NSArray *)copyFilesBuildPhases;
+- (NSArray *)shellScriptBuildPhases;
+- (NSArray *)appleScriptBuildPhases;
+- (BOOL)wantsTopLevelItemForBuildPhases;
+- (BOOL)allowsBuildPhasesOfClass:(Class)aClass;
+- (BOOL)allowsShellScriptBuildPhases;
+- (BOOL)allowsCopyFilesBuildPhases;
+- (BOOL)allowsZeroBuildPhases;
+- (NSArray *)buildPhasesContainingReference:(PBXReference *)reference;
+- (BOOL)containsBuildFileForReferenceIdenticalTo:(PBXReference *)reference
+    inBuildPhase:(PBXBuildPhase *)phase;
 - (NSArray *)dependencies;
 - (void)setDependencies:(NSArray *)dependencies;
 - (NSArray *)buildRules;
@@ -142,7 +168,7 @@
 
 @interface PBXToolTarget : PBXJambaseTarget @end
 
-#endif	/* DEVTOOLSCORE_PBXTARGET_H */
-
 @interface PBXStandaloneTarget : PBXJambaseTarget @end
 @interface PBXExternalTarget : PBXTarget @end
+
+#endif	/* DEVTOOLSCORE_PBXTARGET_H */
