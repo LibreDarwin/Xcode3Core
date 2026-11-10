@@ -72,6 +72,7 @@
 @interface PBXProject : PBXContainer
 {
 	NSMutableDictionary *_attributes;
+	NSNumber *_buildIndependentTargetsInParallel;
 	NSMutableArray *_targets;
 	NSMutableArray *_knownRegions;
 	NSMutableArray *_packageReferences;
@@ -89,6 +90,9 @@
 	NSNumber *_preferredProjectObjectVersion;
 }
 - (NSMutableDictionary *)attributes;
+- (void)setAttributes:(NSDictionary *)attributes;
+- (NSNumber *)buildIndependentTargetsInParallel;
+- (void)setBuildIndependentTargetsInParallel:(NSNumber *)flag;
 - (void)setAttributes:(NSDictionary *)attributes;
 - (NSArray *)targets;
 - (void)setTargets:(NSArray *)targets;

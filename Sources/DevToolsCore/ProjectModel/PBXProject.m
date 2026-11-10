@@ -158,6 +158,16 @@
 	    [attributes mutableCopy] : nil;
 }
 
+- (NSNumber *)buildIndependentTargetsInParallel
+{
+	return (_buildIndependentTargetsInParallel);
+}
+
+- (void)setBuildIndependentTargetsInParallel:(NSNumber *)flag
+{
+	_buildIndependentTargetsInParallel = flag;
+}
+
 - (NSArray *)targets
 {
 	return (_targets);
