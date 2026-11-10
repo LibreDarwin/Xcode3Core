@@ -18,19 +18,34 @@
 	NSArray *_platformFilters;
 	NSArray *_assetTags;
 	NSString *_platformFilter;
+	__weak PBXBuildPhase *_buildPhase;
 }
++ (instancetype)buildFileWithReference:(PBXFileReference *)reference;
+- (instancetype)initWithReference:(PBXFileReference *)reference;
+- (instancetype)initWithProductReference:(PBXReference *)reference;
 - (PBXFileReference *)fileRef;
 - (void)setFileRef:(PBXFileReference *)reference;
+- (PBXFileReference *)fileReference;
+- (PBXReference *)reference;
 - (PBXReference *)productRef;
 - (void)setProductRef:(PBXReference *)reference;
+- (PBXReference *)productReference;
 - (NSMutableDictionary *)settings;
 - (void)setSettings:(NSDictionary *)settings;
+- (BOOL)shouldArchiveSettings;
 - (NSArray *)platformFilters;
 - (void)setPlatformFilters:(NSArray *)filters;
 - (NSString *)platformFilter;
 - (void)setPlatformFilter:(NSString *)filter;
 - (NSArray *)assetTags;
 - (void)setAssetTags:(NSArray *)tags;
+- (NSString *)name;
+- (PBXBuildPhase *)buildPhase;
+- (void)setBuildPhase:(PBXBuildPhase *)phase;
+- (PBXTarget *)target;
+- (NSString *)displayName;
+- (NSComparisonResult)compareName:(NSString *)name;
+- (NSComparisonResult)compareFullPath:(NSString *)path;
 @end
 
 /* Base class for the build phases attached to a target. */
@@ -41,8 +56,11 @@
 	NSNumber *_runOnlyForDeploymentPostprocessing;
 	NSMutableArray *_files;
 	NSMutableArray *_customBuildRules;
+	__weak PBXTarget *_target;
 }
++ (NSString *)identifier;
 + (NSString *)defaultName;
++ (instancetype)buildPhase;
 - (NSString *)name;
 - (void)setName:(NSString *)name;
 - (NSNumber *)buildActionMask;
@@ -52,6 +70,27 @@
 - (NSArray *)files;
 - (void)setFiles:(NSArray *)files;
 - (void)addFile:(PBXBuildFile *)file;
+- (NSArray *)buildFiles;
+- (NSArray *)archivedBuildFiles;
+- (void)setArchivedBuildFiles:(NSArray *)files;
+- (void)insertBuildFiles:(NSArray *)files atIndex:(NSUInteger)index;
+- (void)insertBuildFile:(PBXBuildFile *)file atIndex:(NSUInteger)index;
+- (void)addBuildFile:(PBXBuildFile *)file;
+- (void)addBuildFiles:(NSArray *)files;
+- (void)removeBuildFile:(PBXBuildFile *)file;
+- (void)removeBuildFiles:(NSArray *)files;
+- (PBXBuildFile *)buildFileForReference:(PBXReference *)reference;
+- (PBXBuildFile *)buildFileForProductReference:(PBXReference *)reference;
+- (BOOL)containsFileReferenceIdenticalTo:(PBXReference *)reference;
+- (PBXTarget *)target;
+- (void)setTarget:(PBXTarget *)target;
+- (BOOL)canRename;
+- (BOOL)isDeletable;
+- (NSArray *)allowedFileTypes;
+- (BOOL)acceptsReference:(PBXReference *)reference;
+- (BOOL)acceptsVariantGroups;
+- (BOOL)phaseContainsJavaFiles;
+- (BOOL)phaseContainsNonJavaFiles;
 - (NSArray *)customBuildRules;
 - (void)setCustomBuildRules:(NSArray *)rules;
 - (NSString *)displayName;

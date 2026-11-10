@@ -82,6 +82,92 @@
 	_assetTags = (tags != nil) ? [tags mutableCopy] : nil;
 }
 
++ (instancetype)buildFileWithReference:(PBXFileReference *)reference
+{
+	return ([[self alloc] initWithReference:reference]);
+}
+
+- (instancetype)initWithReference:(PBXFileReference *)reference
+{
+	self = [self init];
+	if (self != nil)
+		_fileRef = reference;
+	return (self);
+}
+
+- (instancetype)initWithProductReference:(PBXReference *)reference
+{
+	self = [self init];
+	if (self != nil)
+		_productRef = reference;
+	return (self);
+}
+
+- (PBXFileReference *)fileReference
+{
+	return (_fileRef);
+}
+
+- (PBXReference *)reference
+{
+	return (_fileRef);
+}
+
+- (PBXReference *)productReference
+{
+	return (_productRef);
+}
+
+- (BOOL)shouldArchiveSettings
+{
+	return (_settings != nil && [_settings count] > 0);
+}
+
+- (PBXBuildPhase *)buildPhase
+{
+	return (_buildPhase);
+}
+
+- (void)setBuildPhase:(PBXBuildPhase *)phase
+{
+	_buildPhase = phase;
+}
+
+- (PBXTarget *)target
+{
+	return ([_buildPhase target]);
+}
+
+- (NSString *)displayName
+{
+	PBXReference *ref = _fileRef ?: _productRef;
+	NSString *fileName = [ref displayName] ?: [self objectID];
+	NSString *phaseName = [_buildPhase displayName];
+
+	if (phaseName == nil)
+		phaseName = @"";
+	return ([NSString stringWithFormat:@"%@ in %@", fileName, phaseName]);
+}
+
+- (NSString *)name
+{
+	return ([self displayName]);
+}
+
+- (NSComparisonResult)compareName:(NSString *)name
+{
+	return ([[self displayName] compare:name]);
+}
+
+- (NSComparisonResult)compareFullPath:(NSString *)path
+{
+	NSString *full = [_fileRef path] ?: [_productRef path];
+
+	if (full == nil)
+		return (NSOrderedSame);
+	return ([full compare:path]);
+}
+
 - (NSString *)archiveComment
 {
 	return (nil);
@@ -102,9 +188,19 @@
 	return (@[@"files", @"customBuildRules"]);
 }
 
++ (NSString *)identifier
+{
+	return ([[self class] classNameForPListArchive]);
+}
+
 + (NSString *)defaultName
 {
 	return (nil);
+}
+
++ (instancetype)buildPhase
+{
+	return ([[self alloc] init]);
 }
 
 - (NSString *)name
@@ -144,14 +240,182 @@
 
 - (void)setFiles:(NSArray *)files
 {
+	PBXBuildFile *file;
+
 	_files = (files != nil) ? [files mutableCopy] : nil;
+	for (file in _files) {
+		if ([file isKindOfClass:[PBXBuildFile class]])
+			[file setBuildPhase:self];
+	}
 }
 
 - (void)addFile:(PBXBuildFile *)file
 {
+	[self addBuildFile:file];
+}
+
+- (NSArray *)buildFiles
+{
+	return (_files);
+}
+
+- (NSArray *)archivedBuildFiles
+{
+	return (_files);
+}
+
+- (void)setArchivedBuildFiles:(NSArray *)files
+{
+	[self setFiles:files];
+}
+
+- (void)insertBuildFiles:(NSArray *)files atIndex:(NSUInteger)index
+{
+	PBXBuildFile *file;
+
+	if (_files == nil)
+		_files = [[NSMutableArray alloc] init];
+	if (index > [_files count])
+		index = [_files count];
+	for (file in files) {
+		if (![file isKindOfClass:[PBXBuildFile class]])
+			continue;
+		[_files insertObject:file atIndex:index++];
+		[file setBuildPhase:self];
+	}
+}
+
+- (void)insertBuildFile:(PBXBuildFile *)file atIndex:(NSUInteger)index
+{
+	if (file != nil)
+		[self insertBuildFiles:@[ file ] atIndex:index];
+}
+
+- (void)addBuildFile:(PBXBuildFile *)file
+{
+	if (file == nil)
+		return;
 	if (_files == nil)
 		_files = [[NSMutableArray alloc] init];
 	[_files addObject:file];
+	[file setBuildPhase:self];
+}
+
+- (void)addBuildFiles:(NSArray *)files
+{
+	PBXBuildFile *file;
+
+	for (file in files)
+		[self addBuildFile:file];
+}
+
+- (void)removeBuildFile:(PBXBuildFile *)file
+{
+	if (file == nil || _files == nil)
+		return;
+	if ([file buildPhase] == self)
+		[file setBuildPhase:nil];
+	[_files removeObject:file];
+}
+
+- (void)removeBuildFiles:(NSArray *)files
+{
+	PBXBuildFile *file;
+
+	for (file in files)
+		[self removeBuildFile:file];
+}
+
+- (PBXBuildFile *)buildFileForReference:(PBXReference *)reference
+{
+	PBXBuildFile *file;
+
+	for (file in _files) {
+		if (![file isKindOfClass:[PBXBuildFile class]])
+			continue;
+		if ([file fileRef] == reference || [file productRef] == reference)
+			return (file);
+	}
+	return (nil);
+}
+
+- (PBXBuildFile *)buildFileForProductReference:(PBXReference *)reference
+{
+	PBXBuildFile *file;
+
+	for (file in _files) {
+		if (![file isKindOfClass:[PBXBuildFile class]])
+			continue;
+		if ([file productRef] == reference)
+			return (file);
+	}
+	return (nil);
+}
+
+- (BOOL)containsFileReferenceIdenticalTo:(PBXReference *)reference
+{
+	return ([self buildFileForReference:reference] != nil);
+}
+
+- (PBXTarget *)target
+{
+	return (_target);
+}
+
+- (void)setTarget:(PBXTarget *)target
+{
+	_target = target;
+}
+
+- (BOOL)canRename
+{
+	return (YES);
+}
+
+- (BOOL)isDeletable
+{
+	return (YES);
+}
+
+- (NSArray *)allowedFileTypes
+{
+	return (nil);
+}
+
+- (BOOL)acceptsReference:(PBXReference *)reference
+{
+	return (YES);
+}
+
+- (BOOL)acceptsVariantGroups
+{
+	return (NO);
+}
+
+- (BOOL)phaseContainsJavaFiles
+{
+	PBXBuildFile *file;
+
+	for (file in _files) {
+		NSString *path = [[file fileRef] path];
+
+		if ([[path pathExtension] isEqualToString:@"java"])
+			return (YES);
+	}
+	return (NO);
+}
+
+- (BOOL)phaseContainsNonJavaFiles
+{
+	PBXBuildFile *file;
+
+	for (file in _files) {
+		NSString *path = [[file fileRef] path];
+
+		if (![[path pathExtension] isEqualToString:@"java"])
+			return (YES);
+	}
+	return (NO);
 }
 
 - (NSArray *)customBuildRules
