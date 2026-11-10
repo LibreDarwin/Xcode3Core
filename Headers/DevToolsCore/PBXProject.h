@@ -7,7 +7,7 @@
 
 #import "DevToolsCore/PBXObject.h"
 
-@class PBXGroup, XCConfigurationList, PBXReference;
+@class PBXGroup, PBXTarget, XCConfigurationList, PBXReference;
 
 /* A container owns the references and targets of a project. */
 @interface PBXContainer : PBXObject
@@ -88,7 +88,54 @@
 	NSNumber *_hasScannedForEncodings;
 	NSNumber *_minimizedProjectReferenceProxies;
 	NSNumber *_preferredProjectObjectVersion;
+	NSMutableArray *_knownPlatforms;
+	NSString *_path;
 }
++ (NSArray *)defaultKnownRegions;
++ (NSArray *)defaultKnownPlatforms;
++ (NSString *)projectWrapperExtension;
++ (BOOL)isProjectWrapperExtension:(NSString *)extension;
++ (NSArray *)knownProjectWrapperExtensions;
++ (NSString *)projectFilePathWithPath:(NSString *)path
+    hasArchivingDelegate:(BOOL)delegate;
+- (NSString *)name;
+- (NSString *)path;
+- (void)setPath:(NSString *)path;
+- (NSString *)projectDirectory;
+- (NSString *)lastUpgradeCheck;
+- (void)setLastUpgradeCheck:(NSString *)check;
+- (NSString *)organizationName;
+- (void)setOrganizationName:(NSString *)name;
+- (NSString *)classPrefix;
+- (void)setClassPrefix:(NSString *)prefix;
+- (NSArray *)knownAssetTags;
+- (void)addKnownAssetTag:(NSString *)tag;
+- (void)removeKnownAssetTag:(NSString *)tag;
+- (PBXTarget *)targetNamed:(NSString *)name;
+- (PBXTarget *)targetWithGlobalID:(NSString *)identifier;
+- (void)insertTargets:(NSArray *)targets atIndex:(NSUInteger)index;
+- (void)addTarget:(PBXTarget *)target;
+- (void)removeTarget:(PBXTarget *)target;
+- (NSArray *)allTargetsInDependencyOrder;
+- (void)addRegion:(NSString *)region;
+- (void)removeRegion:(NSString *)region;
+- (NSArray *)knownPlatforms;
+- (void)addPlatform:(NSString *)platform;
+- (PBXGroup *)productReferenceGroup;
+- (void)setProductReferenceGroup:(PBXGroup *)group;
+- (BOOL)shouldArchiveDevelopmentRegion;
+- (BOOL)shouldArchiveKnownRegions;
+- (BOOL)shouldArchiveKnownPlatforms;
+- (BOOL)shouldArchiveAttributes;
+- (void)addTopLevelItem:(PBXObject *)item;
+- (NSUInteger)preferredInsertionIndexForAppendingTopLevelItems;
+- (void)addProjectReference:(PBXReference *)reference;
+- (void)removeProjectReference:(PBXReference *)reference;
+- (void)insertPackageReferences:(NSArray *)references atIndex:(NSUInteger)index;
+- (void)addPackageReference:(PBXReference *)reference;
+- (void)removePackageReference:(PBXReference *)reference;
+- (NSString *)defaultConfigurationName;
+- (void)setDefaultConfigurationName:(NSString *)name;
 - (NSMutableDictionary *)attributes;
 - (void)setAttributes:(NSDictionary *)attributes;
 - (NSNumber *)buildIndependentTargetsInParallel;

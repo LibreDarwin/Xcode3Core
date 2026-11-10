@@ -3,7 +3,14 @@
  * Container classes and PBXProject (DevToolsCore). */
 
 #import "DevToolsCore/PBXProject.h"
+#import "DevToolsCore/PBXProjectModel.h"
+#import "DevToolsCore/PBXReference.h"
+#import "DevToolsCore/PBXTarget.h"
 #import "DevToolsCore/XCBuildConfiguration.h"
+
+@interface PBXProject ()
+- (void)_setAttribute:(id)value forKey:(NSString *)key;
+@end
 
 @implementation PBXContainer
 
@@ -317,6 +324,359 @@
 {
 	_userBuildSettings = (settings != nil) ?
 	    [settings mutableCopy] : nil;
+}
+
++ (NSArray *)defaultKnownRegions
+{
+	return (@[@"en", @"Base"]);
+}
+
++ (NSArray *)defaultKnownPlatforms
+{
+	return (@[@"macosx", @"iphoneos", @"iphonesimulator"]);
+}
+
++ (NSString *)projectWrapperExtension
+{
+	return (@"xcodeproj");
+}
+
++ (BOOL)isProjectWrapperExtension:(NSString *)extension
+{
+	return ([extension caseInsensitiveCompare:@"xcodeproj"] ==
+	    NSOrderedSame);
+}
+
++ (NSArray *)knownProjectWrapperExtensions
+{
+	return (@[@"xcodeproj"]);
+}
+
++ (NSString *)projectFilePathWithPath:(NSString *)path
+    hasArchivingDelegate:(BOOL)delegate
+{
+	return ([path stringByAppendingPathComponent:@"project.pbxproj"]);
+}
+
+- (void)_setAttribute:(id)value forKey:(NSString *)key
+{
+	if (key == nil)
+		return;
+	if (_attributes == nil)
+		_attributes = [[NSMutableDictionary alloc] init];
+	if (value != nil)
+		[_attributes setObject:value forKey:key];
+	else
+		[_attributes removeObjectForKey:key];
+}
+
+- (NSString *)name
+{
+	if (_path != nil)
+		return ([[_path lastPathComponent]
+		    stringByDeletingPathExtension]);
+	if ([_projectDirPath length] > 0)
+		return ([_projectDirPath lastPathComponent]);
+	return (nil);
+}
+
+- (NSString *)path
+{
+	return (_path);
+}
+
+- (void)setPath:(NSString *)path
+{
+	_path = [path copy];
+}
+
+- (NSString *)projectDirectory
+{
+	return (_path != nil ? [_path stringByDeletingLastPathComponent] :
+	    nil);
+}
+
+- (NSString *)lastUpgradeCheck
+{
+	return ([_attributes objectForKey:@"LastUpgradeCheck"]);
+}
+
+- (void)setLastUpgradeCheck:(NSString *)check
+{
+	[self _setAttribute:check forKey:@"LastUpgradeCheck"];
+}
+
+- (NSString *)organizationName
+{
+	return ([_attributes objectForKey:@"ORGANIZATIONNAME"]);
+}
+
+- (void)setOrganizationName:(NSString *)name
+{
+	[self _setAttribute:name forKey:@"ORGANIZATIONNAME"];
+}
+
+- (NSString *)classPrefix
+{
+	return ([_attributes objectForKey:@"CLASSPREFIX"]);
+}
+
+- (void)setClassPrefix:(NSString *)prefix
+{
+	[self _setAttribute:prefix forKey:@"CLASSPREFIX"];
+}
+
+- (NSArray *)knownAssetTags
+{
+	return ([_attributes objectForKey:@"KnownAssetTags"]);
+}
+
+- (void)addKnownAssetTag:(NSString *)tag
+{
+	NSMutableArray *tags;
+
+	if (tag == nil)
+		return;
+	tags = [[self knownAssetTags] mutableCopy];
+	if (tags == nil)
+		tags = [[NSMutableArray alloc] init];
+	if (![tags containsObject:tag])
+		[tags addObject:tag];
+	[self _setAttribute:tags forKey:@"KnownAssetTags"];
+}
+
+- (void)removeKnownAssetTag:(NSString *)tag
+{
+	NSMutableArray *tags;
+
+	if (tag == nil)
+		return;
+	tags = [[self knownAssetTags] mutableCopy];
+	if (tags == nil)
+		return;
+	[tags removeObject:tag];
+	[self _setAttribute:tags forKey:@"KnownAssetTags"];
+}
+
+- (PBXTarget *)targetNamed:(NSString *)name
+{
+	PBXTarget *target;
+
+	if (name == nil)
+		return (nil);
+	for (target in _targets) {
+		if ([target isKindOfClass:[PBXTarget class]] &&
+		    [[target name] isEqualToString:name])
+			return (target);
+	}
+	return (nil);
+}
+
+- (PBXTarget *)targetWithGlobalID:(NSString *)identifier
+{
+	id object;
+
+	if (identifier == nil)
+		return (nil);
+	object = [[self projectModel] objectForID:identifier];
+	if ([object isKindOfClass:[PBXTarget class]])
+		return (object);
+	return (nil);
+}
+
+- (void)insertTargets:(NSArray *)targets atIndex:(NSUInteger)index
+{
+	PBXTarget *target;
+
+	if (_targets == nil)
+		_targets = [[NSMutableArray alloc] init];
+	if (index > [_targets count])
+		index = [_targets count];
+	for (target in targets) {
+		if (![target isKindOfClass:[PBXTarget class]])
+			continue;
+		[_targets insertObject:target atIndex:index++];
+	}
+}
+
+- (void)addTarget:(PBXTarget *)target
+{
+	if (target == nil)
+		return;
+	if (_targets == nil)
+		_targets = [[NSMutableArray alloc] init];
+	[_targets addObject:target];
+}
+
+- (void)removeTarget:(PBXTarget *)target
+{
+	if (target == nil || _targets == nil)
+		return;
+	[_targets removeObject:target];
+}
+
+static void VisitTarget(PBXTarget *target, NSMutableSet *visited,
+    NSMutableArray *order, NSSet *targetSet)
+{
+	PBXTargetDependency *dependency;
+
+	if ([visited containsObject:target])
+		return;
+	[visited addObject:target];
+	for (dependency in [target dependencies]) {
+		PBXTarget *depTarget = [dependency target];
+
+		if (depTarget != nil && [targetSet containsObject:depTarget])
+			VisitTarget(depTarget, visited, order, targetSet);
+	}
+	[order addObject:target];
+}
+
+- (NSArray *)allTargetsInDependencyOrder
+{
+	NSMutableArray *order = [NSMutableArray array];
+	NSMutableSet *visited = [NSMutableSet set];
+	NSSet *targetSet = [NSSet setWithArray:_targets ?: @[]];
+	PBXTarget *target;
+
+	for (target in _targets) {
+		if ([target isKindOfClass:[PBXTarget class]])
+			VisitTarget(target, visited, order, targetSet);
+	}
+	return (order);
+}
+
+- (void)addRegion:(NSString *)region
+{
+	if (region == nil)
+		return;
+	if (_knownRegions == nil)
+		_knownRegions = [[NSMutableArray alloc] init];
+	if (![_knownRegions containsObject:region])
+		[_knownRegions addObject:region];
+}
+
+- (void)removeRegion:(NSString *)region
+{
+	if (region == nil)
+		return;
+	[_knownRegions removeObject:region];
+}
+
+- (NSArray *)knownPlatforms
+{
+	return (_knownPlatforms);
+}
+
+- (void)addPlatform:(NSString *)platform
+{
+	if (platform == nil)
+		return;
+	if (_knownPlatforms == nil)
+		_knownPlatforms = [[NSMutableArray alloc] init];
+	if (![_knownPlatforms containsObject:platform])
+		[_knownPlatforms addObject:platform];
+}
+
+- (PBXGroup *)productReferenceGroup
+{
+	return (_productRefGroup);
+}
+
+- (void)setProductReferenceGroup:(PBXGroup *)group
+{
+	_productRefGroup = group;
+}
+
+- (BOOL)shouldArchiveDevelopmentRegion
+{
+	return (YES);
+}
+
+- (BOOL)shouldArchiveKnownRegions
+{
+	return (YES);
+}
+
+- (BOOL)shouldArchiveKnownPlatforms
+{
+	return (NO);
+}
+
+- (BOOL)shouldArchiveAttributes
+{
+	return (YES);
+}
+
+- (void)addTopLevelItem:(PBXObject *)item
+{
+	if (item == nil)
+		return;
+	if ([_mainGroup respondsToSelector:@selector(addItem:)])
+		[_mainGroup performSelector:@selector(addItem:) withObject:item];
+}
+
+- (NSUInteger)preferredInsertionIndexForAppendingTopLevelItems
+{
+	if ([_mainGroup respondsToSelector:@selector(itemCount)])
+		return ([_mainGroup itemCount]);
+	return (0);
+}
+
+- (void)addProjectReference:(PBXReference *)reference
+{
+	if (reference == nil)
+		return;
+	if (_projectReferences == nil)
+		_projectReferences = [[NSMutableArray alloc] init];
+	if (![_projectReferences containsObject:reference])
+		[_projectReferences addObject:reference];
+}
+
+- (void)removeProjectReference:(PBXReference *)reference
+{
+	if (reference == nil)
+		return;
+	[_projectReferences removeObject:reference];
+}
+
+- (void)insertPackageReferences:(NSArray *)references atIndex:(NSUInteger)index
+{
+	PBXReference *reference;
+
+	if (_packageReferences == nil)
+		_packageReferences = [[NSMutableArray alloc] init];
+	if (index > [_packageReferences count])
+		index = [_packageReferences count];
+	for (reference in references) {
+		[_packageReferences insertObject:reference atIndex:index++];
+	}
+}
+
+- (void)addPackageReference:(PBXReference *)reference
+{
+	if (reference == nil)
+		return;
+	if (_packageReferences == nil)
+		_packageReferences = [[NSMutableArray alloc] init];
+	[_packageReferences addObject:reference];
+}
+
+- (void)removePackageReference:(PBXReference *)reference
+{
+	if (reference == nil)
+		return;
+	[_packageReferences removeObject:reference];
+}
+
+- (NSString *)defaultConfigurationName
+{
+	return ([_buildConfigurationList defaultConfigurationName]);
+}
+
+- (void)setDefaultConfigurationName:(NSString *)name
+{
+	[_buildConfigurationList setDefaultConfigurationName:name];
 }
 
 @end
