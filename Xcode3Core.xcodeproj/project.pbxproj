@@ -27,6 +27,10 @@
 		1A2B3C4D000000000000000A4 /* PBXPlatformFilterableItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D00000000000000094 /* PBXPlatformFilterableItem.m */; };
 		1A2B3C4D000000000000000A5 /* PBXSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D00000000000000095 /* PBXSupport.m */; };
 		1A2B3C4D000000000000000A7 /* TSPropertyListDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000A6 /* TSPropertyListDictionary.m */; };
+		1A2B3C4D000000000000000B9 /* DVTRegistry.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000B0 /* DVTRegistry.m */; };
+		1A2B3C4D000000000000000BA /* XCSpecification.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000B1 /* XCSpecification.m */; };
+		1A2B3C4D000000000000000BB /* XCSpecificationProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000B2 /* XCSpecificationProxy.m */; };
+		1A2B3C4D000000000000000BC /* XCSpecificationRegistry.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000B3 /* XCSpecificationRegistry.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -76,6 +80,15 @@
 		1A2B3C4D0000000000000009F /* TSPropertyListDictionary.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TSPropertyListDictionary.h; sourceTree = "<group>"; };
 		1A2B3C4D000000000000000A8 /* DevToolsSupport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DevToolsSupport.h; sourceTree = "<group>"; };
 		1A2B3C4D000000000000000A9 /* DevToolsSupport.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DevToolsSupport.m; sourceTree = "<group>"; };
+		1A2B3C4D000000000000000B0 /* DVTRegistry.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DVTRegistry.m; sourceTree = "<group>"; };
+		1A2B3C4D000000000000000B1 /* XCSpecification.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XCSpecification.m; sourceTree = "<group>"; };
+		1A2B3C4D000000000000000B2 /* XCSpecificationProxy.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XCSpecificationProxy.m; sourceTree = "<group>"; };
+		1A2B3C4D000000000000000B3 /* XCSpecificationRegistry.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XCSpecificationRegistry.m; sourceTree = "<group>"; };
+		1A2B3C4D000000000000000B4 /* DVTRegistrable.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DVTRegistrable.h; sourceTree = "<group>"; };
+		1A2B3C4D000000000000000B5 /* DVTRegistry.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DVTRegistry.h; sourceTree = "<group>"; };
+		1A2B3C4D000000000000000B6 /* XCSpecification.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XCSpecification.h; sourceTree = "<group>"; };
+		1A2B3C4D000000000000000B7 /* XCSpecificationProxy.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XCSpecificationProxy.h; sourceTree = "<group>"; };
+		1A2B3C4D000000000000000B8 /* XCSpecificationRegistry.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XCSpecificationRegistry.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -106,6 +119,7 @@
 			children = (
 				1A2B3C4D0000000000000005 /* DevToolsCore */,
 				1A2B3C4D000000000000000AA /* DevToolsSupport */,
+				1A2B3C4D000000000000000AC /* DVTFoundation */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -117,6 +131,7 @@
 				1A2B3C4D000000000000004A /* ProjectModel */,
 				1A2B3C4D0000000000000085 /* pbxmodel */,
 				1A2B3C4D000000000000004B /* pbxtool */,
+				1A2B3C4D000000000000000AD /* BuildSystem */,
 			);
 			path = DevToolsCore;
 			sourceTree = "<group>";
@@ -175,6 +190,7 @@
 			children = (
 				1A2B3C4D0000000000000087 /* DevToolsCore */,
 				1A2B3C4D000000000000000AB /* DevToolsSupport */,
+				1A2B3C4D000000000000000AE /* DVTFoundation */,
 			);
 			path = Headers;
 			sourceTree = "<group>";
@@ -198,6 +214,7 @@
 				1A2B3C4D0000000000000009C /* PBXObjectID.h */,
 				1A2B3C4D0000000000000009D /* PBXPlatformFilter.h */,
 				1A2B3C4D0000000000000009E /* PBXPlatformFilterableItem.h */,
+				1A2B3C4D000000000000000AF /* BuildSystem */,
 			);
 			path = DevToolsCore;
 			sourceTree = "<group>";
@@ -209,6 +226,43 @@
 				1A2B3C4D0000000000000009F /* TSPropertyListDictionary.h */,
 			);
 			path = DevToolsSupport;
+			sourceTree = "<group>";
+		};
+		1A2B3C4D000000000000000AC /* DVTFoundation */ = {
+			isa = PBXGroup;
+			children = (
+				1A2B3C4D000000000000000B0 /* DVTRegistry.m */,
+			);
+			path = DVTFoundation;
+			sourceTree = "<group>";
+		};
+		1A2B3C4D000000000000000AD /* BuildSystem */ = {
+			isa = PBXGroup;
+			children = (
+				1A2B3C4D000000000000000B1 /* XCSpecification.m */,
+				1A2B3C4D000000000000000B2 /* XCSpecificationProxy.m */,
+				1A2B3C4D000000000000000B3 /* XCSpecificationRegistry.m */,
+			);
+			path = BuildSystem;
+			sourceTree = "<group>";
+		};
+		1A2B3C4D000000000000000AE /* DVTFoundation */ = {
+			isa = PBXGroup;
+			children = (
+				1A2B3C4D000000000000000B4 /* DVTRegistrable.h */,
+				1A2B3C4D000000000000000B5 /* DVTRegistry.h */,
+			);
+			path = DVTFoundation;
+			sourceTree = "<group>";
+		};
+		1A2B3C4D000000000000000AF /* BuildSystem */ = {
+			isa = PBXGroup;
+			children = (
+				1A2B3C4D000000000000000B6 /* XCSpecification.h */,
+				1A2B3C4D000000000000000B7 /* XCSpecificationProxy.h */,
+				1A2B3C4D000000000000000B8 /* XCSpecificationRegistry.h */,
+			);
+			path = BuildSystem;
 			sourceTree = "<group>";
 		};
 		1A2B3C4D000000000000004B /* pbxtool */ = {
@@ -343,6 +397,10 @@
 				1A2B3C4D000000000000000A4 /* PBXPlatformFilterableItem.m in Sources */,
 				1A2B3C4D000000000000000A5 /* PBXSupport.m in Sources */,
 				1A2B3C4D000000000000000A7 /* TSPropertyListDictionary.m in Sources */,
+				1A2B3C4D000000000000000B9 /* DVTRegistry.m in Sources */,
+				1A2B3C4D000000000000000BA /* XCSpecification.m in Sources */,
+				1A2B3C4D000000000000000BB /* XCSpecificationProxy.m in Sources */,
+				1A2B3C4D000000000000000BC /* XCSpecificationRegistry.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

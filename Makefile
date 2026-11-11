@@ -39,7 +39,9 @@ PBXMODEL_OBJS := $(OBJDIR)/pbxmodel.o $(OBJDIR)/pbxproj.o \
 	$(OBJDIR)/PBXSupport.o $(OBJDIR)/PBXNamePath.o \
 	$(OBJDIR)/PBXPlatformFilterableItem.o $(OBJDIR)/PBXFolder.o \
 	$(OBJDIR)/PBXFramework.o $(OBJDIR)/PBXFileTypePart.o \
-	$(OBJDIR)/TSPropertyListDictionary.o
+	$(OBJDIR)/TSPropertyListDictionary.o $(OBJDIR)/DVTRegistry.o \
+	$(OBJDIR)/XCSpecification.o $(OBJDIR)/XCSpecificationProxy.o \
+	$(OBJDIR)/XCSpecificationRegistry.o
 
 PREFIX  ?= /usr/local
 DESTDIR ?=
@@ -133,6 +135,22 @@ $(OBJDIR)/TSPropertyListDictionary.o: Sources/DevToolsSupport/TSPropertyListDict
 $(OBJDIR)/PBXFileTypePart.o: $(PROJECTMODEL)/PBXFileTypePart.m
 	@mkdir -p $(OBJDIR)
 	$(CC) $(OBJCFLAGS) -c -o $@ $(PROJECTMODEL)/PBXFileTypePart.m
+
+$(OBJDIR)/DVTRegistry.o: Sources/DVTFoundation/DVTRegistry.m
+	@mkdir -p $(OBJDIR)
+	$(CC) $(OBJCFLAGS) -c -o $@ Sources/DVTFoundation/DVTRegistry.m
+
+$(OBJDIR)/XCSpecification.o: Sources/DevToolsCore/BuildSystem/XCSpecification.m
+	@mkdir -p $(OBJDIR)
+	$(CC) $(OBJCFLAGS) -c -o $@ Sources/DevToolsCore/BuildSystem/XCSpecification.m
+
+$(OBJDIR)/XCSpecificationProxy.o: Sources/DevToolsCore/BuildSystem/XCSpecificationProxy.m
+	@mkdir -p $(OBJDIR)
+	$(CC) $(OBJCFLAGS) -c -o $@ Sources/DevToolsCore/BuildSystem/XCSpecificationProxy.m
+
+$(OBJDIR)/XCSpecificationRegistry.o: Sources/DevToolsCore/BuildSystem/XCSpecificationRegistry.m
+	@mkdir -p $(OBJDIR)
+	$(CC) $(OBJCFLAGS) -c -o $@ Sources/DevToolsCore/BuildSystem/XCSpecificationRegistry.m
 
 test: all
 	@ok=0; \
