@@ -7,18 +7,63 @@
 
 #import "DevToolsCore/PBXObject.h"
 
-@class PBXGroup, PBXTarget, XCConfigurationList, PBXReference;
+@class PBXGroup, PBXGroupEnumerator, PBXTarget, XCConfigurationList;
+@class PBXReference, PBXFileReference;
 
-/* A container owns the references and targets of a project. */
+/*
+ * A container owns a reference tree.  A project container is backed by an
+ * .xcodeproj wrapper; PBXFolder and PBXFramework containers are backed by a
+ * directory or framework bundle on disk.
+ */
 @interface PBXContainer : PBXObject
 {
 	PBXGroup *_rootGroup;
 	NSArray *_comments;
+	NSString *_path;
+	NSString *_resolvedAbsolutePath;
+	NSString *_basePath;
+	PBXGroupEnumerator *_groupEnumerator;
+	NSMapTable *_uniqueIDsToContainerItems;
 }
++ (PBXContainer *)containerForResolvedAbsolutePath:(NSString *)path;
++ (void)setContainer:(PBXContainer *)container
+    forResolvedAbsolutePath:(NSString *)path;
++ (void)removeContainerForResolvedAbsolutePath:(NSString *)path;
+
 - (PBXGroup *)rootGroup;
 - (void)setRootGroup:(PBXGroup *)group;
+- (void)_setRootGroup:(PBXGroup *)group;
 - (NSArray *)comments;
 - (void)setComments:(NSArray *)comments;
+
+- (NSString *)path;
+- (void)setPath:(NSString *)path;
+- (NSString *)name;
+- (NSString *)basePath;
+- (void)setBasePath:(NSString *)path;
+- (NSString *)absolutePath;
+- (NSString *)resolvedAbsolutePath;
+- (void)invalidateAbsolutePathCache;
+- (NSString *)stringByExpandingString:(NSString *)string;
+- (void)close;
+
+- (NSArray *)children;
+- (NSArray *)references;
+- (void)addReference:(PBXReference *)reference;
+- (void)removeReference:(PBXReference *)reference;
+- (void)addItem:(PBXObject *)item;
+- (void)removeItem:(PBXObject *)item;
+- (PBXObject *)itemForGlobalID:(NSString *)globalID;
+- (PBXObject *)itemForGlobalIDHexString:(NSString *)string;
+- (PBXReference *)referenceForPath:(NSString *)path;
+- (PBXFileReference *)fileReferenceForPath:(NSString *)path;
+- (BOOL)enumerateReferencesUsingBlock:
+    (BOOL (^)(PBXReference *reference))block;
+- (PBXGroupEnumerator *)groupEnumerator;
+- (void)_clearGroupEnumerator;
+- (BOOL)isReadOnly;
+- (BOOL)allowsEditingOfChildren;
+- (BOOL)validateValueForRootGroup:(PBXGroup *)group error:(NSError **)error;
 @end
 
 /* A container item has a (non-archived) reference to its owning container. */
@@ -89,7 +134,6 @@
 	NSNumber *_minimizedProjectReferenceProxies;
 	NSNumber *_preferredProjectObjectVersion;
 	NSMutableArray *_knownPlatforms;
-	NSString *_path;
 }
 + (NSArray *)defaultKnownRegions;
 + (NSArray *)defaultKnownPlatforms;

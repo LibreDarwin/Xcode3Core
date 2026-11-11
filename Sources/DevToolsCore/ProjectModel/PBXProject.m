@@ -3,6 +3,7 @@
  * Container classes and PBXProject (DevToolsCore). */
 
 #import "DevToolsCore/PBXProject.h"
+#import "DevToolsCore/PBXGroupEnumerator.h"
 #import "DevToolsCore/PBXProjectModel.h"
 #import "DevToolsCore/PBXReference.h"
 #import "DevToolsCore/PBXTarget.h"
@@ -12,7 +13,58 @@
 - (void)_setAttribute:(id)value forKey:(NSString *)key;
 @end
 
+static NSMapTable *sResolvedPathToContainer = nil;
+
 @implementation PBXContainer
+
++ (PBXContainer *)containerForResolvedAbsolutePath:(NSString *)path
+{
+	if (path == nil)
+		return (nil);
+	return ([sResolvedPathToContainer objectForKey:path]);
+}
+
++ (void)setContainer:(PBXContainer *)container
+    forResolvedAbsolutePath:(NSString *)path
+{
+	if (path == nil)
+		return;
+	if (sResolvedPathToContainer == nil)
+		sResolvedPathToContainer = [NSMapTable strongToWeakObjectsMapTable];
+	if (container != nil)
+		[sResolvedPathToContainer setObject:container forKey:path];
+	else
+		[sResolvedPathToContainer removeObjectForKey:path];
+}
+
++ (void)removeContainerForResolvedAbsolutePath:(NSString *)path
+{
+	if (path != nil && sResolvedPathToContainer != nil)
+		[sResolvedPathToContainer removeObjectForKey:path];
+}
+
+- (instancetype)init
+{
+	self = [super init];
+	if (self != nil) {
+		_uniqueIDsToContainerItems = [NSMapTable strongToStrongObjectsMapTable];
+		_basePath = [[[NSFileManager defaultManager] currentDirectoryPath] copy];
+	}
+	return (self);
+}
+
+- (void)dealloc
+{
+	NSString *resolved = _resolvedAbsolutePath;
+
+	if (resolved != nil) {
+		PBXContainer *registered =
+		    [[self class] containerForResolvedAbsolutePath:resolved];
+
+		if (registered == self)
+			[[self class] removeContainerForResolvedAbsolutePath:resolved];
+	}
+}
 
 - (PBXGroup *)rootGroup
 {
@@ -20,6 +72,11 @@
 }
 
 - (void)setRootGroup:(PBXGroup *)group
+{
+	[self _setRootGroup:group];
+}
+
+- (void)_setRootGroup:(PBXGroup *)group
 {
 	_rootGroup = group;
 }
@@ -32,6 +89,245 @@
 - (void)setComments:(NSArray *)comments
 {
 	_comments = comments;
+}
+
+- (NSString *)path
+{
+	return (_path);
+}
+
+- (void)setPath:(NSString *)path
+{
+	NSString *oldResolved = _resolvedAbsolutePath;
+
+	if (oldResolved != nil &&
+	    [[self class] containerForResolvedAbsolutePath:oldResolved] == self)
+		[[self class] removeContainerForResolvedAbsolutePath:oldResolved];
+	_path = [path copy];
+	_resolvedAbsolutePath = nil;
+}
+
+- (NSString *)name
+{
+	if (_path == nil)
+		return (nil);
+	return ([_path lastPathComponent]);
+}
+
+- (NSString *)basePath
+{
+	return (_basePath);
+}
+
+- (void)setBasePath:(NSString *)path
+{
+	_basePath = [path copy];
+	_resolvedAbsolutePath = nil;
+}
+
+- (NSString *)absolutePath
+{
+	if (_path == nil)
+		return (nil);
+	if ([_path isAbsolutePath])
+		return (_path);
+	if (_basePath == nil)
+		return ([_path stringByStandardizingPath]);
+	return ([[_basePath stringByAppendingPathComponent:_path]
+	    stringByStandardizingPath]);
+}
+
+- (NSString *)resolvedAbsolutePath
+{
+	if (_resolvedAbsolutePath == nil) {
+		NSString *absolute = [self absolutePath];
+
+		if (absolute != nil) {
+			_resolvedAbsolutePath =
+			    [[absolute stringByResolvingSymlinksInPath] copy];
+			[[self class] setContainer:self
+			    forResolvedAbsolutePath:_resolvedAbsolutePath];
+		}
+	}
+	return (_resolvedAbsolutePath);
+}
+
+- (void)invalidateAbsolutePathCache
+{
+	NSString *resolved = _resolvedAbsolutePath;
+
+	if (resolved != nil &&
+	    [[self class] containerForResolvedAbsolutePath:resolved] == self)
+		[[self class] removeContainerForResolvedAbsolutePath:resolved];
+	_resolvedAbsolutePath = nil;
+	if (_rootGroup != nil)
+		[_rootGroup setContainer:nil];
+}
+
+- (NSString *)stringByExpandingString:(NSString *)string
+{
+	return (string);
+}
+
+- (void)close
+{
+	[self invalidateAbsolutePathCache];
+}
+
+- (NSArray *)children
+{
+	return ([_rootGroup children]);
+}
+
+- (NSArray *)references
+{
+	NSMutableArray *references = [NSMutableArray array];
+	PBXGroup *rootGroup = [self rootGroup];
+
+	if (rootGroup != nil) {
+		[rootGroup enumerateDescendantReferencesUsingBlock:
+		    ^BOOL(PBXReference *reference) {
+			[references addObject:reference];
+			return (YES);
+		}];
+	}
+	return (references);
+}
+
+- (void)addReference:(PBXReference *)reference
+{
+	if (reference == nil)
+		return;
+	if (_rootGroup == nil)
+		_rootGroup = [PBXGroup groupWithName:[self name]];
+	[_rootGroup addChild:reference];
+	[self addItem:reference];
+}
+
+- (void)removeReference:(PBXReference *)reference
+{
+	if (reference == nil)
+		return;
+	[reference removeFromGroup];
+	[self removeItem:reference];
+}
+
+- (void)addItem:(PBXObject *)item
+{
+	NSString *objectID;
+
+	if (item == nil)
+		return;
+	objectID = [item objectID];
+	if (objectID != nil)
+		[_uniqueIDsToContainerItems setObject:item forKey:objectID];
+	[item setContainer:self];
+}
+
+- (void)removeItem:(PBXObject *)item
+{
+	NSString *objectID;
+
+	if (item == nil)
+		return;
+	objectID = [item objectID];
+	if (objectID != nil &&
+	    [_uniqueIDsToContainerItems objectForKey:objectID] == item)
+		[_uniqueIDsToContainerItems removeObjectForKey:objectID];
+	if ([item container] == self)
+		[item setContainer:nil];
+}
+
+- (PBXObject *)itemForGlobalID:(NSString *)globalID
+{
+	PBXObject *item;
+
+	if (globalID == nil)
+		return (nil);
+	item = [_uniqueIDsToContainerItems objectForKey:globalID];
+	if (item != nil)
+		return (item);
+	item = [[self projectModel] objectForID:globalID];
+	if (item != nil && [item container] == self)
+		return (item);
+	return (nil);
+}
+
+- (PBXObject *)itemForGlobalIDHexString:(NSString *)string
+{
+	return ([self itemForGlobalID:string]);
+}
+
+- (PBXReference *)referenceForPath:(NSString *)path
+{
+	PBXReference *reference;
+
+	if (path == nil)
+		return (nil);
+	for (reference in [self references]) {
+		NSString *referencePath = [reference path];
+
+		if (referencePath == nil)
+			continue;
+		if ([referencePath isEqualToString:path])
+			return (reference);
+		if ([[reference absolutePath] isEqualToString:path])
+			return (reference);
+	}
+	return (nil);
+}
+
+- (PBXFileReference *)fileReferenceForPath:(NSString *)path
+{
+	PBXReference *reference = [self referenceForPath:path];
+
+	if ([reference isKindOfClass:[PBXFileReference class]])
+		return ((PBXFileReference *)reference);
+	return (nil);
+}
+
+- (BOOL)enumerateReferencesUsingBlock:(BOOL (^)(PBXReference *reference))block
+{
+	PBXGroup *rootGroup = [self rootGroup];
+
+	if (rootGroup == nil)
+		return (YES);
+	return ([rootGroup enumerateDescendantReferencesUsingBlock:block]);
+}
+
+- (PBXGroupEnumerator *)groupEnumerator
+{
+	PBXGroup *rootGroup = [self rootGroup];
+
+	if (_groupEnumerator == nil && rootGroup != nil)
+		_groupEnumerator = [PBXGroupEnumerator enumeratorForGroup:rootGroup];
+	return (_groupEnumerator);
+}
+
+- (void)_clearGroupEnumerator
+{
+	_groupEnumerator = nil;
+}
+
+- (BOOL)isReadOnly
+{
+	return (NO);
+}
+
+- (BOOL)allowsEditingOfChildren
+{
+	return (YES);
+}
+
+- (BOOL)validateValueForRootGroup:(PBXGroup *)group error:(NSError **)error
+{
+	if (group != nil && ![group isKindOfClass:[PBXGroup class]]) {
+		if (error != NULL)
+			*error = [NSError errorWithDomain:NSCocoaErrorDomain
+			    code:1680 userInfo:nil];
+		return (NO);
+	}
+	return (YES);
 }
 
 @end
@@ -387,7 +683,7 @@
 
 - (void)setPath:(NSString *)path
 {
-	_path = [path copy];
+	[super setPath:path];
 }
 
 - (NSString *)projectDirectory

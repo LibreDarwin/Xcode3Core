@@ -37,7 +37,8 @@ PBXMODEL_OBJS := $(OBJDIR)/pbxmodel.o $(OBJDIR)/pbxproj.o \
 	$(OBJDIR)/PBXProject.o $(OBJDIR)/PBXProjectModel.o $(OBJDIR)/PBXReference.o \
 	$(OBJDIR)/PBXTarget.o $(OBJDIR)/XCBuildConfiguration.o \
 	$(OBJDIR)/PBXSupport.o $(OBJDIR)/PBXNamePath.o \
-	$(OBJDIR)/PBXPlatformFilterableItem.o
+	$(OBJDIR)/PBXPlatformFilterableItem.o $(OBJDIR)/PBXFolder.o \
+	$(OBJDIR)/PBXFramework.o
 
 PREFIX  ?= /usr/local
 DESTDIR ?=
@@ -115,6 +116,14 @@ $(OBJDIR)/PBXNamePath.o: $(PROJECTMODEL)/PBXNamePath.m
 $(OBJDIR)/PBXPlatformFilterableItem.o: $(PROJECTMODEL)/PBXPlatformFilterableItem.m
 	@mkdir -p $(OBJDIR)
 	$(CC) $(OBJCFLAGS) -c -o $@ $(PROJECTMODEL)/PBXPlatformFilterableItem.m
+
+$(OBJDIR)/PBXFolder.o: $(PROJECTMODEL)/PBXFolder.m
+	@mkdir -p $(OBJDIR)
+	$(CC) $(OBJCFLAGS) -c -o $@ $(PROJECTMODEL)/PBXFolder.m
+
+$(OBJDIR)/PBXFramework.o: $(PROJECTMODEL)/PBXFramework.m
+	@mkdir -p $(OBJDIR)
+	$(CC) $(OBJCFLAGS) -c -o $@ $(PROJECTMODEL)/PBXFramework.m
 
 test: all
 	@ok=0; \
