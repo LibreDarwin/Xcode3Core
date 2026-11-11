@@ -52,26 +52,6 @@
 	_settings = (settings != nil) ? [settings mutableCopy] : nil;
 }
 
-- (NSArray *)platformFilters
-{
-	return (_platformFilters);
-}
-
-- (void)setPlatformFilters:(NSArray *)filters
-{
-	_platformFilters = (filters != nil) ? [filters mutableCopy] : nil;
-}
-
-- (NSString *)platformFilter
-{
-	return (_platformFilter);
-}
-
-- (void)setPlatformFilter:(NSString *)filter
-{
-	_platformFilter = [filter copy];
-}
-
 - (NSArray *)assetTags
 {
 	return (_assetTags);

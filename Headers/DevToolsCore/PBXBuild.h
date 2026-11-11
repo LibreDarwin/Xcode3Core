@@ -5,19 +5,18 @@
 #ifndef DEVTOOLSCORE_PBXBUILD_H
 #define DEVTOOLSCORE_PBXBUILD_H
 
+#import "DevToolsCore/PBXPlatformFilterableItem.h"
 #import "DevToolsCore/PBXReference.h"
 
 @class PBXFileReference, PBXTarget, XCBuildConfiguration;
 
 /* A file's membership in a build phase. */
-@interface PBXBuildFile : PBXProjectItem
+@interface PBXBuildFile : PBXPlatformFilterableItem
 {
 	PBXFileReference *_fileRef;
 	PBXReference *_productRef;
 	NSMutableDictionary *_settings;
-	NSArray *_platformFilters;
 	NSArray *_assetTags;
-	NSString *_platformFilter;
 	__weak PBXBuildPhase *_buildPhase;
 }
 + (instancetype)buildFileWithReference:(PBXFileReference *)reference;
@@ -33,10 +32,6 @@
 - (NSMutableDictionary *)settings;
 - (void)setSettings:(NSDictionary *)settings;
 - (BOOL)shouldArchiveSettings;
-- (NSArray *)platformFilters;
-- (void)setPlatformFilters:(NSArray *)filters;
-- (NSString *)platformFilter;
-- (void)setPlatformFilter:(NSString *)filter;
 - (NSArray *)assetTags;
 - (void)setAssetTags:(NSArray *)tags;
 - (NSSet *)attributes;
