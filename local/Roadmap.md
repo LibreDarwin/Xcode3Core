@@ -11,20 +11,27 @@ We must achieve behavioral parity and, where specified, byte-identical output wi
 - [x] Target/reference classes expanded (PBX{Application,Bundle,Framework,Library,Tool,Jambase,Wrapped,Standalone,External}Target, PBX*Reference variants, PBXReferenceProxy)
 - [x] FS-synchronized exceptions (all three variants)
 - [x] Scaffolds for DataModel, BuildSystem, RuntimeSupport, DevToolsSupport, XcodePlugIns
+- [x] PBXPlatformFilter, PBXObjectID, PBXGroupEnumerator
 
 ## In Progress / Next
 ### 1) Deepen ProjectModel parity
-- [ ] Complete PBXProject API surface (projectReferences, userBuildSettings, attributes handling, root object behavior) to match Apple behavior
-- [ ] Complete PBXTarget/PBXProjectItem behaviors, dependencies resolution, display names/comments
-- [ ] Complete PBXBuildFile settings, platform filters; PBXBuildPhase ordering/semantics
-- [ ] Complete PBXGroup/PBXFileReference/PBXVariantGroup/XCVersionGroup full APIs
-- [ ] Ensure archiving canonical order matches Apple for all cases; verify on broader corpus
-- [ ] Handle all PBX*ProductType classes if seen (from Apple binary) - add if required
+- [x] Complete PBXProject API surface (projectReferences, userBuildSettings, attributes handling, root object behavior) to match Apple behavior
+- [x] Complete PBXTarget/PBXProjectItem behaviors, dependencies resolution, display names/comments
+- [x] Complete PBXBuildFile settings, platform filters; PBXBuildPhase ordering/semantics
+- [x] Complete PBXGroup/PBXFileReference/PBXVariantGroup/XCVersionGroup full APIs
+- [x] Ensure archiving canonical order matches Apple for all cases; verify on broader corpus (1088/1088 byte-exact)
+- [ ] PBX*ProductType classes: require XCSpecification (BuildSystem), runtime-only and never archived; defer to item 3
+- [ ] PBXArchivingBinding/PBXUnarchivingBinding family: only needed if we expose Apple's binding tables
+- [ ] PBXFileType family: depends on XCSpecification; defer to item 3
 
 ### 2) DataModel (Core Data model format)
-- [ ] Reverse-engineer .xcdatamodel/.xcdatamodeld parsing/writing
+Note: no XCDataModel/XCEntity/XCAttribute/XCRelationship classes exist in
+DevToolsCore or Xcode3Core (verified against the binaries and the 264-class
+list); Core Data model editing lives in the IDE plugins. Keep the scaffold
+only unless a real dependency appears.
+- [ ] Confirm no DevToolsCore integration point exists
+- [ ] Reverse-engineer .xcdatamodel/.xcdatamodeld parsing/writing only if needed
 - [ ] Implement XCDataModel, XCVersionedDataModel, XCEntity, XCAttribute, XCRelationship etc to match Apple behavior
-- [ ] Integration points if used by DevToolsCore
 
 ### 3) BuildSystem
 - [ ] Reverse-engineer XCBuildConfiguration/XCConfigurationList usage in build context
