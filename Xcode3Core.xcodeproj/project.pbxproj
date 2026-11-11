@@ -20,6 +20,12 @@
 		1A2B3C4D0000000000000077 /* PBXReference.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000057 /* PBXReference.m */; };
 		1A2B3C4D0000000000000078 /* PBXTarget.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000058 /* PBXTarget.m */; };
 		1A2B3C4D0000000000000079 /* XCBuildConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000059 /* XCBuildConfiguration.m */; };
+		1A2B3C4D000000000000000A0 /* PBXFileTypePart.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D00000000000000090 /* PBXFileTypePart.m */; };
+		1A2B3C4D000000000000000A1 /* PBXFolder.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D00000000000000091 /* PBXFolder.m */; };
+		1A2B3C4D000000000000000A2 /* PBXFramework.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D00000000000000092 /* PBXFramework.m */; };
+		1A2B3C4D000000000000000A3 /* PBXNamePath.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D00000000000000093 /* PBXNamePath.m */; };
+		1A2B3C4D000000000000000A4 /* PBXPlatformFilterableItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D00000000000000094 /* PBXPlatformFilterableItem.m */; };
+		1A2B3C4D000000000000000A5 /* PBXSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D00000000000000095 /* PBXSupport.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -50,6 +56,21 @@
 		1A2B3C4D000000000000005F /* PBXReference.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PBXReference.h; sourceTree = "<group>"; };
 		1A2B3C4D0000000000000060 /* PBXTarget.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PBXTarget.h; sourceTree = "<group>"; };
 		1A2B3C4D0000000000000061 /* XCBuildConfiguration.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XCBuildConfiguration.h; sourceTree = "<group>"; };
+		1A2B3C4D00000000000000090 /* PBXFileTypePart.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PBXFileTypePart.m; sourceTree = "<group>"; };
+		1A2B3C4D00000000000000091 /* PBXFolder.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PBXFolder.m; sourceTree = "<group>"; };
+		1A2B3C4D00000000000000092 /* PBXFramework.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PBXFramework.m; sourceTree = "<group>"; };
+		1A2B3C4D00000000000000093 /* PBXNamePath.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PBXNamePath.m; sourceTree = "<group>"; };
+		1A2B3C4D00000000000000094 /* PBXPlatformFilterableItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PBXPlatformFilterableItem.m; sourceTree = "<group>"; };
+		1A2B3C4D00000000000000095 /* PBXSupport.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PBXSupport.m; sourceTree = "<group>"; };
+		1A2B3C4D00000000000000096 /* PBXAnchoredReference.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PBXAnchoredReference.h; sourceTree = "<group>"; };
+		1A2B3C4D00000000000000097 /* PBXFileTypePart.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PBXFileTypePart.h; sourceTree = "<group>"; };
+		1A2B3C4D00000000000000098 /* PBXFolder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PBXFolder.h; sourceTree = "<group>"; };
+		1A2B3C4D00000000000000099 /* PBXFramework.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PBXFramework.h; sourceTree = "<group>"; };
+		1A2B3C4D0000000000000009A /* PBXGroupEnumerator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PBXGroupEnumerator.h; sourceTree = "<group>"; };
+		1A2B3C4D0000000000000009B /* PBXNamePath.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PBXNamePath.h; sourceTree = "<group>"; };
+		1A2B3C4D0000000000000009C /* PBXObjectID.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PBXObjectID.h; sourceTree = "<group>"; };
+		1A2B3C4D0000000000000009D /* PBXPlatformFilter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PBXPlatformFilter.h; sourceTree = "<group>"; };
+		1A2B3C4D0000000000000009E /* PBXPlatformFilterableItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PBXPlatformFilterableItem.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -116,6 +137,12 @@
 				1A2B3C4D0000000000000057 /* PBXReference.m */,
 				1A2B3C4D0000000000000058 /* PBXTarget.m */,
 				1A2B3C4D0000000000000059 /* XCBuildConfiguration.m */,
+				1A2B3C4D00000000000000090 /* PBXFileTypePart.m */,
+				1A2B3C4D00000000000000091 /* PBXFolder.m */,
+				1A2B3C4D00000000000000092 /* PBXFramework.m */,
+				1A2B3C4D00000000000000093 /* PBXNamePath.m */,
+				1A2B3C4D00000000000000094 /* PBXPlatformFilterableItem.m */,
+				1A2B3C4D00000000000000095 /* PBXSupport.m */,
 			);
 			path = ProjectModel;
 			sourceTree = "<group>";
@@ -146,6 +173,15 @@
 				1A2B3C4D000000000000005F /* PBXReference.h */,
 				1A2B3C4D0000000000000060 /* PBXTarget.h */,
 				1A2B3C4D0000000000000061 /* XCBuildConfiguration.h */,
+				1A2B3C4D00000000000000096 /* PBXAnchoredReference.h */,
+				1A2B3C4D00000000000000097 /* PBXFileTypePart.h */,
+				1A2B3C4D00000000000000098 /* PBXFolder.h */,
+				1A2B3C4D00000000000000099 /* PBXFramework.h */,
+				1A2B3C4D0000000000000009A /* PBXGroupEnumerator.h */,
+				1A2B3C4D0000000000000009B /* PBXNamePath.h */,
+				1A2B3C4D0000000000000009C /* PBXObjectID.h */,
+				1A2B3C4D0000000000000009D /* PBXPlatformFilter.h */,
+				1A2B3C4D0000000000000009E /* PBXPlatformFilterableItem.h */,
 			);
 			path = DevToolsCore;
 			sourceTree = "<group>";
@@ -275,6 +311,12 @@
 				1A2B3C4D0000000000000077 /* PBXReference.m in Sources */,
 				1A2B3C4D0000000000000078 /* PBXTarget.m in Sources */,
 				1A2B3C4D0000000000000079 /* XCBuildConfiguration.m in Sources */,
+				1A2B3C4D000000000000000A0 /* PBXFileTypePart.m in Sources */,
+				1A2B3C4D000000000000000A1 /* PBXFolder.m in Sources */,
+				1A2B3C4D000000000000000A2 /* PBXFramework.m in Sources */,
+				1A2B3C4D000000000000000A3 /* PBXNamePath.m in Sources */,
+				1A2B3C4D000000000000000A4 /* PBXPlatformFilterableItem.m in Sources */,
+				1A2B3C4D000000000000000A5 /* PBXSupport.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -287,7 +329,11 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				EXECUTABLE_PREFIX = "";
 				GCC_C_LANGUAGE_STANDARD = c11;
-				HEADER_SEARCH_PATHS = "$(SRCROOT)/Sources";
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/Headers",
+					"$(SRCROOT)/Sources",
+					"$(SRCROOT)/Sources/DevToolsCore/ProjectModel",
+				);
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(CONFIGURATION_BUILD_DIR)",
 					"/System/Library/PrivateFrameworks",
@@ -308,7 +354,11 @@
 				EXECUTABLE_PREFIX = "";
 				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_OPTIMIZATION_LEVEL = 3;
-				HEADER_SEARCH_PATHS = "$(SRCROOT)/Sources";
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/Headers",
+					"$(SRCROOT)/Sources",
+					"$(SRCROOT)/Sources/DevToolsCore/ProjectModel",
+				);
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(CONFIGURATION_BUILD_DIR)",
 					"/System/Library/PrivateFrameworks",
@@ -330,7 +380,11 @@
 				CONFIGURATION_BUILD_DIR = "$(SRCROOT)/build/debug";
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				HEADER_SEARCH_PATHS = "$(SRCROOT)/Sources";
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/Headers",
+					"$(SRCROOT)/Sources",
+					"$(SRCROOT)/Sources/DevToolsCore/ProjectModel",
+				);
 				OBJROOT = "$(SRCROOT)/build/obj/debug";
 				SDKROOT = macosx;
 				SYMROOT = "$(SRCROOT)/build";
@@ -343,7 +397,11 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CONFIGURATION_BUILD_DIR = "$(SRCROOT)/build/release";
 				GCC_OPTIMIZATION_LEVEL = 3;
-				HEADER_SEARCH_PATHS = "$(SRCROOT)/Sources";
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/Headers",
+					"$(SRCROOT)/Sources",
+					"$(SRCROOT)/Sources/DevToolsCore/ProjectModel",
+				);
 				OBJROOT = "$(SRCROOT)/build/obj/release";
 				SDKROOT = macosx;
 				SYMROOT = "$(SRCROOT)/build";
@@ -355,7 +413,11 @@
 			buildSettings = {
 				EXECUTABLE_PREFIX = "";
 				GCC_C_LANGUAGE_STANDARD = c11;
-				HEADER_SEARCH_PATHS = "$(SRCROOT)/Sources";
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/Headers",
+					"$(SRCROOT)/Sources",
+					"$(SRCROOT)/Sources/DevToolsCore/ProjectModel",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				OTHER_CFLAGS = (
 					"-D_DARWIN_C_SOURCE",
@@ -372,7 +434,11 @@
 				EXECUTABLE_PREFIX = "";
 				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_OPTIMIZATION_LEVEL = 3;
-				HEADER_SEARCH_PATHS = "$(SRCROOT)/Sources";
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/Headers",
+					"$(SRCROOT)/Sources",
+					"$(SRCROOT)/Sources/DevToolsCore/ProjectModel",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				OTHER_CFLAGS = (
 					"-D_DARWIN_C_SOURCE",
