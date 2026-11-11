@@ -38,7 +38,8 @@ PBXMODEL_OBJS := $(OBJDIR)/pbxmodel.o $(OBJDIR)/pbxproj.o \
 	$(OBJDIR)/PBXTarget.o $(OBJDIR)/XCBuildConfiguration.o \
 	$(OBJDIR)/PBXSupport.o $(OBJDIR)/PBXNamePath.o \
 	$(OBJDIR)/PBXPlatformFilterableItem.o $(OBJDIR)/PBXFolder.o \
-	$(OBJDIR)/PBXFramework.o $(OBJDIR)/PBXFileTypePart.o
+	$(OBJDIR)/PBXFramework.o $(OBJDIR)/PBXFileTypePart.o \
+	$(OBJDIR)/TSPropertyListDictionary.o
 
 PREFIX  ?= /usr/local
 DESTDIR ?=
@@ -124,6 +125,10 @@ $(OBJDIR)/PBXFolder.o: $(PROJECTMODEL)/PBXFolder.m
 $(OBJDIR)/PBXFramework.o: $(PROJECTMODEL)/PBXFramework.m
 	@mkdir -p $(OBJDIR)
 	$(CC) $(OBJCFLAGS) -c -o $@ $(PROJECTMODEL)/PBXFramework.m
+
+$(OBJDIR)/TSPropertyListDictionary.o: Sources/DevToolsSupport/TSPropertyListDictionary.m
+	@mkdir -p $(OBJDIR)
+	$(CC) $(OBJCFLAGS) -c -o $@ Sources/DevToolsSupport/TSPropertyListDictionary.m
 
 $(OBJDIR)/PBXFileTypePart.o: $(PROJECTMODEL)/PBXFileTypePart.m
 	@mkdir -p $(OBJDIR)
