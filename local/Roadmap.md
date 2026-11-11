@@ -12,6 +12,11 @@ We must achieve behavioral parity and, where specified, byte-identical output wi
 - [x] FS-synchronized exceptions (all three variants)
 - [x] Scaffolds for DataModel, BuildSystem, RuntimeSupport, DevToolsSupport, XcodePlugIns
 - [x] PBXPlatformFilter, PBXObjectID, PBXGroupEnumerator
+- [x] PBXNamePath/PBXNamePathComponent, PBXAnchoredReference
+- [x] PBXPlatformFilterableItem superclass for PBXBuildFile
+- [x] PBXContainer path model (path/basePath/absolutePath/resolvedAbsolutePath,
+      container registry, item/reference lookup) and PBXFolder/PBXFramework
+- [x] PBXFileTypePart (abstract base; DevToolsCore ships no concrete parts)
 
 ## In Progress / Next
 ### 1) Deepen ProjectModel parity
@@ -21,7 +26,13 @@ We must achieve behavioral parity and, where specified, byte-identical output wi
 - [x] Complete PBXGroup/PBXFileReference/PBXVariantGroup/XCVersionGroup full APIs
 - [x] Ensure archiving canonical order matches Apple for all cases; verify on broader corpus (1088/1088 byte-exact)
 - [ ] PBX*ProductType classes: require XCSpecification (BuildSystem), runtime-only and never archived; defer to item 3
-- [ ] PBXArchivingBinding/PBXUnarchivingBinding family: only needed if we expose Apple's binding tables
+- [ ] PBXArchivingBinding/PBXUnarchivingBinding family: depends on AppKit
+      NSKeyBinding and on a PListArchiver API (writeValueForObject:toPListArchiver:,
+      pbxPlistArchiver:overrideValue:forArchivingKey:) that we do not expose.
+      They are not used by the archive path we implement; defer until an
+      AppKit-dependent consumer appears.
+- [ ] PBXExtendedWrapperPart / PBXFileSystemSynchronizedGroupRelativeReferenceID:
+      small runtime-only value objects, not used by the archive path
 - [ ] PBXFileType family: depends on XCSpecification; defer to item 3
 
 ### 2) DataModel (Core Data model format)
