@@ -19,6 +19,11 @@
 	NSString *_sourceTree;
 	__weak PBXGroup *_group;
 }
+- (instancetype)initWithName:(NSString *)name path:(NSString *)path
+    sourceTree:(NSString *)tree;
+- (instancetype)initWithName:(NSString *)name path:(NSString *)path;
+- (instancetype)initWithName:(NSString *)name;
+- (instancetype)initWithPath:(NSString *)path;
 - (NSString *)name;
 - (void)setName:(NSString *)name;
 - (NSString *)path;
@@ -43,6 +48,31 @@
 - (NSArray *)children;
 - (void)flattenItemsIntoArray:(NSMutableArray *)array;
 - (BOOL)isAncestorOfItem:(PBXReference *)item;
+- (BOOL)isVariant;
+- (BOOL)isRegionVariant;
+- (NSString *)regionVariantName;
+- (BOOL)isVersion;
+- (BOOL)isCurrentVersion;
+- (BOOL)allowsEditing;
+- (BOOL)canSetName;
+
+/* Path resolution.  <group> paths are resolved through the parent group;
+ * SOURCE_ROOT/SRCROOT through the project directory.  Unresolved build
+ * locations (BUILT_PRODUCTS_DIR, SDKROOT, ...) are returned unexpanded. */
+- (NSString *)absolutePath;
+- (NSString *)absolutePathForDisplay;
+- (NSString *)absoluteDirectory;
+- (NSString *)projectRelativePath;
+- (NSString *)groupRelativePath;
+- (BOOL)fileExists;
+- (BOOL)_hasPath;
+- (NSString *)_path;
+- (NSString *)_sourceTree;
+- (void)_setPath:(NSString *)path;
+- (void)_setSourceTree:(NSString *)tree;
+- (BOOL)shouldArchivePath;
+- (BOOL)shouldArchiveName;
+- (NSString *)presumedBuildConfigurationName;
 
 /* Name ordering used when sorting siblings. */
 - (NSComparisonResult)compareName:(NSString *)name;

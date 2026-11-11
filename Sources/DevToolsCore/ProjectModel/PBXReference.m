@@ -3,12 +3,40 @@
  * File/group reference classes (DevToolsCore). */
 
 #import "DevToolsCore/PBXReference.h"
+#import "DevToolsCore/PBXProjectModel.h"
 
 @implementation PBXReference
 
 + (NSArray *)archivableAttributes
 {
 	return (@[@"name", @"path", @"sourceTree"]);
+}
+
+- (instancetype)initWithName:(NSString *)name path:(NSString *)path
+    sourceTree:(NSString *)tree
+{
+	self = [self init];
+	if (self != nil) {
+		_name = [name copy];
+		_path = [path copy];
+		_sourceTree = [tree copy];
+	}
+	return (self);
+}
+
+- (instancetype)initWithName:(NSString *)name path:(NSString *)path
+{
+	return ([self initWithName:name path:path sourceTree:@"<group>"]);
+}
+
+- (instancetype)initWithName:(NSString *)name
+{
+	return ([self initWithName:name path:nil sourceTree:@"<group>"]);
+}
+
+- (instancetype)initWithPath:(NSString *)path
+{
+	return ([self initWithName:nil path:path sourceTree:@"<absolute>"]);
 }
 
 - (NSString *)name
@@ -108,6 +136,167 @@
 - (BOOL)isAncestorOfItem:(PBXReference *)item
 {
 	return (NO);
+}
+
+- (BOOL)isVariant
+{
+	return ([[self group] isVariantGroup]);
+}
+
+- (BOOL)isRegionVariant
+{
+	return ([self isVariant]);
+}
+
+- (NSString *)regionVariantName
+{
+	return ([self isVariant] ? [self name] : nil);
+}
+
+- (BOOL)isVersion
+{
+	return ([[self group] isVersionGroup]);
+}
+
+- (BOOL)isCurrentVersion
+{
+	PBXGroup *group = [self group];
+
+	if (![group isVersionGroup])
+		return (NO);
+	return ([(XCVersionGroup *)group currentVersion] ==
+	    (PBXFileReference *)self);
+}
+
+- (BOOL)allowsEditing
+{
+	return (YES);
+}
+
+- (BOOL)canSetName
+{
+	return (YES);
+}
+
+- (NSString *)_path
+{
+	return (_path);
+}
+
+- (NSString *)_sourceTree
+{
+	return (_sourceTree);
+}
+
+- (void)_setPath:(NSString *)path
+{
+	_path = [path copy];
+}
+
+- (void)_setSourceTree:(NSString *)tree
+{
+	_sourceTree = [tree copy];
+}
+
+- (BOOL)_hasPath
+{
+	return ([_path length] > 0);
+}
+
+- (NSString *)absolutePath
+{
+	NSString *tree = (_sourceTree != nil) ? _sourceTree : @"<group>";
+	PBXProject *project = [[self projectModel] rootObject];
+
+	if ([tree isEqualToString:@"<absolute>"])
+		return (_path);
+	if ([tree isEqualToString:@"SOURCE_ROOT"] ||
+	    [tree isEqualToString:@"SRCROOT"] ||
+	    [tree isEqualToString:@"PROJECT_DIR"]) {
+		NSString *dir = [project projectDirectory];
+
+		if (dir == nil)
+			return (_path);
+		return (_path != nil ?
+		    [dir stringByAppendingPathComponent:_path] : dir);
+	}
+	if ([tree isEqualToString:@"<group>"]) {
+		PBXGroup *group = [self group];
+		NSString *base = (group != nil) ? [group absolutePath] :
+		    [project projectDirectory];
+
+		if (base == nil)
+			return (_path);
+		return (_path != nil ?
+		    [base stringByAppendingPathComponent:_path] : base);
+	}
+	return (_path);
+}
+
+- (NSString *)absolutePathForDisplay
+{
+	NSString *absolute = [self absolutePath];
+
+	return ((absolute != nil) ? absolute : [self displayName]);
+}
+
+- (NSString *)absoluteDirectory
+{
+	return ([[self absolutePath] stringByDeletingLastPathComponent]);
+}
+
+static NSString *RelativePath(NSString *path, NSString *base)
+{
+	if (path == nil || base == nil)
+		return (nil);
+	if ([path isEqualToString:base])
+		return (@"");
+	if (![path hasPrefix:base])
+		return (nil);
+	if ([base hasSuffix:@"/"])
+		return ([path substringFromIndex:[base length]]);
+	if ([path length] <= [base length] ||
+	    [path characterAtIndex:[base length]] != '/')
+		return (nil);
+	return ([path substringFromIndex:[base length] + 1]);
+}
+
+- (NSString *)projectRelativePath
+{
+	return (RelativePath([self absolutePath],
+	    [[[self projectModel] rootObject] projectDirectory]));
+}
+
+- (NSString *)groupRelativePath
+{
+	PBXGroup *group = [self group];
+
+	return (RelativePath([self absolutePath],
+	    (group != nil) ? [group absolutePath] :
+	    [[[self projectModel] rootObject] projectDirectory]));
+}
+
+- (BOOL)fileExists
+{
+	NSString *absolute = [self absolutePath];
+
+	return (absolute != nil &&
+	    [[NSFileManager defaultManager] fileExistsAtPath:absolute]);
+}
+
+- (BOOL)shouldArchivePath
+{
+	return (_path != nil);
+}
+
+- (BOOL)shouldArchiveName
+{
+	return (_name != nil);
+}
+
+- (NSString *)presumedBuildConfigurationName
+{
+	return (nil);
 }
 
 - (NSComparisonResult)compareName:(NSString *)name
