@@ -93,9 +93,21 @@
 {
 	NSMutableArray *_children;
 }
++ (instancetype)groupWithName:(NSString *)name;
++ (instancetype)groupWithName:(NSString *)name path:(NSString *)path;
 - (NSArray *)children;
 - (void)setChildren:(NSArray *)children;
+- (void)_setChildren:(NSArray *)children;
+- (void)_setItems:(NSArray *)items;
 - (void)addChild:(PBXReference *)reference;
+- (void)addItems:(NSArray *)items;
+- (void)insertItems:(NSArray *)items atIndex:(NSUInteger)index;
+- (void)removeItemsFromChildrenOnly:(NSArray *)items;
+- (BOOL)acceptsItem:(PBXReference *)item;
+- (PBXGroup *)destinationGroupForInsertion;
+- (NSEnumerator *)groupEnumerator;
+- (BOOL)enumerateDescendantReferencesUsingBlock:
+    (BOOL (^)(PBXReference *reference))block;
 
 - (BOOL)allowsSubgroups;
 - (BOOL)containsItem:(PBXReference *)item;

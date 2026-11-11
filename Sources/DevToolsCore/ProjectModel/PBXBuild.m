@@ -82,6 +82,155 @@
 	_assetTags = (tags != nil) ? [tags mutableCopy] : nil;
 }
 
+- (NSSet *)attributes
+{
+	id raw = [_settings objectForKey:@"ATTRIBUTES"];
+
+	if (raw == nil)
+		return ([NSSet set]);
+	if ([raw isKindOfClass:[NSArray class]])
+		return ([NSSet setWithArray:raw]);
+	if ([raw isKindOfClass:[NSSet class]])
+		return (raw);
+	if ([raw isKindOfClass:[NSString class]]) {
+		NSMutableSet *set = [NSMutableSet set];
+		NSArray *parts = [raw componentsSeparatedByString:@","];
+		NSString *part;
+
+		for (part in parts) {
+			NSString *trimmed = [part
+			    stringByTrimmingCharactersInSet:
+			    [NSCharacterSet whitespaceCharacterSet]];
+			if ([trimmed length] > 0)
+				[set addObject:trimmed];
+		}
+		return (set);
+	}
+	return ([NSSet set]);
+}
+
+- (void)setAttributes:(NSSet *)attributes
+{
+	if (_settings == nil)
+		_settings = [[NSMutableDictionary alloc] init];
+	if ([attributes count] == 0) {
+		[_settings removeObjectForKey:@"ATTRIBUTES"];
+	} else {
+		[_settings setObject:[[attributes allObjects]
+		    sortedArrayUsingSelector:@selector(compare:)]
+		    forKey:@"ATTRIBUTES"];
+	}
+}
+
+- (BOOL)boolValueOfAttributeNamed:(NSString *)name
+{
+	return ([[self attributes] containsObject:name]);
+}
+
+- (void)setBoolValue:(BOOL)value ofAttributeNamed:(NSString *)name
+{
+	NSMutableSet *set = [[self attributes] mutableCopy];
+
+	if (value)
+		[set addObject:name];
+	else
+		[set removeObject:name];
+	[self setAttributes:set];
+}
+
+static NSArray *SplitCompilerFlags(NSString *string)
+{
+	NSMutableArray *result = [NSMutableArray array];
+	NSMutableString *current = [NSMutableString string];
+	NSUInteger length = [string length];
+	BOOL inQuotes = NO;
+	NSUInteger i;
+
+	for (i = 0; i < length; i++) {
+		unichar c = [string characterAtIndex:i];
+
+		if (c == '"') {
+			inQuotes = !inQuotes;
+		} else if (!inQuotes &&
+		    [[NSCharacterSet whitespaceCharacterSet]
+		    characterIsMember:c]) {
+			if ([current length] > 0) {
+				[result addObject:[current copy]];
+				current = [NSMutableString string];
+			}
+		} else {
+			[current appendFormat:@"%C", c];
+		}
+	}
+	if ([current length] > 0)
+		[result addObject:[current copy]];
+	return (result);
+}
+
+- (NSArray *)additionalCompilerArguments
+{
+	id raw = [_settings objectForKey:@"COMPILER_FLAGS"];
+
+	if (raw == nil)
+		return (nil);
+	if ([raw isKindOfClass:[NSArray class]])
+		return (raw);
+	if ([raw isKindOfClass:[NSString class]])
+		return (SplitCompilerFlags(raw));
+	return (nil);
+}
+
+- (void)setAdditionalCompilerArguments:(NSArray *)arguments
+{
+	if (_settings == nil)
+		_settings = [[NSMutableDictionary alloc] init];
+	if ([arguments count] == 0)
+		[_settings removeObjectForKey:@"COMPILER_FLAGS"];
+	else
+		[_settings setObject:[arguments componentsJoinedByString:@" "]
+		    forKey:@"COMPILER_FLAGS"];
+}
+
+- (NSString *)additionalCompilerArgumentsAsString
+{
+	id raw = [_settings objectForKey:@"COMPILER_FLAGS"];
+
+	if ([raw isKindOfClass:[NSString class]])
+		return (raw);
+	if ([raw isKindOfClass:[NSArray class]])
+		return ([raw componentsJoinedByString:@" "]);
+	return (nil);
+}
+
+- (void)setAdditionalCompilerArgumentsAsString:(NSString *)string
+{
+	if (_settings == nil)
+		_settings = [[NSMutableDictionary alloc] init];
+	if ([string length] == 0)
+		[_settings removeObjectForKey:@"COMPILER_FLAGS"];
+	else
+		[_settings setObject:[string copy] forKey:@"COMPILER_FLAGS"];
+}
+
+- (NSString *)primaryAttribute
+{
+	NSSet *attributes = [self attributes];
+	NSArray *priority = @[@"Public", @"Private", @"Project", @"Weak"];
+	NSString *candidate;
+
+	for (candidate in priority) {
+		if ([attributes containsObject:candidate])
+			return (candidate);
+	}
+	return ([[[attributes allObjects]
+	    sortedArrayUsingSelector:@selector(compare:)] firstObject]);
+}
+
+- (NSString *)stringValueForPrimaryAttribute
+{
+	return ([self primaryAttribute]);
+}
+
 + (instancetype)buildFileWithReference:(PBXFileReference *)reference
 {
 	return ([[self alloc] initWithReference:reference]);

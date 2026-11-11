@@ -263,9 +263,35 @@
 	return (@[@"children"]);
 }
 
++ (instancetype)groupWithName:(NSString *)name
+{
+	return ([self groupWithName:name path:nil]);
+}
+
++ (instancetype)groupWithName:(NSString *)name path:(NSString *)path
+{
+	PBXGroup *group = [[self alloc] init];
+
+	[group setName:name];
+	if (path != nil)
+		[group setPath:path];
+	[group setSourceTree:@"<group>"];
+	return (group);
+}
+
 - (NSArray *)children
 {
 	return (_children);
+}
+
+- (void)_setChildren:(NSArray *)children
+{
+	[self setChildren:children];
+}
+
+- (void)_setItems:(NSArray *)items
+{
+	[self setChildren:items];
 }
 
 - (void)setChildren:(NSArray *)children
@@ -367,6 +393,66 @@
 - (void)addItem:(PBXReference *)item
 {
 	[self addChild:item];
+}
+
+- (void)addItems:(NSArray *)items
+{
+	PBXReference *item;
+
+	for (item in items)
+		[self addItem:item];
+}
+
+- (void)insertItems:(NSArray *)items atIndex:(NSUInteger)index
+{
+	PBXReference *item;
+
+	for (item in items)
+		[self insertItem:item atIndex:index++];
+}
+
+- (void)removeItemsFromChildrenOnly:(NSArray *)items
+{
+	PBXReference *item;
+
+	for (item in items) {
+		if ([item respondsToSelector:@selector(group)] &&
+		    [item group] == self)
+			[item setGroup:nil];
+		[_children removeObject:item];
+	}
+}
+
+- (BOOL)acceptsItem:(PBXReference *)item
+{
+	return (item != nil && ![self containsItem:item]);
+}
+
+- (PBXGroup *)destinationGroupForInsertion
+{
+	return (self);
+}
+
+- (NSEnumerator *)groupEnumerator
+{
+	return ([_children objectEnumerator]);
+}
+
+- (BOOL)enumerateDescendantReferencesUsingBlock:
+    (BOOL (^)(PBXReference *reference))block
+{
+	PBXReference *child;
+
+	for (child in _children) {
+		if (![child isKindOfClass:[PBXReference class]])
+			continue;
+		if (block != nil && !block(child))
+			return (NO);
+		if ([child isKindOfClass:[PBXGroup class]] &&
+		    ![(PBXGroup *)child enumerateDescendantReferencesUsingBlock:block])
+			return (NO);
+	}
+	return (YES);
 }
 
 - (void)removeItem:(PBXReference *)item

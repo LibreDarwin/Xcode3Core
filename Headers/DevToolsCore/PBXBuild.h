@@ -39,6 +39,16 @@
 - (void)setPlatformFilter:(NSString *)filter;
 - (NSArray *)assetTags;
 - (void)setAssetTags:(NSArray *)tags;
+- (NSSet *)attributes;
+- (void)setAttributes:(NSSet *)attributes;
+- (BOOL)boolValueOfAttributeNamed:(NSString *)name;
+- (void)setBoolValue:(BOOL)value ofAttributeNamed:(NSString *)name;
+- (NSArray *)additionalCompilerArguments;
+- (void)setAdditionalCompilerArguments:(NSArray *)arguments;
+- (NSString *)additionalCompilerArgumentsAsString;
+- (void)setAdditionalCompilerArgumentsAsString:(NSString *)string;
+- (NSString *)primaryAttribute;
+- (NSString *)stringValueForPrimaryAttribute;
 - (NSString *)name;
 - (PBXBuildPhase *)buildPhase;
 - (void)setBuildPhase:(PBXBuildPhase *)phase;
