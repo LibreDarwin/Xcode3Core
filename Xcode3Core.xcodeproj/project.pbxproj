@@ -31,6 +31,8 @@
 		1A2B3C4D000000000000000BA /* XCSpecification.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000B1 /* XCSpecification.m */; };
 		1A2B3C4D000000000000000BB /* XCSpecificationProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000B2 /* XCSpecificationProxy.m */; };
 		1A2B3C4D000000000000000BC /* XCSpecificationRegistry.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000B3 /* XCSpecificationRegistry.m */; };
+		1A2B3C4D000000000000000C1 /* PBXFileType.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000BD /* PBXFileType.m */; };
+		1A2B3C4D000000000000000C2 /* NSString+TSStringAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000BF /* NSString+TSStringAdditions.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -89,6 +91,10 @@
 		1A2B3C4D000000000000000B6 /* XCSpecification.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XCSpecification.h; sourceTree = "<group>"; };
 		1A2B3C4D000000000000000B7 /* XCSpecificationProxy.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XCSpecificationProxy.h; sourceTree = "<group>"; };
 		1A2B3C4D000000000000000B8 /* XCSpecificationRegistry.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XCSpecificationRegistry.h; sourceTree = "<group>"; };
+		1A2B3C4D000000000000000BD /* PBXFileType.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PBXFileType.m; sourceTree = "<group>"; };
+		1A2B3C4D000000000000000BE /* PBXFileType.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PBXFileType.h; sourceTree = "<group>"; };
+		1A2B3C4D000000000000000BF /* NSString+TSStringAdditions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSString+TSStringAdditions.m"; sourceTree = "<group>"; };
+		1A2B3C4D000000000000000C0 /* NSString+TSStringAdditions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSString+TSStringAdditions.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -141,6 +147,7 @@
 			children = (
 				1A2B3C4D000000000000000A9 /* DevToolsSupport.m */,
 				1A2B3C4D000000000000000A6 /* TSPropertyListDictionary.m */,
+				1A2B3C4D000000000000000BF /* NSString+TSStringAdditions.m */,
 			);
 			path = DevToolsSupport;
 			sourceTree = "<group>";
@@ -168,6 +175,7 @@
 				1A2B3C4D0000000000000058 /* PBXTarget.m */,
 				1A2B3C4D0000000000000059 /* XCBuildConfiguration.m */,
 				1A2B3C4D00000000000000090 /* PBXFileTypePart.m */,
+				1A2B3C4D000000000000000BD /* PBXFileType.m */,
 				1A2B3C4D00000000000000091 /* PBXFolder.m */,
 				1A2B3C4D00000000000000092 /* PBXFramework.m */,
 				1A2B3C4D00000000000000093 /* PBXNamePath.m */,
@@ -207,6 +215,7 @@
 				1A2B3C4D0000000000000061 /* XCBuildConfiguration.h */,
 				1A2B3C4D00000000000000096 /* PBXAnchoredReference.h */,
 				1A2B3C4D00000000000000097 /* PBXFileTypePart.h */,
+				1A2B3C4D000000000000000BE /* PBXFileType.h */,
 				1A2B3C4D00000000000000098 /* PBXFolder.h */,
 				1A2B3C4D00000000000000099 /* PBXFramework.h */,
 				1A2B3C4D0000000000000009A /* PBXGroupEnumerator.h */,
@@ -224,6 +233,7 @@
 			children = (
 				1A2B3C4D000000000000000A8 /* DevToolsSupport.h */,
 				1A2B3C4D0000000000000009F /* TSPropertyListDictionary.h */,
+				1A2B3C4D000000000000000C0 /* NSString+TSStringAdditions.h */,
 			);
 			path = DevToolsSupport;
 			sourceTree = "<group>";
@@ -391,12 +401,14 @@
 				1A2B3C4D0000000000000078 /* PBXTarget.m in Sources */,
 				1A2B3C4D0000000000000079 /* XCBuildConfiguration.m in Sources */,
 				1A2B3C4D000000000000000A0 /* PBXFileTypePart.m in Sources */,
+				1A2B3C4D000000000000000C1 /* PBXFileType.m in Sources */,
 				1A2B3C4D000000000000000A1 /* PBXFolder.m in Sources */,
 				1A2B3C4D000000000000000A2 /* PBXFramework.m in Sources */,
 				1A2B3C4D000000000000000A3 /* PBXNamePath.m in Sources */,
 				1A2B3C4D000000000000000A4 /* PBXPlatformFilterableItem.m in Sources */,
 				1A2B3C4D000000000000000A5 /* PBXSupport.m in Sources */,
 				1A2B3C4D000000000000000A7 /* TSPropertyListDictionary.m in Sources */,
+				1A2B3C4D000000000000000C2 /* NSString+TSStringAdditions.m in Sources */,
 				1A2B3C4D000000000000000B9 /* DVTRegistry.m in Sources */,
 				1A2B3C4D000000000000000BA /* XCSpecification.m in Sources */,
 				1A2B3C4D000000000000000BB /* XCSpecificationProxy.m in Sources */,

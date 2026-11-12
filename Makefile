@@ -39,7 +39,9 @@ PBXMODEL_OBJS := $(OBJDIR)/pbxmodel.o $(OBJDIR)/pbxproj.o \
 	$(OBJDIR)/PBXSupport.o $(OBJDIR)/PBXNamePath.o \
 	$(OBJDIR)/PBXPlatformFilterableItem.o $(OBJDIR)/PBXFolder.o \
 	$(OBJDIR)/PBXFramework.o $(OBJDIR)/PBXFileTypePart.o \
-	$(OBJDIR)/TSPropertyListDictionary.o $(OBJDIR)/DVTRegistry.o \
+	$(OBJDIR)/PBXFileType.o \
+	$(OBJDIR)/TSPropertyListDictionary.o \
+	$(OBJDIR)/NSString+TSStringAdditions.o $(OBJDIR)/DVTRegistry.o \
 	$(OBJDIR)/XCSpecification.o $(OBJDIR)/XCSpecificationProxy.o \
 	$(OBJDIR)/XCSpecificationRegistry.o
 
@@ -135,6 +137,14 @@ $(OBJDIR)/TSPropertyListDictionary.o: Sources/DevToolsSupport/TSPropertyListDict
 $(OBJDIR)/PBXFileTypePart.o: $(PROJECTMODEL)/PBXFileTypePart.m
 	@mkdir -p $(OBJDIR)
 	$(CC) $(OBJCFLAGS) -c -o $@ $(PROJECTMODEL)/PBXFileTypePart.m
+
+$(OBJDIR)/PBXFileType.o: $(PROJECTMODEL)/PBXFileType.m
+	@mkdir -p $(OBJDIR)
+	$(CC) $(OBJCFLAGS) -c -o $@ $(PROJECTMODEL)/PBXFileType.m
+
+$(OBJDIR)/NSString+TSStringAdditions.o: Sources/DevToolsSupport/NSString+TSStringAdditions.m
+	@mkdir -p $(OBJDIR)
+	$(CC) $(OBJCFLAGS) -c -o $@ Sources/DevToolsSupport/NSString+TSStringAdditions.m
 
 $(OBJDIR)/DVTRegistry.o: Sources/DVTFoundation/DVTRegistry.m
 	@mkdir -p $(OBJDIR)
