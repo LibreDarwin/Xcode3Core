@@ -45,10 +45,16 @@ only unless a real dependency appears.
 - [ ] Implement XCDataModel, XCVersionedDataModel, XCEntity, XCAttribute, XCRelationship etc to match Apple behavior
 
 ### 3) BuildSystem
+- [x] XCSpecification / XCSpecificationProxy / XCSpecificationRegistry / XCSpecificationFilter
+- [x] PBXFileType and the PBXProject file-type sets (header/source/rezzable/linkable/appleScript)
+- [x] PBXBuildPhase family: identifiers, default names, archivable key tables,
+      template construction, file-type filters, reference acceptance
 - [ ] Reverse-engineer XCBuildConfiguration/XCConfigurationList usage in build context
 - [ ] XCDependencyGraph, build settings expansion, macro evaluation
 - [ ] Target dependencies/phase ordering
 - [ ] Spec loading (.xcspec) compatibility
+      (+registerSpecificationProxiesFromPropertyListsInDirectory:recursively:inDomain:inBundle:)
+- [ ] PBX*ProductType family (unblocked once spec loading can instantiate XCProductTypeSpecification)
 
 ### 4) RuntimeSupport
 - [ ] Macro expansion (XCMacroExpansionExtensions), SDK/package handling
