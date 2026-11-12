@@ -43,7 +43,7 @@ PBXMODEL_OBJS := $(OBJDIR)/pbxmodel.o $(OBJDIR)/pbxproj.o \
 	$(OBJDIR)/TSPropertyListDictionary.o \
 	$(OBJDIR)/NSString+TSStringAdditions.o $(OBJDIR)/DVTRegistry.o \
 	$(OBJDIR)/XCSpecification.o $(OBJDIR)/XCSpecificationProxy.o \
-	$(OBJDIR)/XCSpecificationRegistry.o
+	$(OBJDIR)/XCSpecificationRegistry.o $(OBJDIR)/XCSpecificationFilter.o
 
 PREFIX  ?= /usr/local
 DESTDIR ?=
@@ -157,6 +157,10 @@ $(OBJDIR)/XCSpecification.o: Sources/DevToolsCore/BuildSystem/XCSpecification.m
 $(OBJDIR)/XCSpecificationProxy.o: Sources/DevToolsCore/BuildSystem/XCSpecificationProxy.m
 	@mkdir -p $(OBJDIR)
 	$(CC) $(OBJCFLAGS) -c -o $@ Sources/DevToolsCore/BuildSystem/XCSpecificationProxy.m
+
+$(OBJDIR)/XCSpecificationFilter.o: Sources/DevToolsCore/BuildSystem/XCSpecificationFilter.m
+	@mkdir -p $(OBJDIR)
+	$(CC) $(OBJCFLAGS) -c -o $@ Sources/DevToolsCore/BuildSystem/XCSpecificationFilter.m
 
 $(OBJDIR)/XCSpecificationRegistry.o: Sources/DevToolsCore/BuildSystem/XCSpecificationRegistry.m
 	@mkdir -p $(OBJDIR)

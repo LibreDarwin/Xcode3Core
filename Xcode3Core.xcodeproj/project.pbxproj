@@ -33,6 +33,7 @@
 		1A2B3C4D000000000000000BC /* XCSpecificationRegistry.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000B3 /* XCSpecificationRegistry.m */; };
 		1A2B3C4D000000000000000C1 /* PBXFileType.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000BD /* PBXFileType.m */; };
 		1A2B3C4D000000000000000C2 /* NSString+TSStringAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000BF /* NSString+TSStringAdditions.m */; };
+		1A2B3C4D000000000000000C5 /* XCSpecificationFilter.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000C3 /* XCSpecificationFilter.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -95,6 +96,8 @@
 		1A2B3C4D000000000000000BE /* PBXFileType.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PBXFileType.h; sourceTree = "<group>"; };
 		1A2B3C4D000000000000000BF /* NSString+TSStringAdditions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSString+TSStringAdditions.m"; sourceTree = "<group>"; };
 		1A2B3C4D000000000000000C0 /* NSString+TSStringAdditions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSString+TSStringAdditions.h"; sourceTree = "<group>"; };
+		1A2B3C4D000000000000000C3 /* XCSpecificationFilter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XCSpecificationFilter.m; sourceTree = "<group>"; };
+		1A2B3C4D000000000000000C4 /* XCSpecificationFilter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XCSpecificationFilter.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -252,6 +255,7 @@
 				1A2B3C4D000000000000000B1 /* XCSpecification.m */,
 				1A2B3C4D000000000000000B2 /* XCSpecificationProxy.m */,
 				1A2B3C4D000000000000000B3 /* XCSpecificationRegistry.m */,
+				1A2B3C4D000000000000000C3 /* XCSpecificationFilter.m */,
 			);
 			path = BuildSystem;
 			sourceTree = "<group>";
@@ -271,6 +275,7 @@
 				1A2B3C4D000000000000000B6 /* XCSpecification.h */,
 				1A2B3C4D000000000000000B7 /* XCSpecificationProxy.h */,
 				1A2B3C4D000000000000000B8 /* XCSpecificationRegistry.h */,
+				1A2B3C4D000000000000000C4 /* XCSpecificationFilter.h */,
 			);
 			path = BuildSystem;
 			sourceTree = "<group>";
@@ -413,6 +418,7 @@
 				1A2B3C4D000000000000000BA /* XCSpecification.m in Sources */,
 				1A2B3C4D000000000000000BB /* XCSpecificationProxy.m in Sources */,
 				1A2B3C4D000000000000000BC /* XCSpecificationRegistry.m in Sources */,
+				1A2B3C4D000000000000000C5 /* XCSpecificationFilter.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
