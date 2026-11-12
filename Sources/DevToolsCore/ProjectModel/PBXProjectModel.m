@@ -206,7 +206,13 @@ static NSDictionary *PBXProjectModelClassRegistry(void)
 			PBXObject *object = _objects[[NSString stringWithUTF8String:
 			    objects->entries[i].key]];
 			NSSet *relationships = [[object class] relationshipKeySet];
+			NSMutableSet *archiveRelationships = [NSMutableSet set];
+			NSString *relationship;
 			NSUInteger j;
+
+			for (relationship in relationships)
+				[archiveRelationships addObject:
+				    [[object class] archiveNameForKey:relationship]];
 
 			for (j = 0; j < value->nentry; j++) {
 				const char *field = value->entries[j].key;
@@ -215,7 +221,7 @@ static NSDictionary *PBXProjectModelClassRegistry(void)
 
 				if (strcmp(field, "isa") == 0)
 					continue;
-				if ([relationships containsObject:name])
+				if ([archiveRelationships containsObject:name])
 					converted = [self _resolveReference:
 					    value->entries[j].value];
 				else
@@ -385,17 +391,19 @@ static NSDictionary *PBXProjectModelClassRegistry(void)
 
 		if (value == nil)
 			continue;
+		NSString *archiveKey = [[object class] archiveNameForKey:key];
+
 		if ([relationships containsObject:key]) {
 			NSString *comment = [value isKindOfClass:[PBXObject class]] ?
 			    [value archiveComment] : nil;
 
-			opp_dict_set(dict, [key UTF8String],
+			opp_dict_set(dict, [archiveKey UTF8String],
 			    [self _archiveRelationshipValue:value]);
 			if (comment != nil)
-				opp_dict_set_comment(dict, [key UTF8String],
+				opp_dict_set_comment(dict, [archiveKey UTF8String],
 				    NULL, [comment UTF8String]);
 		} else {
-			opp_dict_set(dict, [key UTF8String],
+			opp_dict_set(dict, [archiveKey UTF8String],
 			    PBXOPPValueFromObject(value));
 		}
 	}

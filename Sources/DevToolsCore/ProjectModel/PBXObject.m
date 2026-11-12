@@ -40,6 +40,11 @@
 	return (keys);
 }
 
++ (NSString *)archiveNameForKey:(NSString *)key
+{
+	return (key);
+}
+
 + (NSSet *)relationshipKeySet
 {
 	NSMutableSet *set = [NSMutableSet set];

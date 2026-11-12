@@ -119,20 +119,39 @@
 
 - (BOOL)includesSpecification:(XCSpecification *)specification
 {
-	BOOL result = _includeAllSpecs;
+	BOOL include = _includeAllSpecs;
+	NSMutableArray *matchingIncludedSpecifications = nil;
 
 	for (XCSpecification *includedSpecification in _includedSpecs) {
-		if ([specification isKindOfSpecification:includedSpecification]) {
-			result = YES;
+		if (![specification isKindOfSpecification:includedSpecification]) {
+			continue;
 		}
+		if (matchingIncludedSpecifications == nil) {
+			matchingIncludedSpecifications = [NSMutableArray array];
+		}
+		[matchingIncludedSpecifications addObject:includedSpecification];
+		include = YES;
 	}
-	if (!result) {
+	if (!include) {
 		return (NO);
 	}
 
 	for (XCSpecification *excludedSpecification in _excludedSpecs) {
-		if (excludedSpecification == specification ||
-		    [excludedSpecification isKindOfSpecification:specification]) {
+		BOOL rescued = NO;
+
+		if (![specification isKindOfSpecification:excludedSpecification]) {
+			continue;
+		}
+		for (XCSpecification *includedSpecification in
+		    matchingIncludedSpecifications) {
+			if (includedSpecification == excludedSpecification ||
+			    [includedSpecification isKindOfSpecification:
+			    excludedSpecification]) {
+				rescued = YES;
+				break;
+			}
+		}
+		if (!rescued) {
 			return (NO);
 		}
 	}

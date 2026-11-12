@@ -140,6 +140,11 @@
 + (NSString *)projectWrapperExtension;
 + (BOOL)isProjectWrapperExtension:(NSString *)extension;
 + (NSArray *)knownProjectWrapperExtensions;
++ (id)headerFileTypes;
++ (id)sourceFileTypes;
++ (id)rezzableFileTypes;
++ (id)linkableFileTypes;
++ (id)appleScriptFileTypes;
 + (NSString *)projectFilePathWithPath:(NSString *)path
     hasArchivingDelegate:(BOOL)delegate;
 - (NSString *)name;

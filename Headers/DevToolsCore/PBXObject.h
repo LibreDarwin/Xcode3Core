@@ -40,6 +40,9 @@
 + (NSArray *)archivableKeys;
 + (NSSet *)relationshipKeySet;
 
+/* Archive key written for a binding key (identity unless overridden). */
++ (NSString *)archiveNameForKey:(NSString *)key;
+
 /* Object identity (the key in the "objects" dictionary). */
 - (NSString *)objectID;
 - (void)setObjectID:(NSString *)objectID;

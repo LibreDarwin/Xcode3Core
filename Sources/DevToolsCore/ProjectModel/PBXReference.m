@@ -78,6 +78,11 @@
 	return (nil);
 }
 
+- (NSString *)fileType
+{
+	return (nil);
+}
+
 - (NSString *)archiveComment
 {
 	return ([self displayName]);

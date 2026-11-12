@@ -34,6 +34,11 @@
 /* Display name used for archive comments (name, else the path's last part). */
 - (NSString *)displayName;
 
+/* File type identifier for this reference.  Apple derives the type from the
+ * path; references that model a type explicitly (PBXFileReference,
+ * XCVersionGroup) override this. */
+- (NSString *)fileType;
+
 /* Owning group (weak back-pointer; set when the group's children are bound). */
 - (PBXGroup *)group;
 - (void)setGroup:(PBXGroup *)group;

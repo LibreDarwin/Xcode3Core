@@ -8,6 +8,8 @@
 #import "DevToolsCore/PBXReference.h"
 #import "DevToolsCore/PBXTarget.h"
 #import "DevToolsCore/XCBuildConfiguration.h"
+#import "DevToolsCore/BuildSystem/XCSpecificationFilter.h"
+#import "DevToolsCore/PBXFileType.h"
 
 @interface PBXProject ()
 - (void)_setAttribute:(id)value forKey:(NSString *)key;
@@ -646,6 +648,124 @@ static NSMapTable *sResolvedPathToContainer = nil;
 + (NSArray *)knownProjectWrapperExtensions
 {
 	return (@[@"xcodeproj"]);
+}
+
+#pragma mark File types
+
+/*
+ * The five class methods below build (once) the specification filters that
+ * describe which file types each kind of build phase accepts.  They are
+ * cached in static variables, exactly like Apple's implementation.
+ *
+ * Deviation: Apple assumes the file-type specifications have already been
+ * loaded, so it passes every looked-up specification straight to the filter.
+ * A standalone tool may run without any .xcspec files, so a lookup that
+ * yields nil is skipped instead of raising.
+ */
+
+static void AddIncluded(XCSpecificationFilter *filter, NSString *identifier)
+{
+	XCSpecification *specification =
+	    [PBXFileType specificationForIdentifier:identifier];
+
+	if (specification != nil)
+		[filter addIncludedSpecification:specification];
+}
+
+static void AddExcluded(XCSpecificationFilter *filter, NSString *identifier)
+{
+	XCSpecification *specification =
+	    [PBXFileType specificationForIdentifier:identifier];
+
+	if (specification != nil)
+		[filter addExcludedSpecification:specification];
+}
+
++ (id)headerFileTypes
+{
+	static XCSpecificationFilter *headerFileTypes = nil;
+
+	if (headerFileTypes == nil) {
+		headerFileTypes = [[XCSpecificationFilter alloc]
+		    initWithSpecificationClass:[PBXFileType class]];
+		AddIncluded(headerFileTypes, @"sourcecode.c.h");
+		AddIncluded(headerFileTypes, @"sourcecode.cpp.h");
+		AddIncluded(headerFileTypes, @"text.apinotes");
+	}
+	return (headerFileTypes);
+}
+
++ (id)sourceFileTypes
+{
+	static XCSpecificationFilter *sourceFileTypes = nil;
+
+	if (sourceFileTypes == nil) {
+		sourceFileTypes = [[XCSpecificationFilter alloc]
+		    initWithSpecificationClass:[PBXFileType class]];
+		AddIncluded(sourceFileTypes, @"sourcecode");
+		AddIncluded(sourceFileTypes, @"text.xml.ibArchivingDescription");
+		AddIncluded(sourceFileTypes, @"text.xml.ibCodingDescription");
+		AddIncluded(sourceFileTypes, @"folder.mlpackage");
+		AddIncluded(sourceFileTypes, @"folder.documentationcatalog");
+		AddIncluded(sourceFileTypes, @"file.referenceobject");
+		AddIncluded(sourceFileTypes, @"folder.fmadapter");
+		[sourceFileTypes addExcludedSpecificationComposition:[self headerFileTypes]];
+		[sourceFileTypes addExcludedSpecificationComposition:[self rezzableFileTypes]];
+		AddExcluded(sourceFileTypes, @"sourcecode.scpt");
+		AddExcluded(sourceFileTypes, @"sourcecode.glsl");
+		AddExcluded(sourceFileTypes, @"sourcecode.javascript");
+		AddExcluded(sourceFileTypes, @"sourcecode.typescript");
+		AddExcluded(sourceFileTypes, @"net.daringfireball.markdown");
+		AddExcluded(sourceFileTypes, @"sourcecode.module-map");
+		AddExcluded(sourceFileTypes, @"sourcecode.text-based-dylib-definition");
+	}
+	return (sourceFileTypes);
+}
+
++ (id)rezzableFileTypes
+{
+	static XCSpecificationFilter *rezzableFileTypes = nil;
+
+	if (rezzableFileTypes == nil) {
+		rezzableFileTypes = [[XCSpecificationFilter alloc]
+		    initWithSpecificationClass:[PBXFileType class]];
+		AddIncluded(rezzableFileTypes, @"sourcecode.rez");
+		AddIncluded(rezzableFileTypes, @"archive.rsrc");
+	}
+	return (rezzableFileTypes);
+}
+
++ (id)linkableFileTypes
+{
+	static XCSpecificationFilter *linkableFileTypes = nil;
+
+	if (linkableFileTypes == nil) {
+		linkableFileTypes = [[XCSpecificationFilter alloc]
+		    initWithSpecificationClass:[PBXFileType class]];
+		AddIncluded(linkableFileTypes, @"wrapper.framework");
+		AddIncluded(linkableFileTypes, @"wrapper.xcframework");
+		AddIncluded(linkableFileTypes, @"archive.ar");
+		AddIncluded(linkableFileTypes, @"compiled.mach-o.dylib");
+		AddIncluded(linkableFileTypes, @"compiled.mach-o.objfile");
+		AddIncluded(linkableFileTypes, @"sourcecode.text-based-dylib-definition");
+		AddIncluded(linkableFileTypes, @"archive.jar");
+		AddIncluded(linkableFileTypes, @"archive.war");
+		AddIncluded(linkableFileTypes, @"archive.ear");
+	}
+	return (linkableFileTypes);
+}
+
++ (id)appleScriptFileTypes
+{
+	static XCSpecificationFilter *appleScriptFileTypes = nil;
+
+	if (appleScriptFileTypes == nil) {
+		appleScriptFileTypes = [[XCSpecificationFilter alloc]
+		    initWithSpecificationClass:[PBXFileType class]];
+		AddIncluded(appleScriptFileTypes, @"sourcecode.applescript");
+		AddIncluded(appleScriptFileTypes, @"sourcecode.scpt");
+	}
+	return (appleScriptFileTypes);
 }
 
 + (NSString *)projectFilePathWithPath:(NSString *)path

@@ -8,7 +8,8 @@
 #import "DevToolsCore/PBXPlatformFilterableItem.h"
 #import "DevToolsCore/PBXReference.h"
 
-@class PBXFileReference, PBXTarget, XCBuildConfiguration;
+@class PBXFileReference, PBXFileType, PBXTarget, XCBuildConfiguration,
+    XCSpecificationFilter;
 
 /* A file's membership in a build phase. */
 @interface PBXBuildFile : PBXPlatformFilterableItem
@@ -66,6 +67,12 @@
 + (NSString *)identifier;
 + (NSString *)defaultName;
 + (instancetype)buildPhase;
++ (instancetype)buildPhaseFromTemplateDictionary:(NSDictionary *)dictionary;
++ (id)fileTypeForCheckingAcceptanceOfReference:(PBXReference *)reference;
++ (BOOL)allowedFileTypes:(XCSpecificationFilter *)filter
+    acceptReference:(PBXReference *)reference;
++ (XCSpecificationFilter *)allowedFileTypes;
++ (NSString *)archiveNameForKey:(NSString *)key;
 - (NSString *)name;
 - (void)setName:(NSString *)name;
 - (NSNumber *)buildActionMask;
@@ -91,14 +98,16 @@
 - (void)setTarget:(PBXTarget *)target;
 - (BOOL)canRename;
 - (BOOL)isDeletable;
-- (NSArray *)allowedFileTypes;
 - (BOOL)acceptsReference:(PBXReference *)reference;
+- (BOOL)acceptsReference:(PBXReference *)reference
+    checkFileType:(BOOL)checkFileType;
+- (BOOL)allowsFileType:(PBXFileType *)fileType;
+- (id)primaryAttributeForBuildFile:(PBXBuildFile *)file;
 - (BOOL)acceptsVariantGroups;
 - (BOOL)phaseContainsJavaFiles;
 - (BOOL)phaseContainsNonJavaFiles;
 - (NSArray *)customBuildRules;
 - (void)setCustomBuildRules:(NSArray *)rules;
-- (NSString *)displayName;
 @end
 
 @interface PBXCopyFilesBuildPhase : PBXBuildPhase
@@ -119,6 +128,7 @@
 {
 	NSString *_shellPath;
 	NSString *_shellScript;
+	NSString *_dependencyFile;
 	NSArray *_inputPaths;
 	NSArray *_outputPaths;
 	NSArray *_inputFileListPaths;
@@ -130,6 +140,10 @@
 - (void)setShellPath:(NSString *)path;
 - (NSString *)shellScript;
 - (void)setShellScript:(NSString *)script;
+- (id<NSCopying>)archivedShellScript;
+- (void)setArchivedShellScript:(id<NSCopying>)script;
+- (NSString *)dependencyFile;
+- (void)setDependencyFile:(NSString *)path;
 - (NSArray *)inputPaths;
 - (void)setInputPaths:(NSArray *)paths;
 - (NSArray *)outputPaths;

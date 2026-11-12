@@ -3,6 +3,9 @@
  * Build-file, build-phase and build-rule classes (DevToolsCore). */
 
 #import "DevToolsCore/PBXBuild.h"
+#import "DevToolsCore/PBXFileType.h"
+#import "DevToolsCore/PBXProject.h"
+#import "DevToolsCore/BuildSystem/XCSpecificationFilter.h"
 
 @implementation PBXBuildFile
 
@@ -271,7 +274,8 @@ static NSArray *SplitCompilerFlags(NSString *string)
 {
 	PBXReference *ref = _fileRef ?: _productRef;
 	NSString *fileName = [ref displayName] ?: [self objectID];
-	NSString *phaseName = [_buildPhase displayName];
+	NSString *phaseName = ([_buildPhase name] != nil) ? [_buildPhase name] :
+	    [[_buildPhase class] defaultName];
 
 	if (phaseName == nil)
 		phaseName = @"";
@@ -306,30 +310,129 @@ static NSArray *SplitCompilerFlags(NSString *string)
 
 @implementation PBXBuildPhase
 
-+ (NSArray *)archivableAttributes
-{
-	return (@[@"buildActionMask", @"name",
-	    @"runOnlyForDeploymentPostprocessing"]);
-}
-
-+ (NSArray *)archivableRelationships
-{
-	return (@[@"files", @"customBuildRules"]);
-}
-
 + (NSString *)identifier
 {
-	return ([[self class] classNameForPListArchive]);
+	return (@"com.apple.buildphase.generic");
 }
 
 + (NSString *)defaultName
 {
-	return (nil);
+	return (@"");
 }
 
 + (instancetype)buildPhase
 {
 	return ([[self alloc] init]);
+}
+
++ (instancetype)buildPhaseFromTemplateDictionary:(NSDictionary *)dictionary
+{
+	NSString *className;
+	Class phaseClass;
+	Class baseClass = [PBXBuildPhase class];
+
+	if (![dictionary isKindOfClass:[NSDictionary class]])
+		[NSException raise:NSInvalidArgumentException format:
+		    @"%@ should be an instance inheriting from %@, but it is %@",
+		    dictionary, [NSDictionary class], [dictionary class]];
+
+	className = [dictionary objectForKey:@"Class"];
+	if (className == nil || [className isEqualToString:@""]) {
+		NSLog(@"ERROR: malformed buildphase dictionary -- required "
+		    "key '%@' is missing or empty", @"Class");
+		return (nil);
+	}
+	phaseClass = NSClassFromString(className);
+	if (phaseClass == Nil) {
+		phaseClass = NSClassFromString(
+		    [NSString stringWithFormat:@"PBX%@BuildPhase", className]);
+	}
+	if (phaseClass == Nil) {
+		NSLog(@"ERROR: malformed buildphase dictionary -- unknown "
+		    "buildphase class '%@'", className);
+		return (nil);
+	}
+	if (![phaseClass isSubclassOfClass:baseClass]) {
+		NSLog(@"ERROR: malformed buildphase dictionary -- buildphase "
+		    "class '%@' doesn't inherit from PBXBuildPhase", className);
+		return (nil);
+	}
+	return ([[phaseClass alloc] initFromTemplateDictionary:dictionary]);
+}
+
++ (id)fileTypeForCheckingAcceptanceOfReference:(PBXReference *)reference
+{
+	NSString *identifier;
+
+	if ([reference isVariant])
+		identifier = [[[[reference children] firstObject] fileType] copy];
+	else
+		identifier = [reference fileType];
+	return ((identifier != nil) ?
+	    [PBXFileType specificationForIdentifier:identifier] : nil);
+}
+
++ (BOOL)allowedFileTypes:(XCSpecificationFilter *)filter
+    acceptReference:(PBXReference *)reference
+{
+	return ([filter includesSpecification:
+	    [self fileTypeForCheckingAcceptanceOfReference:reference]]);
+}
+
++ (XCSpecificationFilter *)allowedFileTypes
+{
+	static XCSpecificationFilter *allowedFileTypes = nil;
+
+	if (allowedFileTypes == nil) {
+		allowedFileTypes = [[XCSpecificationFilter alloc]
+		    initWithSpecificationClass:[PBXFileType class]
+		    includeAllByDefault:YES];
+	}
+	return (allowedFileTypes);
+}
+
++ (NSArray *)archivableAttributes
+{
+	static NSArray *archivableAttributes = nil;
+
+	if (archivableAttributes == nil) {
+		archivableAttributes = @[@"name", @"buildActionMask",
+		    @"runOnlyForDeploymentPostprocessing"];
+	}
+	return (archivableAttributes);
+}
+
++ (NSArray *)archivableRelationships
+{
+	static NSArray *archivableRelationships = nil;
+
+	if (archivableRelationships == nil)
+		archivableRelationships = @[@"archivedBuildFiles"];
+	return (archivableRelationships);
+}
+
++ (NSString *)archiveNameForKey:(NSString *)key
+{
+	if ([key isEqualToString:@"archivedBuildFiles"])
+		return (@"files");
+	return ([super archiveNameForKey:key]);
+}
+
+- (id)initFromTemplateDictionary:(NSDictionary *)dictionary
+{
+	NSString *key;
+
+	if ((self = [self init]) == nil)
+		return (nil);
+	if ([dictionary isKindOfClass:[NSDictionary class]]) {
+		for (key in [[self class] archivableKeys]) {
+			id value = [dictionary objectForKey:key];
+
+			if (value != nil)
+				[self setArchiveValue:value forKey:key];
+		}
+	}
+	return (self);
 }
 
 - (NSString *)name
@@ -502,7 +605,7 @@ static NSArray *SplitCompilerFlags(NSString *string)
 
 - (BOOL)canRename
 {
-	return (YES);
+	return (NO);
 }
 
 - (BOOL)isDeletable
@@ -510,14 +613,74 @@ static NSArray *SplitCompilerFlags(NSString *string)
 	return (YES);
 }
 
-- (NSArray *)allowedFileTypes
+/* Apple answers with an XCPropertyDefinition built from an inline property
+ * list.  We do not model the property-definition subsystem yet, so the base
+ * implementation (which also returns nil) is used for every phase. */
+- (id)primaryAttributeForBuildFile:(PBXBuildFile *)file
 {
+	if (![file isKindOfClass:[PBXBuildFile class]])
+		[NSException raise:NSInvalidArgumentException format:
+		    @"%@ should be an instance inheriting from %@, but it is %@",
+		    file, [PBXBuildFile class], [file class]];
+	if ([file buildPhase] != self)
+		[NSException raise:NSInvalidArgumentException format:
+		    @"%@ should be the build phase of %@", self, file];
 	return (nil);
+}
+
+- (BOOL)_isReferenceReallyInProject:(PBXReference *)reference
+{
+	PBXProjectModel *referenceProject = [reference projectModel];
+
+	if (referenceProject == nil)
+		return (NO);
+	if (referenceProject != [self projectModel])
+		return (NO);
+	return ([reference group] != nil);
+}
+
+- (BOOL)acceptsReference:(PBXReference *)reference
+    checkFileType:(BOOL)checkFileType
+{
+	PBXFileType *fileType;
+
+	if (![self _isReferenceReallyInProject:reference])
+		return (NO);
+	if ([reference isMemberOfClass:[PBXGroup class]])
+		return (NO);
+	if ([reference isKindOfClass:
+	    [PBXFileSystemSynchronizedAbstractGroup class]])
+		return (NO);
+	if ([reference isVariant])
+		return (NO);
+	fileType = [PBXFileType specificationForIdentifier:[reference fileType]];
+	if ([fileType isProjectWrapper])
+		return (NO);
+	if ([reference isVariantGroup]) {
+		if (!checkFileType)
+			return (NO);
+		if (![self acceptsVariantGroups])
+			return (NO);
+	} else if (!checkFileType) {
+		return (YES);
+	}
+	return ([[self class] allowedFileTypes:[[self class] allowedFileTypes]
+	    acceptReference:reference]);
 }
 
 - (BOOL)acceptsReference:(PBXReference *)reference
 {
-	return (YES);
+	return ([self acceptsReference:reference checkFileType:YES]);
+}
+
+- (BOOL)allowsFileType:(PBXFileType *)fileType
+{
+	XCSpecificationFilter *filter = [[self class] allowedFileTypes];
+
+	if (fileType != nil &&
+	    fileType != [PBXFileType specificationForIdentifier:@"file"])
+		return ([filter includesSpecification:fileType]);
+	return ([filter includesAllSpecifications]);
 }
 
 - (BOOL)acceptsVariantGroups
@@ -561,30 +724,28 @@ static NSArray *SplitCompilerFlags(NSString *string)
 	_customBuildRules = (rules != nil) ? [rules mutableCopy] : nil;
 }
 
-- (NSString *)displayName
-{
-	if (_name != nil)
-		return (_name);
-	return ([[self class] defaultName]);
-}
-
 - (NSString *)archiveComment
 {
-	return ([self displayName]);
+	return ((_name != nil) ? _name : [[self class] defaultName]);
 }
 
 @end
 
 @implementation PBXCopyFilesBuildPhase
 
-+ (NSArray *)archivableAttributes
++ (NSString *)identifier
 {
-	return (@[@"dstPath", @"dstSubfolderSpec", @"dstSubfolderSpecName"]);
+	return (@"com.apple.buildphase.copy-files");
 }
 
 + (NSString *)defaultName
 {
-	return (@"CopyFiles");
+	return (@"Copy Files");
+}
+
++ (NSArray *)archivableAttributes
+{
+	return (@[@"dstPath", @"dstSubfolderSpec", @"dstSubfolderSpecName"]);
 }
 
 - (NSString *)dstPath
@@ -621,16 +782,40 @@ static NSArray *SplitCompilerFlags(NSString *string)
 
 @implementation PBXShellScriptBuildPhase
 
-+ (NSArray *)archivableAttributes
++ (NSString *)identifier
 {
-	return (@[@"shellPath", @"shellScript", @"inputPaths", @"outputPaths",
-	    @"inputFileListPaths", @"outputFileListPaths", @"alwaysOutOfDate",
-	    @"showEnvVarsInLog"]);
+	return (@"com.apple.buildphase.shell-script");
 }
 
 + (NSString *)defaultName
 {
-	return (@"ShellScript");
+	return (@"Run Script");
+}
+
++ (NSArray *)archivableAttributes
+{
+	return (@[@"alwaysOutOfDate", @"archivedShellScript", @"dependencyFile",
+	    @"inputFileListPaths", @"inputPaths", @"outputFileListPaths",
+	    @"outputPaths", @"shellPath", @"showEnvVarsInLog"]);
+}
+
++ (NSString *)archiveNameForKey:(NSString *)key
+{
+	if ([key isEqualToString:@"archivedShellScript"])
+		return (@"shellScript");
+	return ([super archiveNameForKey:key]);
+}
+
++ (XCSpecificationFilter *)allowedFileTypes
+{
+	static XCSpecificationFilter *allowedFileTypes = nil;
+
+	if (allowedFileTypes == nil) {
+		allowedFileTypes = [[XCSpecificationFilter alloc]
+		    initWithSpecificationClass:[PBXFileType class]
+		    includeAllByDefault:NO];
+	}
+	return (allowedFileTypes);
 }
 
 - (NSString *)shellPath
@@ -651,6 +836,26 @@ static NSArray *SplitCompilerFlags(NSString *string)
 - (void)setShellScript:(NSString *)script
 {
 	_shellScript = [script copy];
+}
+
+- (id<NSCopying>)archivedShellScript
+{
+	return (_shellScript);
+}
+
+- (void)setArchivedShellScript:(id<NSCopying>)script
+{
+	_shellScript = [(id)script copy];
+}
+
+- (NSString *)dependencyFile
+{
+	return (_dependencyFile);
+}
+
+- (void)setDependencyFile:(NSString *)path
+{
+	_dependencyFile = [path copy];
 }
 
 - (NSArray *)inputPaths
@@ -716,35 +921,164 @@ static NSArray *SplitCompilerFlags(NSString *string)
 @end
 
 @implementation PBXHeadersBuildPhase
-+ (NSString *)defaultName { return (@"Headers"); }
-@end
 
-@implementation PBXSourcesBuildPhase
-+ (NSString *)defaultName { return (@"Sources"); }
-@end
-
-@implementation PBXFrameworksBuildPhase
-+ (NSString *)defaultName { return (@"Frameworks"); }
-@end
-
-@implementation PBXResourcesBuildPhase
-+ (NSString *)defaultName { return (@"Resources"); }
-@end
-
-@implementation PBXRezBuildPhase
-+ (NSString *)defaultName { return (@"Rez"); }
-@end
-
-@implementation PBXAppleScriptBuildPhase
-
-+ (NSArray *)archivableAttributes
++ (NSString *)identifier
 {
-	return (@[@"contextName", @"isSharedContext"]);
+	return (@"com.apple.buildphase.headers");
 }
 
 + (NSString *)defaultName
 {
-	return (@"AppleScript");
+	return (@"Headers");
+}
+
++ (XCSpecificationFilter *)allowedFileTypes
+{
+	return ([PBXProject headerFileTypes]);
+}
+
+@end
+
+@implementation PBXSourcesBuildPhase
+
++ (NSString *)identifier
+{
+	return (@"com.apple.buildphase.sources");
+}
+
++ (NSString *)defaultName
+{
+	return (@"Compile Sources");
+}
+
++ (XCSpecificationFilter *)allowedFileTypes
+{
+	return ([PBXProject sourceFileTypes]);
+}
+
+@end
+
+@implementation PBXFrameworksBuildPhase
+
++ (NSString *)identifier
+{
+	return (@"com.apple.buildphase.frameworks");
+}
+
++ (NSString *)defaultName
+{
+	return (@"Link Binary With Libraries");
+}
+
++ (XCSpecificationFilter *)allowedFileTypes
+{
+	return ([PBXProject linkableFileTypes]);
+}
+
+@end
+
+/* Deviation: see PBXProject.m; nil lookups are skipped. */
+static void AddIncluded(XCSpecificationFilter *filter, NSString *identifier)
+{
+	XCSpecification *specification =
+	    [PBXFileType specificationForIdentifier:identifier];
+
+	if (specification != nil)
+		[filter addIncludedSpecification:specification];
+}
+
+static void AddExcluded(XCSpecificationFilter *filter, NSString *identifier)
+{
+	XCSpecification *specification =
+	    [PBXFileType specificationForIdentifier:identifier];
+
+	if (specification != nil)
+		[filter addExcludedSpecification:specification];
+}
+
+@implementation PBXResourcesBuildPhase
+
++ (NSString *)identifier
+{
+	return (@"com.apple.buildphase.resources");
+}
+
++ (NSString *)defaultName
+{
+	return (@"Copy Bundle Resources");
+}
+
++ (XCSpecificationFilter *)allowedFileTypes
+{
+	static XCSpecificationFilter *allowedFileTypes = nil;
+
+	if (allowedFileTypes == nil) {
+		allowedFileTypes = [[XCSpecificationFilter alloc]
+		    initWithSpecificationClass:[PBXFileType class]
+		    includeAllByDefault:YES];
+		[allowedFileTypes addExcludedSpecifications:
+		    [[PBXSourcesBuildPhase allowedFileTypes]
+		    includedSpecifications]];
+		[allowedFileTypes addExcludedSpecifications:
+		    [[PBXAppleScriptBuildPhase allowedFileTypes]
+		    includedSpecifications]];
+		[allowedFileTypes addExcludedSpecifications:
+		    [[PBXHeadersBuildPhase allowedFileTypes]
+		    includedSpecifications]];
+		[allowedFileTypes addExcludedSpecifications:
+		    [[PBXFrameworksBuildPhase allowedFileTypes]
+		    includedSpecifications]];
+		[allowedFileTypes addExcludedSpecifications:
+		    [[PBXRezBuildPhase allowedFileTypes]
+		    includedSpecifications]];
+		AddExcluded(allowedFileTypes, @"file.playground");
+		AddExcluded(allowedFileTypes, @"text.apinotes");
+		AddIncluded(allowedFileTypes, @"sourcecode.glsl");
+		AddIncluded(allowedFileTypes, @"sourcecode.javascript");
+		AddIncluded(allowedFileTypes, @"net.daringfireball.markdown");
+		AddExcluded(allowedFileTypes, @"sourcecode.module-map");
+		AddExcluded(allowedFileTypes, @"sourcecode.text-based-dylib-definition");
+		AddExcluded(allowedFileTypes, @"text.plist.entitlements");
+	}
+	return (allowedFileTypes);
+}
+
+@end
+
+@implementation PBXRezBuildPhase
+
++ (NSString *)identifier
+{
+	return (@"com.apple.buildphase.rez");
+}
+
++ (NSString *)defaultName
+{
+	return (@"Build Carbon Resources");
+}
+
++ (XCSpecificationFilter *)allowedFileTypes
+{
+	return ([PBXProject rezzableFileTypes]);
+}
+
+@end
+
+@implementation PBXAppleScriptBuildPhase
+
++ (NSString *)identifier
+{
+	return (@"com.apple.buildphase.applescript");
+}
+
++ (NSString *)defaultName
+{
+	return (@"Compile AppleScript Files");
+}
+
++ (XCSpecificationFilter *)allowedFileTypes
+{
+	return ([PBXProject appleScriptFileTypes]);
 }
 
 - (NSString *)contextName
@@ -770,7 +1104,17 @@ static NSArray *SplitCompilerFlags(NSString *string)
 @end
 
 @implementation PBXJavaArchiveBuildPhase
-+ (NSString *)defaultName { return (@"JavaArchive"); }
+
++ (NSString *)identifier
+{
+	return (@"com.apple.buildphase.java-archive");
+}
+
++ (NSString *)defaultName
+{
+	return (@"Build Java Resources");
+}
+
 @end
 
 @implementation PBXBuildRule
