@@ -43,7 +43,8 @@ PBXMODEL_OBJS := $(OBJDIR)/pbxmodel.o $(OBJDIR)/pbxproj.o \
 	$(OBJDIR)/TSPropertyListDictionary.o \
 	$(OBJDIR)/NSString+TSStringAdditions.o $(OBJDIR)/DVTRegistry.o \
 	$(OBJDIR)/XCSpecification.o $(OBJDIR)/XCSpecificationProxy.o \
-	$(OBJDIR)/XCSpecificationRegistry.o $(OBJDIR)/XCSpecificationFilter.o
+	$(OBJDIR)/XCSpecificationRegistry.o $(OBJDIR)/XCSpecificationFilter.o \
+	$(OBJDIR)/DVTFilePath.o $(OBJDIR)/DVTPlugInManager.o
 
 PREFIX  ?= /usr/local
 DESTDIR ?=
@@ -149,6 +150,14 @@ $(OBJDIR)/NSString+TSStringAdditions.o: Sources/DevToolsSupport/NSString+TSStrin
 $(OBJDIR)/DVTRegistry.o: Sources/DVTFoundation/DVTRegistry.m
 	@mkdir -p $(OBJDIR)
 	$(CC) $(OBJCFLAGS) -c -o $@ Sources/DVTFoundation/DVTRegistry.m
+
+$(OBJDIR)/DVTFilePath.o: Sources/DVTFoundation/DVTFilePath.m
+	@mkdir -p $(OBJDIR)
+	$(CC) $(OBJCFLAGS) -c -o $@ Sources/DVTFoundation/DVTFilePath.m
+
+$(OBJDIR)/DVTPlugInManager.o: Sources/DVTFoundation/DVTPlugInManager.m
+	@mkdir -p $(OBJDIR)
+	$(CC) $(OBJCFLAGS) -c -o $@ Sources/DVTFoundation/DVTPlugInManager.m
 
 $(OBJDIR)/XCSpecification.o: Sources/DevToolsCore/BuildSystem/XCSpecification.m
 	@mkdir -p $(OBJDIR)

@@ -26,6 +26,13 @@
  *   - XCSpecificationCache backed proxies are not supported, and
  *   - +registerSpecificationsFromDVTPlugInsForDomains:skippingDomains: is a
  *     no-op because this tree does not implement the plug-in system.
+ *
+ * The specification loaders reproduce Apple's return convention: they return
+ * an array of NSError objects, one per property list element that could not be
+ * registered; successfully registered specifications are only recorded in the
+ * registries.  Directory scanning uses the DVTFilePath and DVTPlugInManager
+ * shims of this tree, and the verbose _kXCSpecificationLoading_LogAspect
+ * diagnostics are not reproduced.
  */
 
 #ifndef DEVTOOLSCORE_BUILDSYSTEM_XCSPECIFICATION_H
@@ -94,7 +101,7 @@
 					  bundle:(NSBundle *)bundle
 			       sourceDescription:(NSString *)sourceDescription
 					inDomain:(NSString *)domain;
-+ (void)_tryRegisterLocalizationDictionaryForSpecification:(XCSpecification *)specification bundle:(NSBundle *)bundle;
++ (void)_tryRegisterLocalizationDictionaryForSpecification:(TSPropertyListDictionary *)specification bundle:(NSBundle *)bundle;
 + (BOOL)_shouldRecurseIntoDirectoryNamed:(NSString *)name ofType:(NSString *)type;
 + (NSArray *)registerSpecificationProxiesFromPropertyListsInDirectory:(NSString *)directory
 							 recursively:(BOOL)recursively

@@ -5,9 +5,45 @@
 #import "DevToolsCore/BuildSystem/XCSpecification.h"
 
 #import <os/lock.h>
+#import <stdarg.h>
 
 #import "DevToolsCore/BuildSystem/XCSpecificationProxy.h"
 #import "DevToolsSupport/TSPropertyListDictionary.h"
+#import "DVTFoundation/DVTFilePath.h"
+#import "DVTFoundation/DVTPlugInManager.h"
+
+/* Apple exports _XCPlatformDirectorySuffix; it is not declared in any public
+ * header, and DVTPlugInManager is not implemented in this tree, so both the
+ * suffix and the "dvtplugin" path extension default live here. */
+static NSString * const XCPlatformDirectorySuffix = @".platform";
+
+/* Fetches a format string from DevToolsCore's PBXCore string table, falling
+ * back to the key itself when the bundle is unavailable. */
+static NSString *
+XCSpecificationLocalizedFormat(NSString *key)
+{
+	NSString *format = [[NSBundle bundleWithIdentifier:@"com.apple.Xcode.DevToolsCore"]
+			    localizedStringForKey:key
+					    value:@""
+					    table:@"PBXCore"];
+
+	return ((format != nil && [format length] != 0) ? format : key);
+}
+
+static NSError *
+XCSpecificationErrorWithLocalizedFormat(NSString *format, ...)
+{
+	va_list arguments;
+
+	va_start(arguments, format);
+	NSString *description = [[NSString alloc] initWithFormat:format arguments:arguments];
+	va_end(arguments);
+
+	return ([NSError errorWithDomain:@"XCSpecificationErrorDomain"
+				    code:0
+				userInfo:[NSDictionary dictionaryWithObject:description
+								     forKey:NSLocalizedDescriptionKey]]);
+}
 
 /*
  * Domain -> registry name -> identifier -> specification.
@@ -552,38 +588,66 @@ NSMutableDictionary *XCGetRegistryDictionaryForForDomain(NSString *domain)
 			    format:@"%@ should be a string, but it is %@", @"type", type];
 	}
 
-	if ([type isEqualToString:NSFileTypeDirectory]) {
-		if ([name hasSuffix:@".lproj"]) {
+	if (![type isEqualToString:NSFileTypeDirectory]) {
+		return (NO);
+	}
+	if ([name hasSuffix:@".lproj"]) {
+		return (NO);
+	}
+	if ([name hasSuffix:XCPlatformDirectorySuffix]) {
+		return (NO);
+	}
+
+	/* Apple skips bundles managed by the plug-in system, which would be loaded
+	 * as plug-ins rather than scanned for specifications. */
+	for (NSString *pathExtension in [[DVTPlugInManager defaultPlugInManager] pathExtensions]) {
+		if ([name hasSuffix:[NSString stringWithFormat:@".%@", pathExtension]]) {
 			return (NO);
 		}
-		return (YES);
 	}
-	return (NO);
+	return (YES);
 }
 
-+ (void)_tryRegisterLocalizationDictionaryForSpecification:(XCSpecification *)specification bundle:(NSBundle *)bundle
++ (void)_tryRegisterLocalizationDictionaryForSpecification:(TSPropertyListDictionary *)specification bundle:(NSBundle *)bundle
 {
-	if (bundle == nil) {
+	if (specification == nil || ![specification isKindOfClass:[TSPropertyListDictionary class]]) {
+		[NSException raise:NSInvalidArgumentException
+			    format:@"%@ should be an instance inheriting from %@, but it is %@",
+				   @"specification", NSStringFromClass([TSPropertyListDictionary class]), specification];
+	}
+
+	id identifier = [specification objectOrNilForKey:@"Identifier"];
+
+	if (identifier == nil || ![identifier isKindOfClass:[NSString class]]) {
 		return;
 	}
 
-	NSString *identifier = [specification identifier];
+	NSString *path = (bundle != nil) ? [bundle pathForResource:identifier ofType:@"strings"] : nil;
 
-	if (identifier == nil) {
-		return;
+	if (path == nil) {
+		id name = [specification objectOrNilForKey:@"Name"];
+
+		if (name == nil || CFGetTypeID((__bridge CFTypeRef)name) != CFStringGetTypeID()) {
+			return;
+		}
+		path = (bundle != nil) ? [bundle pathForResource:name ofType:@"strings"] : nil;
 	}
-
-	NSString *path = [bundle pathForResource:identifier ofType:@"strings"];
-
 	if (path == nil) {
 		return;
 	}
 
-	NSDictionary *strings = [NSDictionary dictionaryWithContentsOfFile:path];
+	NSData *data = [NSData dataWithContentsOfFile:path];
+	NSError *error = nil;
+	id strings = [NSPropertyListSerialization propertyListWithData:data
+							       options:0
+								format:NULL
+								 error:&error];
 
-	if (strings != nil) {
-		[[specification tsProperties] setLocalizationDictionary:strings];
+	if ([strings isKindOfClass:[NSDictionary class]]) {
+		[specification setLocalizationDictionary:strings];
 	}
+	/* Otherwise Apple emits a soft assertion "Error loading strings file at
+	 * %@: %@" through DVTAssertionWarning; this tree has no such facility. */
 }
 
 + (NSArray *)_registerSpecificationProxiesOfType:(NSString *)type
@@ -593,40 +657,91 @@ NSMutableDictionary *XCGetRegistryDictionaryForForDomain(NSString *domain)
 			       sourceDescription:(NSString *)sourceDescription
 					inDomain:(NSString *)domain
 {
-	(void)type;
-	(void)directory;
+	if (dictionaryOrArray == nil) {
+		[NSException raise:NSInvalidArgumentException
+			    format:@"%@ should not be nil", @"dictionaryOrArray"];
+	}
 
-	NSMutableArray *result = [NSMutableArray array];
+	NSArray *dictionaries = nil;
 
-	if ([dictionaryOrArray isKindOfClass:[NSArray class]]) {
-		for (id item in dictionaryOrArray) {
-			[result addObjectsFromArray:[self _registerSpecificationProxiesOfType:type
-									 fromDictionaryOrArray:item
-											inDirectory:directory
-											     bundle:bundle
-								      sourceDescription:sourceDescription
-										       inDomain:domain]];
+	if (![dictionaryOrArray isKindOfClass:[NSArray class]]) {
+		dictionaries = [NSArray arrayWithObject:dictionaryOrArray];
+	} else {
+		dictionaries = dictionaryOrArray;
+	}
+	if (type != nil && CFGetTypeID((__bridge CFTypeRef)type) != CFStringGetTypeID()) {
+		[NSException raise:NSInvalidArgumentException
+			    format:@"%@ should be a string, but it is %@", @"type", type];
+	}
+
+	NSMutableArray *errors = [NSMutableArray array];
+	NSUInteger count = [dictionaries count];
+
+	for (NSUInteger index = 0; index < count; index++) {
+		id item = [dictionaries objectAtIndex:index];
+
+		if (![item isKindOfClass:[NSDictionary class]]) {
+			[errors addObject:XCSpecificationErrorWithLocalizedFormat(
+				XCSpecificationLocalizedFormat(@"Expected to find a dictionary as the %u-th element but found %@."),
+				(unsigned)index, NSStringFromClass([item class]))];
+			continue;
 		}
-	} else if ([dictionaryOrArray isKindOfClass:[TSPropertyListDictionary class]]) {
-		TSPropertyListDictionary *propertyList = dictionaryOrArray;
 
-		if (bundle != nil) {
-			[propertyList setBundle:bundle];
+		NSString *specificationType = [item objectForKey:@"Type"];
+
+		if (specificationType != nil) {
+			if (sourceDescription != nil) {
+				NSMutableDictionary *mutableItem = [item mutableCopy];
+
+				[mutableItem setObject:sourceDescription forKey:@"SourceDescription"];
+				item = mutableItem;
+			}
+		} else if (type != nil) {
+			/* Apple logs a level 2 diagnostic for every file type except
+			 * Language, FileType and PropertyPane, whose lists do not carry a
+			 * Type key. */
+			if (![type isEqualToString:@"Language"] &&
+			    ![type isEqualToString:@"FileType"] &&
+			    ![type isEqualToString:@"PropertyPane"]) {
+				/* _kXCSpecificationLoading_LogAspect level 2 diagnostic. */
+			}
+
+			NSMutableDictionary *mutableItem = [item mutableCopy];
+
+			[mutableItem setObject:type forKey:@"Type"];
+			if (sourceDescription != nil) {
+				[mutableItem setObject:sourceDescription forKey:@"SourceDescription"];
+			}
+			item = mutableItem;
+		} else {
+			[errors addObject:XCSpecificationErrorWithLocalizedFormat(
+				XCSpecificationLocalizedFormat(@"No 'Type' key present, and none can be inferred from the filename suffix (File: '%@' Identifier: '%@')."),
+				[sourceDescription lastPathComponent], [item objectForKey:@"Identifier"])];
+			continue;
 		}
 
-		id specification = nil;
+		TSPropertyListDictionary *propertyList = [TSPropertyListDictionary propertyListDictionaryWithDictionary:item];
+
+		if (directory != nil) {
+			if (bundle != nil) {
+				[self _tryRegisterLocalizationDictionaryForSpecification:propertyList bundle:bundle];
+				[propertyList setBundle:bundle];
+			} else {
+				NSBundle *directoryBundle = [NSBundle bundleWithPath:directory];
+
+				[self _tryRegisterLocalizationDictionaryForSpecification:propertyList bundle:directoryBundle];
+			}
+		}
+
 		NSError *error = [self registerSpecificationProxyFromPropertyList:propertyList
 									 inDomain:domain
-							 outSpecificationOrProxy:&specification];
+							 outSpecificationOrProxy:NULL];
 
 		if (error != nil) {
-			NSLog(@"%@: %@", sourceDescription, [error localizedDescription]);
-		} else if (specification != nil) {
-			[self _tryRegisterLocalizationDictionaryForSpecification:specification bundle:bundle];
-			[result addObject:specification];
+			[errors addObject:error];
 		}
 	}
-	return (result);
+	return (errors);
 }
 
 + (NSArray *)registerSpecificationProxiesFromPropertyListsInDirectory:(NSString *)directory
@@ -634,44 +749,93 @@ NSMutableDictionary *XCGetRegistryDictionaryForForDomain(NSString *domain)
 							    inDomain:(NSString *)domain
 							    inBundle:(NSBundle *)bundle
 {
-	NSMutableArray *result = [NSMutableArray array];
-	NSFileManager *fileManager = [NSFileManager defaultManager];
-	NSArray *contents = [fileManager contentsOfDirectoryAtPath:directory error:NULL];
+	if (directory == nil) {
+		[NSException raise:NSInvalidArgumentException
+			    format:@"%@ should not be nil", @"directory"];
+	}
+	if (CFGetTypeID((__bridge CFTypeRef)directory) != CFStringGetTypeID()) {
+		[NSException raise:NSInvalidArgumentException
+			    format:@"%@ should be a string, but it is %@", @"directory", directory];
+	}
+	if (bundle != nil && ![bundle isKindOfClass:[NSBundle class]]) {
+		[NSException raise:NSInvalidArgumentException
+			    format:@"%@ should be an instance inheriting from %@, but it is %@",
+				   @"bundle", NSStringFromClass([NSBundle class]), bundle];
+	}
+
+	NSMutableArray *errors = [NSMutableArray array];
+	NSArray *contents = [[DVTFilePath filePathForPathString:directory] sortedDirectoryContents];
 
 	for (NSString *name in contents) {
-		NSString *fullPath = [directory stringByAppendingPathComponent:name];
-		NSDictionary *attributes = [fileManager attributesOfItemAtPath:fullPath error:NULL];
-		NSString *fileType = [attributes fileType];
+		NSString *path = [directory stringByAppendingPathComponent:name];
 
-		if ([fileType isEqualToString:NSFileTypeDirectory]) {
-			if (recursively && [self _shouldRecurseIntoDirectoryNamed:name ofType:fileType]) {
-				[result addObjectsFromArray:[self registerSpecificationProxiesFromPropertyListsInDirectory:fullPath
-														   recursively:recursively
-														      inDomain:domain
-														      inBundle:bundle]];
+		/* Nested property list dictionaries are wrapped in parentheses and are
+		 * never specifications in their own right. */
+		if ([name hasPrefix:@"("] && [name hasSuffix:@")"]) {
+			continue;
+		}
+
+		NSString *fileType = [[DVTFilePath filePathForPathString:path] fileTypeAttribute];
+
+		if (fileType == nil) {
+			continue;
+		}
+		if (![fileType isEqualToString:NSFileTypeRegular]) {
+			if (!recursively) {
+				continue;
 			}
+			if (![self _shouldRecurseIntoDirectoryNamed:name ofType:fileType]) {
+				continue;
+			}
+			[errors addObjectsFromArray:[self registerSpecificationProxiesFromPropertyListsInDirectory:path
+													   recursively:recursively
+													      inDomain:domain
+													      inBundle:bundle]];
 			continue;
 		}
 
-		if ([[fullPath pathExtension] caseInsensitiveCompare:@"xcspec"] != NSOrderedSame) {
+		NSString *pathExtension = [path pathExtension];
+		NSString *type = [[self _pathExtensionsToTypesRegistry] objectForKey:pathExtension];
+
+		if (type == nil && ![pathExtension isEqualToString:@"xcspec"]) {
 			continue;
 		}
 
-		TSPropertyListDictionary *propertyList = [[TSPropertyListDictionary alloc] initWithContentsOfFile:fullPath
-													  encoding:NSUTF8StringEncoding];
+		@try {
+			NSError *readError = nil;
+			NSData *data = [NSData dataWithContentsOfFile:path options:NSDataReadingUncached error:&readError];
 
-		if (propertyList == nil) {
-			continue;
+			if (data == nil) {
+				@throw [NSException exceptionWithName:NSGenericException
+							      reason:[readError localizedDescription]
+							    userInfo:nil];
+			}
+
+			NSError *propertyListError = nil;
+			id propertyList = [NSPropertyListSerialization propertyListWithData:data
+										   options:0
+										    format:NULL
+										     error:&propertyListError];
+
+			if (propertyList == nil) {
+				@throw [NSException exceptionWithName:NSGenericException
+							      reason:[propertyListError localizedDescription]
+							    userInfo:nil];
+			}
+
+			NSString *sourceDescription = [NSString stringWithFormat:@"file at '%@'", path];
+
+			[errors addObjectsFromArray:[self _registerSpecificationProxiesOfType:type
+										    fromDictionaryOrArray:propertyList
+											   inDirectory:directory
+												bundle:bundle
+										 sourceDescription:sourceDescription
+											      inDomain:domain]];
+		} @catch (NSException *exception) {
+			NSLog(@"Couldn't load '%@'. Reason: %@.", path, [exception reason]);
 		}
-
-		[result addObjectsFromArray:[self _registerSpecificationProxiesOfType:nil
-								 fromDictionaryOrArray:propertyList
-									    inDirectory:directory
-										 bundle:bundle
-								  sourceDescription:fullPath
-									       inDomain:domain]];
 	}
-	return (result);
+	return (errors);
 }
 
 + (NSArray *)registerSpecificationProxiesFromPropertyListsInDirectory:(NSString *)directory

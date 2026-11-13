@@ -34,6 +34,8 @@
 		1A2B3C4D000000000000000C1 /* PBXFileType.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000BD /* PBXFileType.m */; };
 		1A2B3C4D000000000000000C2 /* NSString+TSStringAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000BF /* NSString+TSStringAdditions.m */; };
 		1A2B3C4D000000000000000C5 /* XCSpecificationFilter.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000C3 /* XCSpecificationFilter.m */; };
+		1A2B3C4D000000000000000CA /* DVTFilePath.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000C6 /* DVTFilePath.m */; };
+		1A2B3C4D000000000000000CB /* DVTPlugInManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000C8 /* DVTPlugInManager.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -98,6 +100,10 @@
 		1A2B3C4D000000000000000C0 /* NSString+TSStringAdditions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSString+TSStringAdditions.h"; sourceTree = "<group>"; };
 		1A2B3C4D000000000000000C3 /* XCSpecificationFilter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XCSpecificationFilter.m; sourceTree = "<group>"; };
 		1A2B3C4D000000000000000C4 /* XCSpecificationFilter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XCSpecificationFilter.h; sourceTree = "<group>"; };
+		1A2B3C4D000000000000000C6 /* DVTFilePath.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DVTFilePath.m; sourceTree = "<group>"; };
+		1A2B3C4D000000000000000C7 /* DVTFilePath.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DVTFilePath.h; sourceTree = "<group>"; };
+		1A2B3C4D000000000000000C8 /* DVTPlugInManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DVTPlugInManager.m; sourceTree = "<group>"; };
+		1A2B3C4D000000000000000C9 /* DVTPlugInManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DVTPlugInManager.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -245,6 +251,8 @@
 			isa = PBXGroup;
 			children = (
 				1A2B3C4D000000000000000B0 /* DVTRegistry.m */,
+				1A2B3C4D000000000000000C6 /* DVTFilePath.m */,
+				1A2B3C4D000000000000000C8 /* DVTPlugInManager.m */,
 			);
 			path = DVTFoundation;
 			sourceTree = "<group>";
@@ -265,6 +273,8 @@
 			children = (
 				1A2B3C4D000000000000000B4 /* DVTRegistrable.h */,
 				1A2B3C4D000000000000000B5 /* DVTRegistry.h */,
+				1A2B3C4D000000000000000C7 /* DVTFilePath.h */,
+				1A2B3C4D000000000000000C9 /* DVTPlugInManager.h */,
 			);
 			path = DVTFoundation;
 			sourceTree = "<group>";
@@ -419,6 +429,8 @@
 				1A2B3C4D000000000000000BB /* XCSpecificationProxy.m in Sources */,
 				1A2B3C4D000000000000000BC /* XCSpecificationRegistry.m in Sources */,
 				1A2B3C4D000000000000000C5 /* XCSpecificationFilter.m in Sources */,
+				1A2B3C4D000000000000000CA /* DVTFilePath.m in Sources */,
+				1A2B3C4D000000000000000CB /* DVTPlugInManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

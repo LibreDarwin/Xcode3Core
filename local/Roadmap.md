@@ -52,8 +52,12 @@ only unless a real dependency appears.
 - [ ] Reverse-engineer XCBuildConfiguration/XCConfigurationList usage in build context
 - [ ] XCDependencyGraph, build settings expansion, macro evaluation
 - [ ] Target dependencies/phase ordering
-- [ ] Spec loading (.xcspec) compatibility
-      (+registerSpecificationProxiesFromPropertyListsInDirectory:recursively:inDomain:inBundle:)
+- [x] Spec loading (.xcspec) compatibility
+      (+registerSpecificationProxiesFromPropertyListsInDirectory:recursively:inDomain:inBundle:,
+       _registerSpecificationProxiesOfType:fromDictionaryOrArray:inDirectory:bundle:
+       sourceDescription:inDomain:, _shouldRecurseIntoDirectoryNamed:ofType:,
+       _tryRegisterLocalizationDictionaryForSpecification:bundle:; returns NSError arrays)
+- [x] DVTFilePath and DVTPlugInManager (DVTFoundation) partial shims used by spec loading
 - [ ] PBX*ProductType family (unblocked once spec loading can instantiate XCProductTypeSpecification)
 
 ### 4) RuntimeSupport
