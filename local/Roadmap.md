@@ -58,10 +58,20 @@ only unless a real dependency appears.
        sourceDescription:inDomain:, _shouldRecurseIntoDirectoryNamed:ofType:,
        _tryRegisterLocalizationDictionaryForSpecification:bundle:; returns NSError arrays)
 - [x] DVTFilePath and DVTPlugInManager (DVTFoundation) partial shims used by spec loading
-- [ ] PBX*ProductType family (unblocked once spec loading can instantiate XCProductTypeSpecification)
+- [ ] PBX*ProductType family: XCProductTypeSpecification, PBXPackageTypeSpecification and the
+      ten PBX*/XC*ProductType subclasses are decoded (type identity, plist keys, package
+      types, embedded-binary flags), but their initialisers need
+      DVTMacroDefinitionTable + DVTMacroExpansionScope + XCPropertyDefinition to build
+      DefaultBuildProperties/OverridingBuildSettings; blocked on item 4 (macro expansion)
+- [ ] XCMacroExpansionScope (DevToolsCore extension of DVTMacroExpansionScope)
 
 ### 4) RuntimeSupport
 - [ ] Macro expansion (XCMacroExpansionExtensions), SDK/package handling
+      Prerequisites, in order:
+        [ ] DVTMacroFoundation shims: DVTMacroDefinitionTable, DVTMacroExpansionScope,
+            DVTMacroDefinitionConditionSet, DVTMacroExpressionByParsingString(AsList)
+        [ ] XCPropertyDefinition / XCPropertyTypes / XCPropertyDomainSpecification
+        [ ] XCMacroExpansionExtensions category (DVTMacroDefinitionTable+XCMacroExpansionExtensions.h)
 - [ ] Environment/paths behavior
 
 ### 5) pbxtool/pbxmodel parity hardening
