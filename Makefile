@@ -44,7 +44,11 @@ PBXMODEL_OBJS := $(OBJDIR)/pbxmodel.o $(OBJDIR)/pbxproj.o \
 	$(OBJDIR)/NSString+TSStringAdditions.o $(OBJDIR)/DVTRegistry.o \
 	$(OBJDIR)/XCSpecification.o $(OBJDIR)/XCSpecificationProxy.o \
 	$(OBJDIR)/XCSpecificationRegistry.o $(OBJDIR)/XCSpecificationFilter.o \
-	$(OBJDIR)/DVTFilePath.o $(OBJDIR)/DVTPlugInManager.o
+	$(OBJDIR)/DVTFilePath.o $(OBJDIR)/DVTPlugInManager.o \
+	$(OBJDIR)/DVTMacroDefinitionConditionParameter.o \
+	$(OBJDIR)/DVTMacroDefinitionCondition.o \
+	$(OBJDIR)/DVTMacroDefinitionConditionIdentityKey.o \
+	$(OBJDIR)/DVTMacroDefinitionConditionSet.o
 
 PREFIX  ?= /usr/local
 DESTDIR ?=
@@ -158,6 +162,22 @@ $(OBJDIR)/DVTFilePath.o: Sources/DVTFoundation/DVTFilePath.m
 $(OBJDIR)/DVTPlugInManager.o: Sources/DVTFoundation/DVTPlugInManager.m
 	@mkdir -p $(OBJDIR)
 	$(CC) $(OBJCFLAGS) -c -o $@ Sources/DVTFoundation/DVTPlugInManager.m
+
+$(OBJDIR)/DVTMacroDefinitionConditionParameter.o: Sources/DVTMacroFoundation/DVTMacroDefinitionConditionParameter.m
+	@mkdir -p $(OBJDIR)
+	$(CC) $(OBJCFLAGS) -c -o $@ Sources/DVTMacroFoundation/DVTMacroDefinitionConditionParameter.m
+
+$(OBJDIR)/DVTMacroDefinitionCondition.o: Sources/DVTMacroFoundation/DVTMacroDefinitionCondition.m
+	@mkdir -p $(OBJDIR)
+	$(CC) $(OBJCFLAGS) -c -o $@ Sources/DVTMacroFoundation/DVTMacroDefinitionCondition.m
+
+$(OBJDIR)/DVTMacroDefinitionConditionIdentityKey.o: Sources/DVTMacroFoundation/DVTMacroDefinitionConditionIdentityKey.m
+	@mkdir -p $(OBJDIR)
+	$(CC) $(OBJCFLAGS) -c -o $@ Sources/DVTMacroFoundation/DVTMacroDefinitionConditionIdentityKey.m
+
+$(OBJDIR)/DVTMacroDefinitionConditionSet.o: Sources/DVTMacroFoundation/DVTMacroDefinitionConditionSet.m
+	@mkdir -p $(OBJDIR)
+	$(CC) $(OBJCFLAGS) -c -o $@ Sources/DVTMacroFoundation/DVTMacroDefinitionConditionSet.m
 
 $(OBJDIR)/XCSpecification.o: Sources/DevToolsCore/BuildSystem/XCSpecification.m
 	@mkdir -p $(OBJDIR)

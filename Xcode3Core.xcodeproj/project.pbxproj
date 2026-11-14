@@ -36,6 +36,10 @@
 		1A2B3C4D000000000000000C5 /* XCSpecificationFilter.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000C3 /* XCSpecificationFilter.m */; };
 		1A2B3C4D000000000000000CA /* DVTFilePath.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000C6 /* DVTFilePath.m */; };
 		1A2B3C4D000000000000000CB /* DVTPlugInManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000C8 /* DVTPlugInManager.m */; };
+		1A2B3C4D0000000000000D4 /* DVTMacroDefinitionConditionParameter.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000D2 /* DVTMacroDefinitionConditionParameter.m */; };
+		1A2B3C4D0000000000000D5 /* DVTMacroDefinitionCondition.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000CE /* DVTMacroDefinitionCondition.m */; };
+		1A2B3C4D0000000000000D6 /* DVTMacroDefinitionConditionIdentityKey.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000D0 /* DVTMacroDefinitionConditionIdentityKey.m */; };
+		1A2B3C4D0000000000000D7 /* DVTMacroDefinitionConditionSet.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000CC /* DVTMacroDefinitionConditionSet.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -104,6 +108,14 @@
 		1A2B3C4D000000000000000C7 /* DVTFilePath.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DVTFilePath.h; sourceTree = "<group>"; };
 		1A2B3C4D000000000000000C8 /* DVTPlugInManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DVTPlugInManager.m; sourceTree = "<group>"; };
 		1A2B3C4D000000000000000C9 /* DVTPlugInManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DVTPlugInManager.h; sourceTree = "<group>"; };
+		1A2B3C4D0000000000000CC /* DVTMacroDefinitionConditionSet.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DVTMacroDefinitionConditionSet.m; sourceTree = "<group>"; };
+		1A2B3C4D0000000000000CD /* DVTMacroDefinitionConditionSet.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DVTMacroDefinitionConditionSet.h; sourceTree = "<group>"; };
+		1A2B3C4D0000000000000CE /* DVTMacroDefinitionCondition.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DVTMacroDefinitionCondition.m; sourceTree = "<group>"; };
+		1A2B3C4D0000000000000CF /* DVTMacroDefinitionCondition.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DVTMacroDefinitionCondition.h; sourceTree = "<group>"; };
+		1A2B3C4D0000000000000D0 /* DVTMacroDefinitionConditionIdentityKey.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DVTMacroDefinitionConditionIdentityKey.m; sourceTree = "<group>"; };
+		1A2B3C4D0000000000000D1 /* DVTMacroDefinitionConditionIdentityKey.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DVTMacroDefinitionConditionIdentityKey.h; sourceTree = "<group>"; };
+		1A2B3C4D0000000000000D2 /* DVTMacroDefinitionConditionParameter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DVTMacroDefinitionConditionParameter.m; sourceTree = "<group>"; };
+		1A2B3C4D0000000000000D3 /* DVTMacroDefinitionConditionParameter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DVTMacroDefinitionConditionParameter.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -135,6 +147,7 @@
 				1A2B3C4D0000000000000005 /* DevToolsCore */,
 				1A2B3C4D000000000000000AA /* DevToolsSupport */,
 				1A2B3C4D000000000000000AC /* DVTFoundation */,
+				1A2B3C4D0000000000000D8 /* DVTMacroFoundation */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -208,6 +221,7 @@
 				1A2B3C4D0000000000000087 /* DevToolsCore */,
 				1A2B3C4D000000000000000AB /* DevToolsSupport */,
 				1A2B3C4D000000000000000AE /* DVTFoundation */,
+				1A2B3C4D0000000000000D9 /* DVTMacroFoundation */,
 			);
 			path = Headers;
 			sourceTree = "<group>";
@@ -304,6 +318,28 @@
 				1A2B3C4D0000000000000019 /* agvtool.1 */,
 			);
 			path = man;
+			sourceTree = "<group>";
+		};
+		1A2B3C4D0000000000000D8 /* DVTMacroFoundation */ = {
+			isa = PBXGroup;
+			children = (
+				1A2B3C4D0000000000000CC /* DVTMacroDefinitionConditionSet.m */,
+				1A2B3C4D0000000000000CE /* DVTMacroDefinitionCondition.m */,
+				1A2B3C4D0000000000000D0 /* DVTMacroDefinitionConditionIdentityKey.m */,
+				1A2B3C4D0000000000000D2 /* DVTMacroDefinitionConditionParameter.m */,
+			);
+			path = DVTMacroFoundation;
+			sourceTree = "<group>";
+		};
+		1A2B3C4D0000000000000D9 /* DVTMacroFoundation */ = {
+			isa = PBXGroup;
+			children = (
+				1A2B3C4D0000000000000CD /* DVTMacroDefinitionConditionSet.h */,
+				1A2B3C4D0000000000000CF /* DVTMacroDefinitionCondition.h */,
+				1A2B3C4D0000000000000D1 /* DVTMacroDefinitionConditionIdentityKey.h */,
+				1A2B3C4D0000000000000D3 /* DVTMacroDefinitionConditionParameter.h */,
+			);
+			path = DVTMacroFoundation;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -431,6 +467,10 @@
 				1A2B3C4D000000000000000C5 /* XCSpecificationFilter.m in Sources */,
 				1A2B3C4D000000000000000CA /* DVTFilePath.m in Sources */,
 				1A2B3C4D000000000000000CB /* DVTPlugInManager.m in Sources */,
+				1A2B3C4D0000000000000D4 /* DVTMacroDefinitionConditionParameter.m in Sources */,
+				1A2B3C4D0000000000000D5 /* DVTMacroDefinitionCondition.m in Sources */,
+				1A2B3C4D0000000000000D6 /* DVTMacroDefinitionConditionIdentityKey.m in Sources */,
+				1A2B3C4D0000000000000D7 /* DVTMacroDefinitionConditionSet.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
