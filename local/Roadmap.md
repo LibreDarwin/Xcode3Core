@@ -67,9 +67,13 @@ only unless a real dependency appears.
 
 ### 4) RuntimeSupport
 - [ ] Macro expansion (XCMacroExpansionExtensions), SDK/package handling
-      Prerequisites, in order:
-        [ ] DVTMacroFoundation shims: DVTMacroDefinitionTable, DVTMacroExpansionScope,
-            DVTMacroDefinitionConditionSet, DVTMacroExpressionByParsingString(AsList)
+      Prerequisites, in order (work happens in the DVTFrameworks repo):
+        [x] DVTMacroDefinitionTable, DVTMacroDefinitionCondition*, DVTMacroNameString,
+            DVTMacroNameRegistry (+ DVTRegistry description)
+        [ ] DVTMacroExpansionScope
+        [ ] DVTMacroExpressionByParsingString(AsList/ArrayAsList) and the
+            DVTMacroExpansionString{,_Substitution,_Concatenation} /
+            DVTMacroExpansionStringList{,_NonLiteral} expression classes
         [ ] XCPropertyDefinition / XCPropertyTypes / XCPropertyDomainSpecification
         [ ] XCMacroExpansionExtensions category (DVTMacroDefinitionTable+XCMacroExpansionExtensions.h)
 - [ ] Environment/paths behavior
