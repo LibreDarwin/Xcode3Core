@@ -21,9 +21,15 @@ OBJDIR    := $(BUILD_DIR)/obj
 
 PROJECTMODEL := Sources/DevToolsCore/ProjectModel
 
+# The DVT* frameworks live in the sibling DVTFrameworks repository and are
+# built there first ("make -C $(DVTFRAMEWORKS)").  The path is relative to
+# this repository root and is baked into the binary's run path.
+DVTFRAMEWORKS       ?= ../DVTFrameworks
+DVTFRAMEWORKS_BUILD := $(DVTFRAMEWORKS)/build
+
 CFLAGS   := $(OPT) -std=c11 -D_DARWIN_C_SOURCE -isysroot "$(SDK)" -ISources -Wall -Wextra
 OBJCFLAGS := $(OPT) -fobjc-arc -D_DARWIN_C_SOURCE -isysroot "$(SDK)" \
-	-IHeaders -ISources -I$(PROJECTMODEL) -Wall -Wextra
+	-IHeaders -ISources -I$(PROJECTMODEL) -F$(DVTFRAMEWORKS_BUILD) -Wall -Wextra
 
 AGVTOOL      := $(BUILD_DIR)/agvtool
 AGVTOOL_OBJS := $(OBJDIR)/agvtool.o
@@ -41,14 +47,9 @@ PBXMODEL_OBJS := $(OBJDIR)/pbxmodel.o $(OBJDIR)/pbxproj.o \
 	$(OBJDIR)/PBXFramework.o $(OBJDIR)/PBXFileTypePart.o \
 	$(OBJDIR)/PBXFileType.o \
 	$(OBJDIR)/TSPropertyListDictionary.o \
-	$(OBJDIR)/NSString+TSStringAdditions.o $(OBJDIR)/DVTRegistry.o \
+	$(OBJDIR)/NSString+TSStringAdditions.o \
 	$(OBJDIR)/XCSpecification.o $(OBJDIR)/XCSpecificationProxy.o \
-	$(OBJDIR)/XCSpecificationRegistry.o $(OBJDIR)/XCSpecificationFilter.o \
-	$(OBJDIR)/DVTFilePath.o $(OBJDIR)/DVTPlugInManager.o \
-	$(OBJDIR)/DVTMacroDefinitionConditionParameter.o \
-	$(OBJDIR)/DVTMacroDefinitionCondition.o \
-	$(OBJDIR)/DVTMacroDefinitionConditionIdentityKey.o \
-	$(OBJDIR)/DVTMacroDefinitionConditionSet.o
+	$(OBJDIR)/XCSpecificationRegistry.o $(OBJDIR)/XCSpecificationFilter.o
 
 PREFIX  ?= /usr/local
 DESTDIR ?=
@@ -77,7 +78,10 @@ $(OBJDIR)/pbxtool.o: Sources/DevToolsCore/pbxtool/pbxtool.c
 
 $(PBXMODEL): $(PBXMODEL_OBJS)
 	@mkdir -p $(BUILD_DIR)
-	$(CC) $(OBJCFLAGS) -o $@ $(PBXMODEL_OBJS) -framework Foundation
+	$(CC) $(OBJCFLAGS) -o $@ $(PBXMODEL_OBJS) -framework Foundation \
+		-F$(DVTFRAMEWORKS_BUILD) -framework DVTMacroFoundation \
+		-framework DVTFoundation \
+		-Wl,-rpath,@loader_path/../../$(DVTFRAMEWORKS)/build
 
 $(OBJDIR)/pbxmodel.o: Sources/DevToolsCore/pbxmodel/pbxmodel.m
 	@mkdir -p $(OBJDIR)
@@ -150,34 +154,6 @@ $(OBJDIR)/PBXFileType.o: $(PROJECTMODEL)/PBXFileType.m
 $(OBJDIR)/NSString+TSStringAdditions.o: Sources/DevToolsSupport/NSString+TSStringAdditions.m
 	@mkdir -p $(OBJDIR)
 	$(CC) $(OBJCFLAGS) -c -o $@ Sources/DevToolsSupport/NSString+TSStringAdditions.m
-
-$(OBJDIR)/DVTRegistry.o: Sources/DVTFoundation/DVTRegistry.m
-	@mkdir -p $(OBJDIR)
-	$(CC) $(OBJCFLAGS) -c -o $@ Sources/DVTFoundation/DVTRegistry.m
-
-$(OBJDIR)/DVTFilePath.o: Sources/DVTFoundation/DVTFilePath.m
-	@mkdir -p $(OBJDIR)
-	$(CC) $(OBJCFLAGS) -c -o $@ Sources/DVTFoundation/DVTFilePath.m
-
-$(OBJDIR)/DVTPlugInManager.o: Sources/DVTFoundation/DVTPlugInManager.m
-	@mkdir -p $(OBJDIR)
-	$(CC) $(OBJCFLAGS) -c -o $@ Sources/DVTFoundation/DVTPlugInManager.m
-
-$(OBJDIR)/DVTMacroDefinitionConditionParameter.o: Sources/DVTMacroFoundation/DVTMacroDefinitionConditionParameter.m
-	@mkdir -p $(OBJDIR)
-	$(CC) $(OBJCFLAGS) -c -o $@ Sources/DVTMacroFoundation/DVTMacroDefinitionConditionParameter.m
-
-$(OBJDIR)/DVTMacroDefinitionCondition.o: Sources/DVTMacroFoundation/DVTMacroDefinitionCondition.m
-	@mkdir -p $(OBJDIR)
-	$(CC) $(OBJCFLAGS) -c -o $@ Sources/DVTMacroFoundation/DVTMacroDefinitionCondition.m
-
-$(OBJDIR)/DVTMacroDefinitionConditionIdentityKey.o: Sources/DVTMacroFoundation/DVTMacroDefinitionConditionIdentityKey.m
-	@mkdir -p $(OBJDIR)
-	$(CC) $(OBJCFLAGS) -c -o $@ Sources/DVTMacroFoundation/DVTMacroDefinitionConditionIdentityKey.m
-
-$(OBJDIR)/DVTMacroDefinitionConditionSet.o: Sources/DVTMacroFoundation/DVTMacroDefinitionConditionSet.m
-	@mkdir -p $(OBJDIR)
-	$(CC) $(OBJCFLAGS) -c -o $@ Sources/DVTMacroFoundation/DVTMacroDefinitionConditionSet.m
 
 $(OBJDIR)/XCSpecification.o: Sources/DevToolsCore/BuildSystem/XCSpecification.m
 	@mkdir -p $(OBJDIR)

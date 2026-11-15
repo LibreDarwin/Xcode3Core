@@ -31,9 +31,18 @@ it makes to `project.pbxproj`, `Info.plist` and related files.
 
 ## Building
 
+The `DVT*` frameworks this repository links against live in the sibling
+`DVTFrameworks` repository and must be built first:
+
+    make -C ../DVTFrameworks
+
+Then:
+
     make            # builds the tools under Sources/DevToolsCore/
     make test       # differential test of agvtool vs. Apple's (needs Xcode)
     make install    # binaries + man pages under $(PREFIX)
+
+`DVTFRAMEWORKS` overrides the sibling checkout location.
 
     # Alternative build system (Xcode):
     xcodebuild -project Xcode3Core.xcodeproj -target agvtool build

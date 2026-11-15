@@ -14,7 +14,7 @@
 
 #import <Foundation/Foundation.h>
 
-#import "DVTFoundation/DVTRegistry.h"
+#import <DVTFoundation/DVTRegistry.h>
 
 @class XCSpecification;
 

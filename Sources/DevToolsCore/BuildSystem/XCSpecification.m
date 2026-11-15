@@ -9,8 +9,8 @@
 
 #import "DevToolsCore/BuildSystem/XCSpecificationProxy.h"
 #import "DevToolsSupport/TSPropertyListDictionary.h"
-#import "DVTFoundation/DVTFilePath.h"
-#import "DVTFoundation/DVTPlugInManager.h"
+#import <DVTFoundation/DVTFilePath.h>
+#import <DVTFoundation/DVTPlugInManager.h>
 
 /* Apple exports _XCPlatformDirectorySuffix; it is not declared in any public
  * header, and DVTPlugInManager is not implemented in this tree, so both the
