@@ -49,7 +49,8 @@ PBXMODEL_OBJS := $(OBJDIR)/pbxmodel.o $(OBJDIR)/pbxproj.o \
 	$(OBJDIR)/TSPropertyListDictionary.o \
 	$(OBJDIR)/NSString+TSStringAdditions.o \
 	$(OBJDIR)/XCSpecification.o $(OBJDIR)/XCSpecificationProxy.o \
-	$(OBJDIR)/XCSpecificationRegistry.o $(OBJDIR)/XCSpecificationFilter.o
+	$(OBJDIR)/XCSpecificationRegistry.o $(OBJDIR)/XCSpecificationFilter.o \
+	$(OBJDIR)/XCPropertyDefinition.o $(OBJDIR)/XCPropertyTypes.o
 
 PREFIX  ?= /usr/local
 DESTDIR ?=
@@ -171,10 +172,19 @@ $(OBJDIR)/XCSpecificationRegistry.o: Sources/DevToolsCore/BuildSystem/XCSpecific
 	@mkdir -p $(OBJDIR)
 	$(CC) $(OBJCFLAGS) -c -o $@ Sources/DevToolsCore/BuildSystem/XCSpecificationRegistry.m
 
+$(OBJDIR)/XCPropertyDefinition.o: Sources/DevToolsCore/BuildSystem/XCPropertyDefinition.m
+	@mkdir -p $(OBJDIR)
+	$(CC) $(OBJCFLAGS) -c -o $@ Sources/DevToolsCore/BuildSystem/XCPropertyDefinition.m
+
+$(OBJDIR)/XCPropertyTypes.o: Sources/DevToolsCore/BuildSystem/XCPropertyTypes.m
+	@mkdir -p $(OBJDIR)
+	$(CC) $(OBJCFLAGS) -c -o $@ Sources/DevToolsCore/BuildSystem/XCPropertyTypes.m
+
 test: all
 	@ok=0; \
 	bash tools/difftest.sh $(AGVTOOL) || ok=1; \
 	PBXMODEL=$(PBXMODEL) PBXTOOL=$(PBXTOOL) bash tools/pbxroundtrip.sh || ok=1; \
+	PBXMODEL=$(PBXMODEL) bash tools/propertydefs.sh || ok=1; \
 	exit $$ok
 
 install: all

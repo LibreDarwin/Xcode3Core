@@ -5,7 +5,9 @@
 #import "DevToolsCore/PBXBuild.h"
 #import "DevToolsCore/PBXFileType.h"
 #import "DevToolsCore/PBXProject.h"
+#import "DevToolsCore/BuildSystem/XCPropertyDefinition.h"
 #import "DevToolsCore/BuildSystem/XCSpecificationFilter.h"
+#import "DevToolsSupport/TSPropertyListDictionary.h"
 
 @implementation PBXBuildFile
 
@@ -973,6 +975,25 @@ static NSArray *SplitCompilerFlags(NSString *string)
 + (XCSpecificationFilter *)allowedFileTypes
 {
 	return ([PBXProject linkableFileTypes]);
+}
+
+- (id)primaryAttributeForBuildFile:(PBXBuildFile *)file
+{
+	static XCPropertyDefinition *roleDefinition = nil;
+
+	[super primaryAttributeForBuildFile:file];
+	if (roleDefinition == nil) {
+		TSPropertyListDictionary *plist =
+		    [TSPropertyListDictionary propertyListDictionaryWithDictionary:
+		@{@"Name": @"Role",
+		  @"Type": @"String",
+		  @"AllowedValues": @[@"Required", @"Weak"],
+		  @"DisplayValues": @[@"Required", @"Optional"],
+		  @"DefaultValue": @"Required"}];
+
+		roleDefinition = [XCPropertyDefinition propertyDefinitionFromPListDictionary:plist];
+	}
+	return (roleDefinition);
 }
 
 @end

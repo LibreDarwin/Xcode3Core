@@ -33,6 +33,8 @@
 		1A2B3C4D000000000000000C1 /* PBXFileType.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000BD /* PBXFileType.m */; };
 		1A2B3C4D000000000000000C2 /* NSString+TSStringAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000BF /* NSString+TSStringAdditions.m */; };
 		1A2B3C4D000000000000000C5 /* XCSpecificationFilter.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000C3 /* XCSpecificationFilter.m */; };
+		1A2B3C4D000000000000000DA /* XCPropertyDefinition.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000DC /* XCPropertyDefinition.m */; };
+		1A2B3C4D000000000000000DB /* XCPropertyTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000DE /* XCPropertyTypes.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -94,6 +96,10 @@
 		1A2B3C4D000000000000000C0 /* NSString+TSStringAdditions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSString+TSStringAdditions.h"; sourceTree = "<group>"; };
 		1A2B3C4D000000000000000C3 /* XCSpecificationFilter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XCSpecificationFilter.m; sourceTree = "<group>"; };
 		1A2B3C4D000000000000000C4 /* XCSpecificationFilter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XCSpecificationFilter.h; sourceTree = "<group>"; };
+		1A2B3C4D000000000000000DC /* XCPropertyDefinition.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XCPropertyDefinition.m; sourceTree = "<group>"; };
+		1A2B3C4D000000000000000DD /* XCPropertyDefinition.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XCPropertyDefinition.h; sourceTree = "<group>"; };
+		1A2B3C4D000000000000000DE /* XCPropertyTypes.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XCPropertyTypes.m; sourceTree = "<group>"; };
+		1A2B3C4D000000000000000DF /* XCPropertyTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XCPropertyTypes.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -251,6 +257,8 @@
 				1A2B3C4D000000000000000B2 /* XCSpecificationProxy.m */,
 				1A2B3C4D000000000000000B3 /* XCSpecificationRegistry.m */,
 				1A2B3C4D000000000000000C3 /* XCSpecificationFilter.m */,
+				1A2B3C4D000000000000000DC /* XCPropertyDefinition.m */,
+				1A2B3C4D000000000000000DE /* XCPropertyTypes.m */,
 			);
 			path = BuildSystem;
 			sourceTree = "<group>";
@@ -269,6 +277,8 @@
 				1A2B3C4D000000000000000B7 /* XCSpecificationProxy.h */,
 				1A2B3C4D000000000000000B8 /* XCSpecificationRegistry.h */,
 				1A2B3C4D000000000000000C4 /* XCSpecificationFilter.h */,
+				1A2B3C4D000000000000000DD /* XCPropertyDefinition.h */,
+				1A2B3C4D000000000000000DF /* XCPropertyTypes.h */,
 			);
 			path = BuildSystem;
 			sourceTree = "<group>";
@@ -411,6 +421,8 @@
 				1A2B3C4D000000000000000BB /* XCSpecificationProxy.m in Sources */,
 				1A2B3C4D000000000000000BC /* XCSpecificationRegistry.m in Sources */,
 				1A2B3C4D000000000000000C5 /* XCSpecificationFilter.m in Sources */,
+				1A2B3C4D000000000000000DA /* XCPropertyDefinition.m in Sources */,
+				1A2B3C4D000000000000000DB /* XCPropertyTypes.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

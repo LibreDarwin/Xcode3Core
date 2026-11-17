@@ -74,7 +74,8 @@ only unless a real dependency appears.
         [x] DVTMacroExpressionByParsingString(AsList/ArrayAsList) and the
             DVTMacroExpansionString{,_Substitution,_Concatenation} /
             DVTMacroExpansionStringList{,_NonLiteral} expression classes
-        [ ] XCPropertyDefinition / XCPropertyTypes / XCPropertyDomainSpecification
+        [x] XCPropertyDefinition / XCPropertyTypes
+        [ ] XCPropertyDomainSpecification
         [ ] XCMacroExpansionExtensions category (DVTMacroDefinitionTable+XCMacroExpansionExtensions.h)
 - [ ] Environment/paths behavior
 

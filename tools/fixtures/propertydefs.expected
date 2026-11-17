@@ -1,0 +1,82 @@
+role:
+  class = <XCStringPropertyDefinition>
+  name = <Role>
+  type = <string>
+  isList = <0>
+  default = <Required>
+  allowed = <(
+    Required,
+    Weak
+)>
+  localized = <(
+    Required,
+    Optional
+)>
+  category = <nil>
+  basic = <0>
+  internal = <0>
+  canCL = <1>
+  commandInfo = <nil>
+  description = <<XCStringPropertyDefinition:'Role':string:(
+    Required,
+    Weak
+):'Required'>>
+list:
+  class = <XCStringListPropertyDefinition>
+  name = <FLAGS>
+  type = <stringlist>
+  isList = <1>
+  default = <ab$(x)>
+  allowed = <nil>
+  localized = <(
+)>
+  category = <nil>
+  basic = <0>
+  internal = <0>
+  canCL = <1>
+  commandInfo = <nil>
+  description = <<XCStringListPropertyDefinition:'FLAGS':stringlist:-:'(
+    a,
+    b,
+    "$(x)"
+)'>>
+boolean:
+  class = <XCBooleanPropertyDefinition>
+  name = <ENABLED>
+  type = <bool>
+  isList = <0>
+  default = <YES>
+  allowed = <nil>
+  localized = <(
+    Yes,
+    No
+)>
+  category = <nil>
+  basic = <0>
+  internal = <0>
+  canCL = <1>
+  commandInfo = <nil>
+  description = <<XCBooleanPropertyDefinition:'ENABLED':bool:-:'YES'>>
+enumeration:
+  class = <XCEnumerationPropertyDefinition>
+  name = <MODE>
+  type = <enum>
+  isList = <0>
+  default = <fast>
+  allowed = <(
+    fast,
+    slow
+)>
+  localized = <(
+    fast,
+    slow
+)>
+  category = <nil>
+  basic = <0>
+  internal = <0>
+  canCL = <1>
+  commandInfo = <nil>
+  description = <<XCEnumerationPropertyDefinition:'MODE':enum:(
+    fast,
+    slow
+):'fast'>>

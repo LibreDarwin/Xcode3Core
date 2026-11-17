@@ -8,7 +8,9 @@
 
 #import "DevToolsCore/PBXProjectModel.h"
 #import "DevToolsCore/PBXObject.h"
+#import "DevToolsCore/BuildSystem/XCPropertyDefinition.h"
 #import "DevToolsCore/ProjectModel/pbxproj.h"
+#import "DevToolsSupport/TSPropertyListDictionary.h"
 #import "PBXPListCoding.h"
 
 static void
@@ -17,7 +19,8 @@ usage(void)
 	fprintf(stderr,
 	    "usage: pbxmodel roundtrip <project.pbxproj>\n"
 	    "       pbxmodel cat <project.pbxproj>\n"
-	    "       pbxmodel dump <project.pbxproj>\n");
+	    "       pbxmodel dump <project.pbxproj>\n"
+	    "       pbxmodel propertydefs\n");
 	exit(2);
 }
 
@@ -181,12 +184,72 @@ cmdDump(NSString *path)
 	return (0);
 }
 
+/* propertydefs: deterministic snapshot of the reconstructed property-definition
+ * layer.  The fixture is compared against an Apple DevToolsCore probe. */
+static XCPropertyDefinition *
+DefinitionFromDictionary(NSDictionary *dictionary)
+{
+	return ([XCPropertyDefinition propertyDefinitionFromPListDictionary:
+	    [TSPropertyListDictionary propertyListDictionaryWithDictionary:
+	    dictionary]]);
+}
+
+static void
+PrintValue(const char *label, id value)
+{
+	printf("%s = <%s>\n", label,
+	    (value != nil) ? [[value description] UTF8String] : "nil");
+}
+
+static void
+PrintDefinition(const char *label, XCPropertyDefinition *definition)
+{
+	printf("%s:\n", label);
+	PrintValue("  class", NSStringFromClass([definition class]));
+	PrintValue("  name", [definition name]);
+	PrintValue("  type", [definition typeString]);
+	PrintValue("  isList", @([definition isListType]));
+	PrintValue("  default", [definition defaultValue]);
+	PrintValue("  allowed", [definition allowedValues]);
+	PrintValue("  localized", [definition localizedAllowedValues]);
+	PrintValue("  category", [definition category]);
+	PrintValue("  basic", @([definition isBasic]));
+	PrintValue("  internal", @([definition isAppleInternalOnly]));
+	PrintValue("  canCL", @([definition canGenerateCommandLineArguments]));
+	PrintValue("  commandInfo", [definition commandArgumentGenerationInfo]);
+	PrintValue("  description", [definition description]);
+}
+
+static int
+cmdPropertyDefs(void)
+{
+	PrintDefinition("role", DefinitionFromDictionary(@{
+	    @"Name": @"Role", @"Type": @"String",
+	    @"AllowedValues": @[@"Required", @"Weak"],
+	    @"DisplayValues": @[@"Required", @"Optional"],
+	    @"DefaultValue": @"Required"}));
+	PrintDefinition("list", DefinitionFromDictionary(@{
+	    @"Name": @"FLAGS", @"Type": @"StringList",
+	    @"DefaultValue": @"a b $(x)"}));
+	PrintDefinition("boolean", DefinitionFromDictionary(@{
+	    @"Name": @"ENABLED", @"Type": @"Boolean",
+	    @"DefaultValue": @"YES"}));
+	PrintDefinition("enumeration", DefinitionFromDictionary(@{
+	    @"Name": @"MODE", @"Type": @"Enumeration",
+	    @"Values": @[@"fast", @"slow"],
+	    @"DisplayValues": @[@"Fast", @"Slow"],
+	    @"DefaultValue": @"fast"}));
+	return (0);
+}
+
 int
 main(int argc, char **argv)
 {
 	@autoreleasepool {
 		const char *cmd;
 
+		if (argc >= 2 && strcmp(argv[1], "propertydefs") == 0)
+			return (cmdPropertyDefs());
 		if (argc < 3)
 			usage();
 		cmd = argv[1];
