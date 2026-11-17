@@ -70,8 +70,8 @@ only unless a real dependency appears.
       Prerequisites, in order (work happens in the DVTFrameworks repo):
         [x] DVTMacroDefinitionTable, DVTMacroDefinitionCondition*, DVTMacroNameString,
             DVTMacroNameRegistry (+ DVTRegistry description)
-        [ ] DVTMacroExpansionScope
-        [ ] DVTMacroExpressionByParsingString(AsList/ArrayAsList) and the
+        [x] DVTMacroExpansionScope
+        [x] DVTMacroExpressionByParsingString(AsList/ArrayAsList) and the
             DVTMacroExpansionString{,_Substitution,_Concatenation} /
             DVTMacroExpansionStringList{,_NonLiteral} expression classes
         [ ] XCPropertyDefinition / XCPropertyTypes / XCPropertyDomainSpecification
