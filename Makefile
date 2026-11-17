@@ -51,7 +51,8 @@ PBXMODEL_OBJS := $(OBJDIR)/pbxmodel.o $(OBJDIR)/pbxproj.o \
 	$(OBJDIR)/XCSpecification.o $(OBJDIR)/XCSpecificationProxy.o \
 	$(OBJDIR)/XCSpecificationRegistry.o $(OBJDIR)/XCSpecificationFilter.o \
 	$(OBJDIR)/XCPropertyDefinition.o $(OBJDIR)/XCPropertyTypes.o \
-	$(OBJDIR)/XCPropertyCategory.o $(OBJDIR)/XCPropertyDomainSpecification.o
+	$(OBJDIR)/XCPropertyCategory.o $(OBJDIR)/XCPropertyDomainSpecification.o \
+	$(OBJDIR)/DVTMacroDefinitionTable+XCMacroExpansionExtensions.o
 
 PREFIX  ?= /usr/local
 DESTDIR ?=
@@ -189,12 +190,17 @@ $(OBJDIR)/XCPropertyDomainSpecification.o: Sources/DevToolsCore/BuildSystem/XCPr
 	@mkdir -p $(OBJDIR)
 	$(CC) $(OBJCFLAGS) -c -o $@ Sources/DevToolsCore/BuildSystem/XCPropertyDomainSpecification.m
 
+$(OBJDIR)/DVTMacroDefinitionTable+XCMacroExpansionExtensions.o: Sources/DevToolsCore/BuildSystem/DVTMacroDefinitionTable+XCMacroExpansionExtensions.m
+	@mkdir -p $(OBJDIR)
+	$(CC) $(OBJCFLAGS) -c -o $@ Sources/DevToolsCore/BuildSystem/DVTMacroDefinitionTable+XCMacroExpansionExtensions.m
+
 test: all
 	@ok=0; \
 	bash tools/difftest.sh $(AGVTOOL) || ok=1; \
 	PBXMODEL=$(PBXMODEL) PBXTOOL=$(PBXTOOL) bash tools/pbxroundtrip.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/propertydefs.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/propertydomains.sh || ok=1; \
+	PBXMODEL=$(PBXMODEL) bash tools/xcmacroexpansion.sh || ok=1; \
 	exit $$ok
 
 install: all

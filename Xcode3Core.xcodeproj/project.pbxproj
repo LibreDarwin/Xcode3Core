@@ -37,6 +37,7 @@
 		1A2B3C4D000000000000000DB /* XCPropertyTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000DE /* XCPropertyTypes.m */; };
 		1A2B3C4D000000000000000E0 /* XCPropertyCategory.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000E2 /* XCPropertyCategory.m */; };
 		1A2B3C4D000000000000000E1 /* XCPropertyDomainSpecification.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000E4 /* XCPropertyDomainSpecification.m */; };
+		1A2B3C4D000000000000000E6 /* DVTMacroDefinitionTable+XCMacroExpansionExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000E7 /* DVTMacroDefinitionTable+XCMacroExpansionExtensions.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -106,6 +107,8 @@
 		1A2B3C4D000000000000000E3 /* XCPropertyCategory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XCPropertyCategory.h; sourceTree = "<group>"; };
 		1A2B3C4D000000000000000E4 /* XCPropertyDomainSpecification.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XCPropertyDomainSpecification.m; sourceTree = "<group>"; };
 		1A2B3C4D000000000000000E5 /* XCPropertyDomainSpecification.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XCPropertyDomainSpecification.h; sourceTree = "<group>"; };
+		1A2B3C4D000000000000000E7 /* DVTMacroDefinitionTable+XCMacroExpansionExtensions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "DVTMacroDefinitionTable+XCMacroExpansionExtensions.m"; sourceTree = "<group>"; };
+		1A2B3C4D000000000000000E8 /* DVTMacroDefinitionTable+XCMacroExpansionExtensions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "DVTMacroDefinitionTable+XCMacroExpansionExtensions.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -267,6 +270,7 @@
 				1A2B3C4D000000000000000DE /* XCPropertyTypes.m */,
 				1A2B3C4D000000000000000E2 /* XCPropertyCategory.m */,
 				1A2B3C4D000000000000000E4 /* XCPropertyDomainSpecification.m */,
+				1A2B3C4D000000000000000E7 /* DVTMacroDefinitionTable+XCMacroExpansionExtensions.m */,
 			);
 			path = BuildSystem;
 			sourceTree = "<group>";
@@ -289,6 +293,7 @@
 				1A2B3C4D000000000000000DF /* XCPropertyTypes.h */,
 				1A2B3C4D000000000000000E3 /* XCPropertyCategory.h */,
 				1A2B3C4D000000000000000E5 /* XCPropertyDomainSpecification.h */,
+				1A2B3C4D000000000000000E8 /* DVTMacroDefinitionTable+XCMacroExpansionExtensions.h */,
 			);
 			path = BuildSystem;
 			sourceTree = "<group>";
@@ -435,6 +440,7 @@
 				1A2B3C4D000000000000000DB /* XCPropertyTypes.m in Sources */,
 				1A2B3C4D000000000000000E0 /* XCPropertyCategory.m in Sources */,
 				1A2B3C4D000000000000000E1 /* XCPropertyDomainSpecification.m in Sources */,
+				1A2B3C4D000000000000000E6 /* DVTMacroDefinitionTable+XCMacroExpansionExtensions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

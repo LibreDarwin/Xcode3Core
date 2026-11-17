@@ -8,6 +8,7 @@
 
 #import "DevToolsCore/PBXProjectModel.h"
 #import "DevToolsCore/PBXObject.h"
+#import "DevToolsCore/BuildSystem/DVTMacroDefinitionTable+XCMacroExpansionExtensions.h"
 #import "DevToolsCore/BuildSystem/XCPropertyDefinition.h"
 #import "DevToolsCore/BuildSystem/XCPropertyDomainSpecification.h"
 #import "DevToolsCore/ProjectModel/pbxproj.h"
@@ -22,7 +23,8 @@ usage(void)
 	    "       pbxmodel cat <project.pbxproj>\n"
 	    "       pbxmodel dump <project.pbxproj>\n"
 	    "       pbxmodel propertydefs\n"
-	    "       pbxmodel propertydomains\n");
+	    "       pbxmodel propertydomains\n"
+	    "       pbxmodel xcmacroexpansion\n");
 	exit(2);
 }
 
@@ -397,6 +399,90 @@ cmdPropertyDomains(void)
 	return (0);
 }
 
+static id
+ArchiveDescription(DVTMacroDefinitionTable *table)
+{
+	NSDictionary *archive = [table xc_dictionaryRepresentationForProjectArchiving];
+	NSArray *keys = [[archive allKeys] sortedArrayUsingSelector:@selector(compare:)];
+	NSMutableArray *entries = [NSMutableArray arrayWithCapacity:[keys count]];
+
+	for (NSString *key in keys)
+		[entries addObject:[NSString stringWithFormat:@"%@=%@", key,
+		    [archive objectForKey:key]]];
+	return ([entries componentsJoinedByString:@"|"]);
+}
+
+static DVTMacroDefinitionTable *
+TableWithValue(id name, id value)
+{
+	DVTMacroDefinitionTable *table = [DVTMacroDefinitionTable newWithLabel:@"probe"];
+
+	[table xc_setValue:value forMacroName:name errorHandler:^(id error) {
+		(void)error;
+	}];
+	return (table);
+}
+
+static int
+cmdXCMacroExpansion(void)
+{
+	DVTMacroDefinitionTable *split = [DVTMacroDefinitionTable newWithLabel:@"probe"];
+	DVTMacroDefinitionTable *conditions = [DVTMacroDefinitionTable newWithLabel:@"probe"];
+	NSArray *defaults = @[
+	    [XCPropertyDefinition stringPropertyDefinitionWithName:@"ROLE"
+		defaultValue:@"defaultRole"],
+	    [XCPropertyDefinition stringPropertyDefinitionWithName:@"FLAGS"
+		defaultValue:@"one two"]
+	];
+	NSDictionary *archiving = @{
+	    @"SDKROOT": @"/Applications/Xcode.app/usr",
+	    @"ARCHS": @[@"arm64", @"x86_64"],
+	    @"FLAGS": @"base",
+	    @"FLAGS[sdk=macosx]": @"conditioned"
+	};
+	DVTMacroDefinitionTable *unarchived;
+
+	PrintNSStringValue(@"split.OTHER_LDFLAGS",
+	    @([split _xc_shouldSplitValueOfListSettingNamed:@"OTHER_LDFLAGS"
+		whenArchivingToFormat:nil]));
+	PrintNSStringValue(@"split.FLAGS",
+	    @([split _xc_shouldSplitValueOfListSettingNamed:@"FLAGS"
+		whenArchivingToFormat:nil]));
+	PrintNSStringValue(@"archive.simple", ArchiveDescription(
+	    TableWithValue(@"OTHER_LDFLAGS", @"a b  c")));
+	PrintNSStringValue(@"archive.escaped", ArchiveDescription(
+	    TableWithValue(@"OTHER_LDFLAGS", @"a\\ b")));
+	PrintNSStringValue(@"archive.array", ArchiveDescription(
+	    TableWithValue(@"HEADER_SEARCH_PATHS",
+		@[@"a", @"b c", @"\"d e\"", @"$(FOO)"])));
+	PrintNSStringValue(@"archive.sdkroot", ArchiveDescription(
+	    TableWithValue(@"SDKROOT", @"path/to sdk")));
+	PrintNSStringValue(@"archive.archs", ArchiveDescription(
+	    TableWithValue(@"ARCHS", @"arm64 x86_64")));
+	PrintNSStringValue(@"archive.archsArray", ArchiveDescription(
+	    TableWithValue(@"ARCHS", @[@"arm64", @"x86_64"])));
+	PrintNSStringValue(@"archive.archsEmpty", ArchiveDescription(
+	    TableWithValue(@"ARCHS", @"")));
+	PrintNSStringValue(@"archive.unknown", ArchiveDescription(
+	    TableWithValue(@"CUSTOM_SETTING", @"a b")));
+
+	[conditions xc_setMacroNamesAndValuesFromDictionary:archiving
+	    usingPropertyDefinitionsFromSpecificationDomain:nil
+	    errorHandler:^(id error) {
+		(void)error;
+	}];
+	PrintNSStringValue(@"archive.conditions", ArchiveDescription(conditions));
+
+	[split xc_addPropertyDefinitionDefaultValues:defaults];
+	PrintNSStringValue(@"defaults", ArchiveDescription(split));
+
+	unarchived = [DVTMacroDefinitionTable
+	    xc_macroDefinitionTableFromDictionaryRepresentationForProjectArchiving:archiving
+	    usingPropertyDefinitionsFromSpecificationDomain:nil];
+	PrintNSStringValue(@"unarchive", ArchiveDescription(unarchived));
+	return (0);
+}
+
 int
 main(int argc, char **argv)
 {
@@ -407,6 +493,8 @@ main(int argc, char **argv)
 			return (cmdPropertyDefs());
 		if (argc >= 2 && strcmp(argv[1], "propertydomains") == 0)
 			return (cmdPropertyDomains());
+		if (argc >= 2 && strcmp(argv[1], "xcmacroexpansion") == 0)
+			return (cmdXCMacroExpansion());
 		if (argc < 3)
 			usage();
 		cmd = argv[1];

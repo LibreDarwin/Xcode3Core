@@ -1,0 +1,34 @@
+split.OTHER_LDFLAGS = <1>
+split.FLAGS = <0>
+archive.simple = <OTHER_LDFLAGS=(
+    a,
+    b,
+    c
+)>
+archive.escaped = <OTHER_LDFLAGS=a\ b>
+archive.array = <HEADER_SEARCH_PATHS=(
+    a,
+    "b\\ c",
+    "\\\"d\\ e\\\"",
+    "$(FOO)"
+)>
+archive.sdkroot = <SDKROOT=path/to sdk>
+archive.archs = <ARCHS=(
+    arm64,
+    "x86_64"
+)>
+archive.archsArray = <ARCHS=(
+    arm64,
+    "x86_64"
+)>
+archive.archsEmpty = <ARCHS=>
+archive.unknown = <CUSTOM_SETTING=a b>
+archive.conditions = <ARCHS=(
+    arm64,
+    "x86_64"
+)|FLAGS=base|FLAGS[sdk=macosx]=conditioned|SDKROOT=/Applications/Xcode.app/usr>
+defaults = <FLAGS=one two|ROLE=defaultRole>
+unarchive = <ARCHS=(
+    arm64,
+    "x86_64"
+)|FLAGS=base|FLAGS[sdk=macosx]=conditioned|SDKROOT=/Applications/Xcode.app/usr>

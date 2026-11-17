@@ -76,7 +76,8 @@ only unless a real dependency appears.
             DVTMacroExpansionStringList{,_NonLiteral} expression classes
         [x] XCPropertyDefinition / XCPropertyTypes
         [x] XCPropertyDomainSpecification
-        [ ] XCMacroExpansionExtensions category (DVTMacroDefinitionTable+XCMacroExpansionExtensions.h)
+        [x] XCMacroExpansionExtensions category (DVTMacroDefinitionTable+XCMacroExpansionExtensions.h;
+            pbxmodel xcmacroexpansion harness matches Apple)
 - [ ] Environment/paths behavior
 
 ### 5) pbxtool/pbxmodel parity hardening
