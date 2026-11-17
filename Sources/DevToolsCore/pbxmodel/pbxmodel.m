@@ -9,6 +9,7 @@
 #import "DevToolsCore/PBXProjectModel.h"
 #import "DevToolsCore/PBXObject.h"
 #import "DevToolsCore/BuildSystem/XCPropertyDefinition.h"
+#import "DevToolsCore/BuildSystem/XCPropertyDomainSpecification.h"
 #import "DevToolsCore/ProjectModel/pbxproj.h"
 #import "DevToolsSupport/TSPropertyListDictionary.h"
 #import "PBXPListCoding.h"
@@ -20,7 +21,8 @@ usage(void)
 	    "usage: pbxmodel roundtrip <project.pbxproj>\n"
 	    "       pbxmodel cat <project.pbxproj>\n"
 	    "       pbxmodel dump <project.pbxproj>\n"
-	    "       pbxmodel propertydefs\n");
+	    "       pbxmodel propertydefs\n"
+	    "       pbxmodel propertydomains\n");
 	exit(2);
 }
 
@@ -242,6 +244,159 @@ cmdPropertyDefs(void)
 	return (0);
 }
 
+static TSPropertyListDictionary *
+PropertyDictionary(NSDictionary *dictionary)
+{
+	return ([TSPropertyListDictionary propertyListDictionaryWithDictionary:
+	    dictionary]);
+}
+
+static NSDictionary *
+DomainProperty(NSString *name, NSString *type, NSString *value,
+    NSString *category)
+{
+	NSMutableDictionary *dictionary = [NSMutableDictionary
+	    dictionaryWithDictionary:@{
+	        @"Name": name, @"Type": type, @"DefaultValue": value}];
+
+	if (category != nil)
+		[dictionary setObject:category forKey:@"Category"];
+	return (dictionary);
+}
+
+static XCPropertyDomainSpecification *
+MakeDomainSpecification(NSString *identifier, NSString *basedOn,
+    NSArray *properties, NSArray *deleted, NSArray *categories)
+{
+	NSMutableDictionary *dictionary = [NSMutableDictionary
+	    dictionaryWithDictionary:@{
+	        @"Type": @"PropertyDomain", @"Identifier": identifier,
+	        @"Properties": properties}];
+
+	if (basedOn != nil)
+		[dictionary setObject:basedOn forKey:@"BasedOn"];
+	if (deleted != nil)
+		[dictionary setObject:deleted forKey:@"DeletedProperties"];
+	if (categories != nil)
+		[dictionary setObject:categories forKey:@"OptionCategories"];
+	return ([[XCPropertyDomainSpecification alloc]
+	    initWithPropertyListDictionary:PropertyDictionary(dictionary)
+	    inDomain:@"probe.domain"]);
+}
+
+static NSString *
+JoinedDescriptions(NSArray *values)
+{
+	NSMutableArray *strings = [NSMutableArray array];
+
+	for (id value in values)
+		[strings addObject:[value description]];
+	return ([strings componentsJoinedByString:@", "]);
+}
+
+static NSArray *
+DefinitionNames(NSArray *definitions)
+{
+	NSMutableArray *names = [NSMutableArray array];
+
+	for (XCPropertyDefinition *definition in definitions)
+		[names addObject:[definition name]];
+	return (names);
+}
+
+static NSArray *
+SortedDictionaryKeys(NSDictionary *dictionary)
+{
+	return ([[dictionary allKeys] sortedArrayUsingSelector:@selector(compare:)]);
+}
+
+static void
+PrintNSStringValue(NSString *label, id value)
+{
+	PrintValue([label UTF8String], value);
+}
+
+static void
+PrintDomainSpecification(NSString *label, XCPropertyDomainSpecification *spec)
+{
+	PrintNSStringValue([label stringByAppendingString:@".identifier"],
+	    [spec identifier]);
+	PrintNSStringValue([label stringByAppendingString:@".domain"], [spec domain]);
+	PrintNSStringValue([label stringByAppendingString:@".direct"],
+	    SortedDictionaryKeys([spec directlyDeclaredBuildOptions]));
+	PrintNSStringValue([label stringByAppendingString:@".build"],
+	    SortedDictionaryKeys([spec buildOptions]));
+	PrintNSStringValue([label stringByAppendingString:@".ordered"],
+	    DefinitionNames([spec orderedBuildOptions]));
+	PrintNSStringValue([label stringByAppendingString:@".orderedSelf"],
+	    DefinitionNames([spec orderedSelfDefinedBuildOptions]));
+	PrintNSStringValue([label stringByAppendingString:@".categories"],
+	    [spec buildOptionCategories]);
+	PrintNSStringValue([label stringByAppendingString:@".flatCategories"],
+	    [spec flattenedOptionCategories]);
+	PrintNSStringValue([label stringByAppendingString:@".namesCL"],
+	    [spec namesOfBuildOptionsForCommandLine]);
+	PrintNSStringValue([label stringByAppendingString:@".flatNamesCL"],
+	    [spec namesOfFlattenedOptionsForCommandLine]);
+	PrintNSStringValue([label stringByAppendingString:@".defaults"],
+	    [spec defaultMacrosForAllOptions]);
+	PrintNSStringValue([label stringByAppendingString:@".ui"],
+	    [[spec specificationToShowInUserInterface] identifier]);
+}
+
+static int
+cmdPropertyDomains(void)
+{
+	NSArray *baseProperties = @[
+	    DomainProperty(@"FOO", @"String", @"bar", @"Test"),
+	    DomainProperty(@"BAR", @"Boolean", @"YES", @"Build"),
+	    DomainProperty(@"BAZ", @"StringList", @"a b", @"Test")
+	];
+	NSArray *derivedProperties = @[
+	    DomainProperty(@"EXTRA", @"String", @"x", @"Test"),
+	    DomainProperty(@"FOO", @"String", @"override", nil)
+	];
+	XCPropertyDomainSpecification *base = MakeDomainSpecification(@"base", nil,
+	    baseProperties, nil,
+	    @[@{@"Name": @"Test", @"Options": @[@"FOO", @"BAZ"]},
+	      @{@"Name": @"Build", @"Options": @[@"BAR"]}]);
+	XCPropertyDomainSpecification *derived;
+
+	[XCPropertyDomainSpecification registerSpecificationOrProxy:base];
+	derived = MakeDomainSpecification(@"derived", @"base", derivedProperties,
+	    @[@"BAR"], nil);
+	[XCPropertyDomainSpecification registerSpecificationOrProxy:derived];
+
+	PrintNSStringValue(@"meta.type",
+	    [XCPropertyDomainSpecification specificationType]);
+	PrintNSStringValue(@"meta.localizedType",
+	    [XCPropertyDomainSpecification localizedSpecificationTypeName]);
+	PrintNSStringValue(@"meta.extensions", JoinedDescriptions(
+	    [[XCPropertyDomainSpecification specificationTypePathExtensions]
+	    allObjects]));
+	PrintNSStringValue(@"meta.registry",
+	    [XCPropertyDomainSpecification specificationRegistryName]);
+	PrintDomainSpecification(@"base", base);
+	PrintDomainSpecification(@"derived", derived);
+	PrintNSStringValue(@"registry.domains",
+	    [[[XCPropertyDomainSpecification allRegisteredSpecificationDomains]
+	    allObjects] sortedArrayUsingSelector:@selector(compare:)]);
+	PrintNSStringValue(@"registry.identifiers", SortedDictionaryKeys(
+	    [XCPropertyDomainSpecification
+	    dictionaryOfallRegisteredPropertyDomainsInSpecificationDomain:
+	    @"probe.domain"]));
+	PrintNSStringValue(@"registry.count", @([[XCPropertyDomainSpecification
+	    allRegisteredPropertyDomainsInSpecificationDomain:@"probe.domain"] count]));
+	PrintNSStringValue(@"registry.domainBase", [[XCPropertyDomainSpecification
+	    propertyDomainForIdentifier:@"base" inSpecificationDomain:@"probe.domain"]
+	    identifier]);
+	PrintNSStringValue(@"registry.propertiesFOO", DefinitionNames(
+	    [XCPropertyDomainSpecification allRegisteredPropertiesForName:@"FOO"]));
+	PrintNSStringValue(@"property.FOO",
+	    [XCPropertyDomainSpecification allRegisteredPropertiesForName:@"FOO"]);
+	return (0);
+}
+
 int
 main(int argc, char **argv)
 {
@@ -250,6 +405,8 @@ main(int argc, char **argv)
 
 		if (argc >= 2 && strcmp(argv[1], "propertydefs") == 0)
 			return (cmdPropertyDefs());
+		if (argc >= 2 && strcmp(argv[1], "propertydomains") == 0)
+			return (cmdPropertyDomains());
 		if (argc < 3)
 			usage();
 		cmd = argv[1];

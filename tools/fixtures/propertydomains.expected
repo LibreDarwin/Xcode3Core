@@ -1,0 +1,111 @@
+meta.type = <PropertyDomain>
+meta.localizedType = <property domain>
+meta.extensions = <pbbsetspec>
+meta.registry = <PropertyDomain>
+base.identifier = <base>
+base.domain = <probe.domain>
+base.direct = <(
+    BAR,
+    BAZ,
+    FOO
+)>
+base.build = <(
+    BAR,
+    BAZ,
+    FOO
+)>
+base.ordered = <(
+    FOO,
+    BAR,
+    BAZ
+)>
+base.orderedSelf = <(
+    FOO,
+    BAR,
+    BAZ
+)>
+base.categories = <(
+    "<XCPropertyCategory:'Test':(\n    FOO,\n    BAZ\n)>",
+    "<XCPropertyCategory:'Build':(\n    BAR\n)>"
+)>
+base.flatCategories = <(
+    "<XCPropertyCategory:'Test':(\n    FOO,\n    BAZ\n)>",
+    "<XCPropertyCategory:'Build':(\n    BAR\n)>"
+)>
+base.namesCL = <(
+    FOO,
+    BAR,
+    BAZ
+)>
+base.flatNamesCL = <(
+    FOO,
+    BAR,
+    BAZ
+)>
+base.defaults = <{ // default macros for <probe.domain:base> (immutable)
+   BAR = 【YES】
+   BAZ = 【𝗡𝗼𝗻𝗹𝗶𝘁𝗲𝗿𝗮𝗹𝗔𝗿𝗿𝗮𝘆:【a】,【b】】
+   FOO = 【𝗟𝗶𝘁𝗲𝗿𝗮𝗹𝗦𝘁𝗿𝗶𝗻𝗴:bar】
+}>
+base.ui = <base>
+derived.identifier = <derived>
+derived.domain = <probe.domain>
+derived.direct = <(
+    EXTRA,
+    FOO
+)>
+derived.build = <(
+    BAZ,
+    EXTRA,
+    FOO
+)>
+derived.ordered = <(
+    FOO,
+    BAZ,
+    EXTRA,
+    FOO
+)>
+derived.orderedSelf = <(
+    EXTRA,
+    FOO
+)>
+derived.categories = <(
+    "<XCPropertyCategory:'Test':(\n    FOO,\n    BAZ\n)>",
+    "<XCPropertyCategory:'Build':(\n)>"
+)>
+derived.flatCategories = <(
+    "<XCPropertyCategory:'Test':(\n    FOO,\n    BAZ,\n    EXTRA\n)>",
+    "<XCPropertyCategory:'Build':(\n)>"
+)>
+derived.namesCL = <(
+    EXTRA,
+    FOO
+)>
+derived.flatNamesCL = <(
+    FOO,
+    BAZ,
+    EXTRA
+)>
+derived.defaults = <{ // default macros for <probe.domain:derived> (immutable)
+   BAZ = 【𝗡𝗼𝗻𝗹𝗶𝘁𝗲𝗿𝗮𝗹𝗔𝗿𝗿𝗮𝘆:【a】,【b】】
+   EXTRA = 【𝗟𝗶𝘁𝗲𝗿𝗮𝗹𝗦𝘁𝗿𝗶𝗻𝗴:x】
+   FOO = 【𝗟𝗶𝘁𝗲𝗿𝗮𝗹𝗦𝘁𝗿𝗶𝗻𝗴:override】
+}>
+derived.ui = <derived>
+registry.domains = <(
+    "probe.domain"
+)>
+registry.identifiers = <(
+    base,
+    derived
+)>
+registry.count = <2>
+registry.domainBase = <base>
+registry.propertiesFOO = <(
+    FOO,
+    FOO
+)>
+property.FOO = <(
+    "<XCStringPropertyDefinition:'FOO':string:-:'bar'>",
+    "<XCStringPropertyDefinition:'FOO':string:-:'override'>"
+)>

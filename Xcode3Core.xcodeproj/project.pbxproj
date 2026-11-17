@@ -35,6 +35,8 @@
 		1A2B3C4D000000000000000C5 /* XCSpecificationFilter.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000C3 /* XCSpecificationFilter.m */; };
 		1A2B3C4D000000000000000DA /* XCPropertyDefinition.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000DC /* XCPropertyDefinition.m */; };
 		1A2B3C4D000000000000000DB /* XCPropertyTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000DE /* XCPropertyTypes.m */; };
+		1A2B3C4D000000000000000E0 /* XCPropertyCategory.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000E2 /* XCPropertyCategory.m */; };
+		1A2B3C4D000000000000000E1 /* XCPropertyDomainSpecification.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000E4 /* XCPropertyDomainSpecification.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -100,6 +102,10 @@
 		1A2B3C4D000000000000000DD /* XCPropertyDefinition.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XCPropertyDefinition.h; sourceTree = "<group>"; };
 		1A2B3C4D000000000000000DE /* XCPropertyTypes.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XCPropertyTypes.m; sourceTree = "<group>"; };
 		1A2B3C4D000000000000000DF /* XCPropertyTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XCPropertyTypes.h; sourceTree = "<group>"; };
+		1A2B3C4D000000000000000E2 /* XCPropertyCategory.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XCPropertyCategory.m; sourceTree = "<group>"; };
+		1A2B3C4D000000000000000E3 /* XCPropertyCategory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XCPropertyCategory.h; sourceTree = "<group>"; };
+		1A2B3C4D000000000000000E4 /* XCPropertyDomainSpecification.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XCPropertyDomainSpecification.m; sourceTree = "<group>"; };
+		1A2B3C4D000000000000000E5 /* XCPropertyDomainSpecification.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XCPropertyDomainSpecification.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -259,6 +265,8 @@
 				1A2B3C4D000000000000000C3 /* XCSpecificationFilter.m */,
 				1A2B3C4D000000000000000DC /* XCPropertyDefinition.m */,
 				1A2B3C4D000000000000000DE /* XCPropertyTypes.m */,
+				1A2B3C4D000000000000000E2 /* XCPropertyCategory.m */,
+				1A2B3C4D000000000000000E4 /* XCPropertyDomainSpecification.m */,
 			);
 			path = BuildSystem;
 			sourceTree = "<group>";
@@ -279,6 +287,8 @@
 				1A2B3C4D000000000000000C4 /* XCSpecificationFilter.h */,
 				1A2B3C4D000000000000000DD /* XCPropertyDefinition.h */,
 				1A2B3C4D000000000000000DF /* XCPropertyTypes.h */,
+				1A2B3C4D000000000000000E3 /* XCPropertyCategory.h */,
+				1A2B3C4D000000000000000E5 /* XCPropertyDomainSpecification.h */,
 			);
 			path = BuildSystem;
 			sourceTree = "<group>";
@@ -423,6 +433,8 @@
 				1A2B3C4D000000000000000C5 /* XCSpecificationFilter.m in Sources */,
 				1A2B3C4D000000000000000DA /* XCPropertyDefinition.m in Sources */,
 				1A2B3C4D000000000000000DB /* XCPropertyTypes.m in Sources */,
+				1A2B3C4D000000000000000E0 /* XCPropertyCategory.m in Sources */,
+				1A2B3C4D000000000000000E1 /* XCPropertyDomainSpecification.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

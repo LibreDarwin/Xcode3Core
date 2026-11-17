@@ -915,7 +915,7 @@ NSMutableDictionary *XCGetRegistryDictionaryForForDomain(NSString *domain)
 				 fromDomainPrefixedIdentifier:basedOn];
 
 			_superSpecification = [[[self class] specificationForIdentifier:superIdentifier
-									       inDomain:superDomain] loadedSpecification];
+									       inDomain:(superDomain ?: domain)] loadedSpecification];
 
 			if (_superSpecification == nil) {
 				NSLog(@"warning: specification %@ in domain %@ is based on unknown specification %@",
