@@ -52,7 +52,8 @@ PBXMODEL_OBJS := $(OBJDIR)/pbxmodel.o $(OBJDIR)/pbxproj.o \
 	$(OBJDIR)/XCSpecificationRegistry.o $(OBJDIR)/XCSpecificationFilter.o \
 	$(OBJDIR)/XCPropertyDefinition.o $(OBJDIR)/XCPropertyTypes.o \
 	$(OBJDIR)/XCPropertyCategory.o $(OBJDIR)/XCPropertyDomainSpecification.o \
-	$(OBJDIR)/DVTMacroDefinitionTable+XCMacroExpansionExtensions.o
+	$(OBJDIR)/DVTMacroDefinitionTable+XCMacroExpansionExtensions.o \
+	$(OBJDIR)/XCMacroExpansionScope.o
 
 PREFIX  ?= /usr/local
 DESTDIR ?=
@@ -193,6 +194,10 @@ $(OBJDIR)/XCPropertyDomainSpecification.o: Sources/DevToolsCore/BuildSystem/XCPr
 $(OBJDIR)/DVTMacroDefinitionTable+XCMacroExpansionExtensions.o: Sources/DevToolsCore/BuildSystem/DVTMacroDefinitionTable+XCMacroExpansionExtensions.m
 	@mkdir -p $(OBJDIR)
 	$(CC) $(OBJCFLAGS) -c -o $@ Sources/DevToolsCore/BuildSystem/DVTMacroDefinitionTable+XCMacroExpansionExtensions.m
+
+$(OBJDIR)/XCMacroExpansionScope.o: Sources/DevToolsCore/XCMacroExpansionScope.m
+	@mkdir -p $(OBJDIR)
+	$(CC) $(OBJCFLAGS) -c -o $@ Sources/DevToolsCore/XCMacroExpansionScope.m
 
 test: all
 	@ok=0; \

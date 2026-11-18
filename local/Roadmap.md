@@ -63,7 +63,8 @@ only unless a real dependency appears.
       types, embedded-binary flags), but their initialisers need
       DVTMacroDefinitionTable + DVTMacroExpansionScope + XCPropertyDefinition to build
       DefaultBuildProperties/OverridingBuildSettings; blocked on item 4 (macro expansion)
-- [ ] XCMacroExpansionScope (DevToolsCore extension of DVTMacroExpansionScope)
+- [x] XCMacroExpansionScope (DevToolsCore extension of DVTMacroExpansionScope;
+      pbxmodel xcmacroexpansion harness matches Apple)
 
 ### 4) RuntimeSupport
 - [ ] Macro expansion (XCMacroExpansionExtensions), SDK/package handling

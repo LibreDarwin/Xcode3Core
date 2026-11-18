@@ -38,6 +38,7 @@
 		1A2B3C4D000000000000000E0 /* XCPropertyCategory.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000E2 /* XCPropertyCategory.m */; };
 		1A2B3C4D000000000000000E1 /* XCPropertyDomainSpecification.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000E4 /* XCPropertyDomainSpecification.m */; };
 		1A2B3C4D000000000000000E6 /* DVTMacroDefinitionTable+XCMacroExpansionExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000E7 /* DVTMacroDefinitionTable+XCMacroExpansionExtensions.m */; };
+		1A2B3C4D000000000000000EB /* XCMacroExpansionScope.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000E9 /* XCMacroExpansionScope.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -109,6 +110,8 @@
 		1A2B3C4D000000000000000E5 /* XCPropertyDomainSpecification.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XCPropertyDomainSpecification.h; sourceTree = "<group>"; };
 		1A2B3C4D000000000000000E7 /* DVTMacroDefinitionTable+XCMacroExpansionExtensions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "DVTMacroDefinitionTable+XCMacroExpansionExtensions.m"; sourceTree = "<group>"; };
 		1A2B3C4D000000000000000E8 /* DVTMacroDefinitionTable+XCMacroExpansionExtensions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "DVTMacroDefinitionTable+XCMacroExpansionExtensions.h"; sourceTree = "<group>"; };
+		1A2B3C4D000000000000000E9 /* XCMacroExpansionScope.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XCMacroExpansionScope.m; sourceTree = "<group>"; };
+		1A2B3C4D000000000000000EA /* XCMacroExpansionScope.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XCMacroExpansionScope.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -151,6 +154,7 @@
 				1A2B3C4D000000000000004A /* ProjectModel */,
 				1A2B3C4D0000000000000085 /* pbxmodel */,
 				1A2B3C4D000000000000004B /* pbxtool */,
+				1A2B3C4D000000000000000E9 /* XCMacroExpansionScope.m */,
 				1A2B3C4D000000000000000AD /* BuildSystem */,
 			);
 			path = DevToolsCore;
@@ -237,6 +241,7 @@
 				1A2B3C4D0000000000000009C /* PBXObjectID.h */,
 				1A2B3C4D0000000000000009D /* PBXPlatformFilter.h */,
 				1A2B3C4D0000000000000009E /* PBXPlatformFilterableItem.h */,
+				1A2B3C4D000000000000000EA /* XCMacroExpansionScope.h */,
 				1A2B3C4D000000000000000AF /* BuildSystem */,
 			);
 			path = DevToolsCore;
@@ -441,6 +446,7 @@
 				1A2B3C4D000000000000000E0 /* XCPropertyCategory.m in Sources */,
 				1A2B3C4D000000000000000E1 /* XCPropertyDomainSpecification.m in Sources */,
 				1A2B3C4D000000000000000E6 /* DVTMacroDefinitionTable+XCMacroExpansionExtensions.m in Sources */,
+				1A2B3C4D000000000000000EB /* XCMacroExpansionScope.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

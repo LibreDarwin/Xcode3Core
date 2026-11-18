@@ -32,3 +32,19 @@ unarchive = <ARCHS=(
     arm64,
     "x86_64"
 )|FLAGS=base|FLAGS[sdk=macosx]=conditioned|SDKROOT=/Applications/Xcode.app/usr>
+scope.levels = <14>
+scope.level.0 = <default toolchain override>
+scope.level.5 = <project>
+scope.level.13 = <metadata>
+scope.level.unknown = <unknown level 14>
+scope.zero.class = <XCMacroExpansionScope>
+scope.zero.level = <0>
+scope.zero.options = <0>
+scope.zero.conditions = <>
+scope.zero.FOO = <bar>
+scope.full.level = <1>
+scope.full.options = <1>
+scope.full.FOO = <bar>
+scope.values.conditions = <ARCHS=arm64|sdk=macosx>
+scope.values.sdk = <macosx>
+scope.values.archs = <arm64>

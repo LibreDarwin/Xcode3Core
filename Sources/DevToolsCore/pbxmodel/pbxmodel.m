@@ -9,6 +9,7 @@
 #import "DevToolsCore/PBXProjectModel.h"
 #import "DevToolsCore/PBXObject.h"
 #import "DevToolsCore/BuildSystem/DVTMacroDefinitionTable+XCMacroExpansionExtensions.h"
+#import "DevToolsCore/XCMacroExpansionScope.h"
 #import "DevToolsCore/BuildSystem/XCPropertyDefinition.h"
 #import "DevToolsCore/BuildSystem/XCPropertyDomainSpecification.h"
 #import "DevToolsCore/ProjectModel/pbxproj.h"
@@ -423,6 +424,19 @@ TableWithValue(id name, id value)
 	return (table);
 }
 
+static id
+ScopeConditionsDescription(DVTMacroExpansionScope *scope)
+{
+	NSDictionary *values = [scope allConditionParameterValues];
+	NSArray *keys = [[values allKeys] sortedArrayUsingSelector:@selector(compare:)];
+	NSMutableArray *entries = [NSMutableArray arrayWithCapacity:[keys count]];
+
+	for (NSString *key in keys)
+		[entries addObject:[NSString stringWithFormat:@"%@=%@", key,
+		    [values objectForKey:key]]];
+	return ([entries componentsJoinedByString:@"|"]);
+}
+
 static int
 cmdXCMacroExpansion(void)
 {
@@ -441,6 +455,17 @@ cmdXCMacroExpansion(void)
 	    @"FLAGS[sdk=macosx]": @"conditioned"
 	};
 	DVTMacroDefinitionTable *unarchived;
+	DVTMacroDefinitionTable *scopeTable = [DVTMacroDefinitionTable newWithLabel:@"T"];
+	XCMacroExpansionScope *scopeZero;
+	XCMacroExpansionScope *scopeFull;
+	XCMacroExpansionScope *scopeValues;
+	NSDictionary *scopeValuesDict = @{@"sdk": @"macosx", @"ARCHS": @"arm64"};
+
+	[scopeTable xc_setValue:@"bar" forMacroName:@"FOO"
+	    usingPropertyDefinitionsFromSpecificationDomain:nil
+	    errorHandler:^(id error) {
+		(void)error;
+	}];
 
 	PrintNSStringValue(@"split.OTHER_LDFLAGS",
 	    @([split _xc_shouldSplitValueOfListSettingNamed:@"OTHER_LDFLAGS"
@@ -480,6 +505,48 @@ cmdXCMacroExpansion(void)
 	    xc_macroDefinitionTableFromDictionaryRepresentationForProjectArchiving:archiving
 	    usingPropertyDefinitionsFromSpecificationDomain:nil];
 	PrintNSStringValue(@"unarchive", ArchiveDescription(unarchived));
+
+	PrintNSStringValue(@"scope.levels",
+	    @([XCMacroExpansionScope numberOfDefinitionLevels]));
+	PrintNSStringValue(@"scope.level.0",
+	    [XCMacroExpansionScope stringForDefinitionLevel:0]);
+	PrintNSStringValue(@"scope.level.5",
+	    [XCMacroExpansionScope stringForDefinitionLevel:5]);
+	PrintNSStringValue(@"scope.level.13",
+	    [XCMacroExpansionScope stringForDefinitionLevel:13]);
+	PrintNSStringValue(@"scope.level.unknown",
+	    [XCMacroExpansionScope stringForDefinitionLevel:14]);
+
+	scopeZero = [XCMacroExpansionScope newWithParentScope:nil
+	    macroDefinitionTable:scopeTable definitionLevel:0];
+	PrintNSStringValue(@"scope.zero.class", NSStringFromClass([scopeZero class]));
+	PrintNSStringValue(@"scope.zero.level", @([scopeZero definitionLevel]));
+	PrintNSStringValue(@"scope.zero.options", @([scopeZero options]));
+	PrintNSStringValue(@"scope.zero.conditions",
+	    ScopeConditionsDescription(scopeZero));
+	PrintNSStringValue(@"scope.zero.FOO",
+	    [scopeZero evaluatedStringValueForMacroNamed:@"FOO"]);
+
+	scopeFull = [[XCMacroExpansionScope alloc] initWithParentScope:scopeZero
+	    macroDefinitionTable:scopeTable definitionLevel:1
+	    definitionLevelsToClear:nil conditionParameterValues:nil
+	    conditionParameterFallbackValues:nil expansionOptions:1];
+	PrintNSStringValue(@"scope.full.level", @([scopeFull definitionLevel]));
+	PrintNSStringValue(@"scope.full.options", @([scopeFull options]));
+	PrintNSStringValue(@"scope.full.FOO",
+	    [scopeFull evaluatedStringValueForMacroNamed:@"FOO"]);
+
+	scopeValues = [[XCMacroExpansionScope alloc] initWithParentScope:scopeZero
+	    macroDefinitionTable:scopeTable definitionLevel:2
+	    definitionLevelsToClear:nil conditionParameterValues:scopeValuesDict
+	    conditionParameterFallbackValues:@{@"sdk": @"iphoneos"}
+	    expansionOptions:0];
+	PrintNSStringValue(@"scope.values.conditions",
+	    ScopeConditionsDescription(scopeValues));
+	PrintNSStringValue(@"scope.values.sdk",
+	    [scopeValues valueForConditionParameter:@"sdk"]);
+	PrintNSStringValue(@"scope.values.archs",
+	    [scopeValues valueForConditionParameter:@"ARCHS"]);
 	return (0);
 }
 
