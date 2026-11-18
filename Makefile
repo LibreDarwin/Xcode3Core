@@ -53,7 +53,9 @@ PBXMODEL_OBJS := $(OBJDIR)/pbxmodel.o $(OBJDIR)/pbxproj.o \
 	$(OBJDIR)/XCPropertyDefinition.o $(OBJDIR)/XCPropertyTypes.o \
 	$(OBJDIR)/XCPropertyCategory.o $(OBJDIR)/XCPropertyDomainSpecification.o \
 	$(OBJDIR)/DVTMacroDefinitionTable+XCMacroExpansionExtensions.o \
-	$(OBJDIR)/XCMacroExpansionScope.o
+	$(OBJDIR)/XCMacroExpansionScope.o \
+	$(OBJDIR)/PBXPackageTypeSpecification.o \
+	$(OBJDIR)/XCProductTypeSpecification.o
 
 PREFIX  ?= /usr/local
 DESTDIR ?=
@@ -199,6 +201,14 @@ $(OBJDIR)/XCMacroExpansionScope.o: Sources/DevToolsCore/XCMacroExpansionScope.m
 	@mkdir -p $(OBJDIR)
 	$(CC) $(OBJCFLAGS) -c -o $@ Sources/DevToolsCore/XCMacroExpansionScope.m
 
+$(OBJDIR)/PBXPackageTypeSpecification.o: Sources/DevToolsCore/BuildSystem/PBXPackageTypeSpecification.m
+	@mkdir -p $(OBJDIR)
+	$(CC) $(OBJCFLAGS) -c -o $@ Sources/DevToolsCore/BuildSystem/PBXPackageTypeSpecification.m
+
+$(OBJDIR)/XCProductTypeSpecification.o: Sources/DevToolsCore/BuildSystem/XCProductTypeSpecification.m
+	@mkdir -p $(OBJDIR)
+	$(CC) $(OBJCFLAGS) -c -o $@ Sources/DevToolsCore/BuildSystem/XCProductTypeSpecification.m
+
 test: all
 	@ok=0; \
 	bash tools/difftest.sh $(AGVTOOL) || ok=1; \
@@ -206,6 +216,7 @@ test: all
 	PBXMODEL=$(PBXMODEL) bash tools/propertydefs.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/propertydomains.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/xcmacroexpansion.sh || ok=1; \
+	PBXMODEL=$(PBXMODEL) bash tools/xcproducttypes.sh || ok=1; \
 	exit $$ok
 
 install: all

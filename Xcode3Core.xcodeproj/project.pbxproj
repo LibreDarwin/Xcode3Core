@@ -39,6 +39,8 @@
 		1A2B3C4D000000000000000E1 /* XCPropertyDomainSpecification.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000E4 /* XCPropertyDomainSpecification.m */; };
 		1A2B3C4D000000000000000E6 /* DVTMacroDefinitionTable+XCMacroExpansionExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000E7 /* DVTMacroDefinitionTable+XCMacroExpansionExtensions.m */; };
 		1A2B3C4D000000000000000EB /* XCMacroExpansionScope.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000E9 /* XCMacroExpansionScope.m */; };
+		1A2B3C4D000000000000000EC /* PBXPackageTypeSpecification.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000ED /* PBXPackageTypeSpecification.m */; };
+		1A2B3C4D000000000000000EF /* XCProductTypeSpecification.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000F0 /* XCProductTypeSpecification.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -112,6 +114,10 @@
 		1A2B3C4D000000000000000E8 /* DVTMacroDefinitionTable+XCMacroExpansionExtensions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "DVTMacroDefinitionTable+XCMacroExpansionExtensions.h"; sourceTree = "<group>"; };
 		1A2B3C4D000000000000000E9 /* XCMacroExpansionScope.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XCMacroExpansionScope.m; sourceTree = "<group>"; };
 		1A2B3C4D000000000000000EA /* XCMacroExpansionScope.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XCMacroExpansionScope.h; sourceTree = "<group>"; };
+		1A2B3C4D000000000000000ED /* PBXPackageTypeSpecification.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PBXPackageTypeSpecification.m; sourceTree = "<group>"; };
+		1A2B3C4D000000000000000EE /* PBXPackageTypeSpecification.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PBXPackageTypeSpecification.h; sourceTree = "<group>"; };
+		1A2B3C4D000000000000000F0 /* XCProductTypeSpecification.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XCProductTypeSpecification.m; sourceTree = "<group>"; };
+		1A2B3C4D000000000000000F1 /* XCProductTypeSpecification.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XCProductTypeSpecification.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -276,6 +282,8 @@
 				1A2B3C4D000000000000000E2 /* XCPropertyCategory.m */,
 				1A2B3C4D000000000000000E4 /* XCPropertyDomainSpecification.m */,
 				1A2B3C4D000000000000000E7 /* DVTMacroDefinitionTable+XCMacroExpansionExtensions.m */,
+				1A2B3C4D000000000000000ED /* PBXPackageTypeSpecification.m */,
+				1A2B3C4D000000000000000F0 /* XCProductTypeSpecification.m */,
 			);
 			path = BuildSystem;
 			sourceTree = "<group>";
@@ -299,6 +307,8 @@
 				1A2B3C4D000000000000000E3 /* XCPropertyCategory.h */,
 				1A2B3C4D000000000000000E5 /* XCPropertyDomainSpecification.h */,
 				1A2B3C4D000000000000000E8 /* DVTMacroDefinitionTable+XCMacroExpansionExtensions.h */,
+				1A2B3C4D000000000000000EE /* PBXPackageTypeSpecification.h */,
+				1A2B3C4D000000000000000F1 /* XCProductTypeSpecification.h */,
 			);
 			path = BuildSystem;
 			sourceTree = "<group>";
@@ -447,6 +457,8 @@
 				1A2B3C4D000000000000000E1 /* XCPropertyDomainSpecification.m in Sources */,
 				1A2B3C4D000000000000000E6 /* DVTMacroDefinitionTable+XCMacroExpansionExtensions.m in Sources */,
 				1A2B3C4D000000000000000EB /* XCMacroExpansionScope.m in Sources */,
+				1A2B3C4D000000000000000EC /* PBXPackageTypeSpecification.m in Sources */,
+				1A2B3C4D000000000000000EF /* XCProductTypeSpecification.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

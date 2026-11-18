@@ -9,7 +9,9 @@
 #import "DevToolsCore/PBXProjectModel.h"
 #import "DevToolsCore/PBXObject.h"
 #import "DevToolsCore/BuildSystem/DVTMacroDefinitionTable+XCMacroExpansionExtensions.h"
+#import "DevToolsCore/PBXPackageTypeSpecification.h"
 #import "DevToolsCore/XCMacroExpansionScope.h"
+#import "DevToolsCore/XCProductTypeSpecification.h"
 #import "DevToolsCore/BuildSystem/XCPropertyDefinition.h"
 #import "DevToolsCore/BuildSystem/XCPropertyDomainSpecification.h"
 #import "DevToolsCore/ProjectModel/pbxproj.h"
@@ -25,7 +27,8 @@ usage(void)
 	    "       pbxmodel dump <project.pbxproj>\n"
 	    "       pbxmodel propertydefs\n"
 	    "       pbxmodel propertydomains\n"
-	    "       pbxmodel xcmacroexpansion\n");
+	    "       pbxmodel xcmacroexpansion\n"
+	    "       pbxmodel xcproducttypes\n");
 	exit(2);
 }
 
@@ -550,6 +553,277 @@ cmdXCMacroExpansion(void)
 	return (0);
 }
 
+static NSString *
+ProductDescription(id value)
+{
+	if ([value isKindOfClass:[NSDictionary class]]) {
+		NSMutableArray *parts = [NSMutableArray array];
+
+		for (id key in SortedDictionaryKeys(value)) {
+			[parts addObject:[NSString stringWithFormat:@"%@=%@",
+			    key, ProductDescription([(NSDictionary *)value objectForKey:key])]];
+		}
+		return ([NSString stringWithFormat:@"{%@}",
+		    [parts componentsJoinedByString:@","]]);
+	}
+	if ([value isKindOfClass:[NSArray class]]) {
+		NSMutableArray *parts = [NSMutableArray array];
+
+		for (id item in (NSArray *)value) {
+			[parts addObject:ProductDescription(item)];
+		}
+		return ([NSString stringWithFormat:@"(%@)",
+		    [parts componentsJoinedByString:@","]]);
+	}
+	if ([value isKindOfClass:[NSSet class]]) {
+		NSMutableArray *items = [NSMutableArray array];
+
+		for (id item in (NSSet *)value) {
+			[items addObject:[item description]];
+		}
+		return (ProductDescription([items sortedArrayUsingSelector:@selector(compare:)]));
+	}
+	return ([value description]);
+}
+
+static NSString *
+ProductMacroDescription(id table)
+{
+	id representation = nil;
+
+	if ([table respondsToSelector:@selector(xc_dictionaryRepresentationForProjectArchiving)]) {
+		representation = [table xc_dictionaryRepresentationForProjectArchiving];
+	}
+	return (ProductDescription(representation));
+}
+
+static void
+RegisterProductPackageType(NSString *identifier)
+{
+	NSDictionary *dictionary = @{
+		@"Type": @"PackageType",
+		@"Identifier": identifier,
+		@"Name": identifier,
+		@"Description": identifier,
+		@"Class": @"PBXPackageTypeSpecification",
+		@"DefaultBuildSettings": @{@"FOO": @"bar"},
+		@"ProductReference": @{
+			@"FileType": @"wrapper.application",
+			@"Name": @"$(PRODUCT_NAME)",
+			@"IsLaunchable": @"YES"
+		}
+	};
+	id plist = [TSPropertyListDictionary propertyListDictionaryWithDictionary:dictionary];
+	PBXPackageTypeSpecification *specification =
+	    [[PBXPackageTypeSpecification alloc] initWithPropertyListDictionary:plist inDomain:@""];
+
+	[PBXPackageTypeSpecification registerSpecificationOrProxy:specification];
+}
+
+static XCProductTypeSpecification *
+MakeProductSpecification(NSString *className)
+{
+	NSDictionary *dictionary = @{
+		@"Type": @"ProductType",
+		@"Identifier": @"probe.id",
+		@"Name": @"Probe Name",
+		@"Description": @"Probe Description",
+		@"Class": className,
+		@"DefaultTargetName": @"Probe Target",
+		@"DefaultBuildProperties": @{@"FOO": @"bar", @"BAZ": @"$(FOO)/x"},
+		@"OverridingBuildSettings": @{@"OVR": @"qux"},
+		@"PackageTypes": @[@"com.apple.package-type.bundle", @"com.apple.package-type.mach-o-executable"],
+		@"AllowedBuildPhases": @[@"com.apple.buildphase.sources", @"com.apple.buildphase.frameworks"],
+		@"DefaultEntitlements": @{@"com.apple.developer.test": @"YES"},
+		@"InfoPlistAdditions": @{@"CFBundleIdentifier": @"$(PRODUCT_BUNDLE_IDENTIFIER)"},
+		@"CanEmbedCompilerSanitizerLibraries": @"YES",
+		@"RunpathSearchPathForEmbeddedFrameworks": @"@executable_path/../Frameworks/$(FOO)",
+		@"IsEmbeddable": @"YES",
+		@"BuildPhaseInjectionsWhenEmbedding": @[@{@"BuildPhase": @"CopyFiles"}],
+		@"RequiredBuiltProductsDir": @"WATCH_BUILT_PRODUCTS_DIR",
+		@"Platforms": @[@"macosx", @"iphoneos"],
+		@"WantsSimpleTargetEditing": @"YES",
+		@"WantsInfoEditorHidden": @"YES",
+		@"IsCapabilitiesUnsupported": @"YES",
+		@"ValidateEmbeddedBinaries": @"YES",
+		@"WantsBundleIdentifierEditing": @"YES",
+		@"WantsSigningEditing": @"YES",
+		@"IsUnitTest": @"YES",
+		@"IsUITest": @"YES",
+		@"XCTContainsUITests": @"YES",
+		@"IsExternalTest": @"YES",
+		@"SupportsHostingTests": @"YES",
+		@"SupportsBeingUITestTarget": @"YES",
+		@"AllowEmbedding": @"YES",
+		@"HasInfoPlist": @"YES"
+	};
+	id plist = [TSPropertyListDictionary propertyListDictionaryWithDictionary:dictionary];
+	Class cls = NSClassFromString(className);
+
+	return ([[cls alloc] initWithPropertyListDictionary:plist inDomain:@"probe"]);
+}
+
+static void
+PrintProductClassMethods(NSString *label, Class cls)
+{
+	PrintNSStringValue([label stringByAppendingString:@".base"],
+	    NSStringFromClass([cls specificationTypeBaseClass]));
+	PrintNSStringValue([label stringByAppendingString:@".type"],
+	    [cls specificationType]);
+	PrintNSStringValue([label stringByAppendingString:@".registry"],
+	    [cls specificationRegistryName]);
+	PrintNSStringValue([label stringByAppendingString:@".extensions"],
+	    ProductDescription([cls specificationTypePathExtensions]));
+	PrintNSStringValue([label stringByAppendingString:@".localized"],
+	    [cls localizedSpecificationTypeName]);
+}
+
+static NSArray *
+ProductPackageIdentifiers(NSArray *packageTypes)
+{
+	NSMutableArray *identifiers = [NSMutableArray arrayWithCapacity:[packageTypes count]];
+
+	for (PBXPackageTypeSpecification *specification in packageTypes) {
+		[identifiers addObject:[specification identifier]];
+	}
+	return (identifiers);
+}
+
+static int
+cmdXCProductTypes(void)
+{
+	NSArray *classNames = @[
+		@"XCProductTypeSpecification",
+		@"PBXApplicationProductType",
+		@"PBXBundleProductType",
+		@"PBXFrameworkProductType",
+		@"PBXStaticLibraryProductType",
+		@"PBXDynamicLibraryProductType",
+		@"PBXToolProductType",
+		@"PBXXCTestBundleProductType",
+		@"XCKernelExtensionProductType",
+		@"XCStandaloneExecutableProductType",
+		@"XCStaticFrameworkProductType"
+	];
+
+	RegisterProductPackageType(@"com.apple.package-type.bundle");
+	RegisterProductPackageType(@"com.apple.package-type.mach-o-executable");
+	PrintProductClassMethods(@"package.class.PBXPackageTypeSpecification",
+	    [PBXPackageTypeSpecification class]);
+	for (NSString *name in classNames) {
+		PrintProductClassMethods([@"product.class." stringByAppendingString:name],
+		    NSClassFromString(name));
+	}
+
+	PBXPackageTypeSpecification *package = [PBXPackageTypeSpecification
+	    specificationForIdentifier:@"com.apple.package-type.bundle"];
+	PrintNSStringValue(@"package.identifier", [package identifier]);
+	PrintNSStringValue(@"package.macros", ProductMacroDescription([package defaultMacros]));
+	PrintNSStringValue(@"package.reference.name", [package productReferenceName]);
+	PrintNSStringValue(@"package.reference.launchable", @([package productReferenceIsLaunchable]));
+
+	DVTMacroDefinitionTable *scopeTable = [DVTMacroDefinitionTable empty];
+	XCMacroExpansionScope *scope = [XCMacroExpansionScope newWithParentScope:nil
+	    macroDefinitionTable:scopeTable definitionLevel:0];
+
+	for (NSString *name in classNames) {
+		NSString *label = [@"product." stringByAppendingString:name];
+		XCProductTypeSpecification *specification = MakeProductSpecification(name);
+		id expanded;
+
+		PrintNSStringValue([label stringByAppendingString:@".class"],
+		    NSStringFromClass([specification class]));
+		PrintNSStringValue([label stringByAppendingString:@".identifier"],
+		    [specification identifier]);
+		PrintNSStringValue([label stringByAppendingString:@".targetName"],
+		    [specification defaultTargetName]);
+		PrintNSStringValue([label stringByAppendingString:@".defaultMacros"],
+		    ProductMacroDescription([specification defaultMacros]));
+		PrintNSStringValue([label stringByAppendingString:@".overridingMacros"],
+		    ProductMacroDescription([specification overridingMacros]));
+		PrintNSStringValue([label stringByAppendingString:@".allowedClasses"],
+		    ProductDescription([specification allowedBuildPhaseClasses]));
+		PrintNSStringValue([label stringByAppendingString:@".allowsSources"],
+		    @([specification allowsBuildPhaseWithIdentifier:@"com.apple.buildphase.sources"]));
+		PrintNSStringValue([label stringByAppendingString:@".allowsUnknown"],
+		    @([specification allowsBuildPhaseWithIdentifier:@"com.apple.buildphase.unknown"]));
+		PrintNSStringValue([label stringByAppendingString:@".allowedFileTypes"],
+		    ProductDescription([specification allowedFileTypesForBuildPhaseIdentifier:
+			@"com.apple.buildphase.sources"]));
+		PrintNSStringValue([label stringByAppendingString:@".packageTypes"],
+		    ProductDescription(ProductPackageIdentifiers([specification packageTypes])));
+		PrintNSStringValue([label stringByAppendingString:@".defaultPackage"],
+		    [[specification defaultPackageType] identifier]);
+		PrintNSStringValue([label stringByAppendingString:@".hasInfoPlist"],
+		    @([specification hasInfoPlist]));
+		PrintNSStringValue([label stringByAppendingString:@".infoPlistAdditions"],
+		    ProductDescription([specification infoPlistAdditions]));
+		PrintNSStringValue([label stringByAppendingString:@".canEmbedSanitizers"],
+		    @([specification canEmbedCompilerSanitizerLibraries]));
+		PrintNSStringValue([label stringByAppendingString:@".runpath"],
+		    [specification runpathSearchPathForEmbeddedFrameworks]);
+		PrintNSStringValue([label stringByAppendingString:@".isEmbeddable"],
+		    @([specification isEmbeddable]));
+		PrintNSStringValue([label stringByAppendingString:@".injections"],
+		    ProductDescription([specification buildPhaseInjectionsWhenEmbedding]));
+		PrintNSStringValue([label stringByAppendingString:@".requiredDir"],
+		    [specification requiredBuiltProductsDir]);
+		PrintNSStringValue([label stringByAppendingString:@".entitlements"],
+		    ProductDescription([specification additionalEntitlementsForMacroExpansionScope:scope]));
+		expanded = [specification macroExpansionScopeByAddingMacroDefinitionTablesToScope:scope];
+		PrintNSStringValue([label stringByAppendingString:@".expanded.class"],
+		    NSStringFromClass([expanded class]));
+		PrintNSStringValue([label stringByAppendingString:@".expanded.PRODUCT_TYPE"],
+		    [expanded evaluatedStringValueForMacroNamed:@"PRODUCT_TYPE"]);
+		PrintNSStringValue([label stringByAppendingString:@".expanded.OVR"],
+		    [expanded evaluatedStringValueForMacroNamed:@"OVR"]);
+		PrintNSStringValue([label stringByAppendingString:@".simple"],
+		    @([specification wantsSimpleTargetEditing]));
+		PrintNSStringValue([label stringByAppendingString:@".infoHidden"],
+		    @([specification wantsInfoEditorHidden]));
+		PrintNSStringValue([label stringByAppendingString:@".caps"],
+		    @([specification areCapabilitiesSupported]));
+		PrintNSStringValue([label stringByAppendingString:@".validate"],
+		    @([specification validateEmbeddedBinaries]));
+		PrintNSStringValue([label stringByAppendingString:@".bundleId"],
+		    @([specification wantsBundleIdentifierEditing]));
+		PrintNSStringValue([label stringByAppendingString:@".signing"],
+		    @([specification wantsSigningEditing]));
+		PrintNSStringValue([label stringByAppendingString:@".unit"],
+		    @([specification isUnitTest]));
+		PrintNSStringValue([label stringByAppendingString:@".ui"],
+		    @([specification isUITest]));
+		PrintNSStringValue([label stringByAppendingString:@".multi"],
+		    @([specification isMultiDeviceUITest]));
+		PrintNSStringValue([label stringByAppendingString:@".external"],
+		    @([specification isExternalTest]));
+		PrintNSStringValue([label stringByAppendingString:@".hosting"],
+		    @([specification supportsHostingTests]));
+		PrintNSStringValue([label stringByAppendingString:@".beingUI"],
+		    @([specification supportsBeingUITestTarget]));
+		PrintNSStringValue([label stringByAppendingString:@".embedding"],
+		    @([specification allowEmbedding]));
+		PrintNSStringValue([label stringByAppendingString:@".platforms"],
+		    ProductDescription([specification platforms]));
+		if ([specification isKindOfClass:[PBXXCTestBundleProductType class]]) {
+			PBXXCTestBundleProductType *test = (PBXXCTestBundleProductType *)specification;
+
+			PrintNSStringValue([label stringByAppendingString:@".xct.plistReplacements"],
+			    ProductDescription([test _XCTRunnerInfoPlistReplacements]));
+			PrintNSStringValue([label stringByAppendingString:@".xct.definitions"],
+			    ProductDescription([test _XCTRunnerInfoPlistPreprocessorDefinitions]));
+			PrintNSStringValue([label stringByAppendingString:@".xct.bundleId"],
+			    [test _XCTRunnerBundleIdentifierWithMacroExpansionScope:scope]);
+			PrintNSStringValue([label stringByAppendingString:@".xct.testHost"],
+			    [test _adjustedTestHostFromOriginalTestHost:@"host"
+			    addingOverridesToMacroDefinitionTable:nil macroExpansionScope:scope]);
+			PrintNSStringValue([label stringByAppendingString:@".xct.pluginDirectory"],
+			    [test _pluginDirectoryForTestHost:@"host" macroExpansionScope:scope]);
+		}
+	}
+	return (0);
+}
+
 int
 main(int argc, char **argv)
 {
@@ -562,6 +836,8 @@ main(int argc, char **argv)
 			return (cmdPropertyDomains());
 		if (argc >= 2 && strcmp(argv[1], "xcmacroexpansion") == 0)
 			return (cmdXCMacroExpansion());
+		if (argc >= 2 && strcmp(argv[1], "xcproducttypes") == 0)
+			return (cmdXCProductTypes());
 		if (argc < 3)
 			usage();
 		cmd = argv[1];

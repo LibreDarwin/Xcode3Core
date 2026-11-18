@@ -24,8 +24,8 @@ We must achieve behavioral parity and, where specified, byte-identical output wi
 - [x] Complete PBXTarget/PBXProjectItem behaviors, dependencies resolution, display names/comments
 - [x] Complete PBXBuildFile settings, platform filters; PBXBuildPhase ordering/semantics
 - [x] Complete PBXGroup/PBXFileReference/PBXVariantGroup/XCVersionGroup full APIs
-- [x] Ensure archiving canonical order matches Apple for all cases; verify on broader corpus (1088/1088 byte-exact)
-- [ ] PBX*ProductType classes: require XCSpecification (BuildSystem), runtime-only and never archived; defer to item 3
+- [x] Ensure archiving canonical order matches Apple for all cases; verify on broader corpus (1081/1081 byte-exact)
+- [x] PBX*ProductType classes: runtime-only XCSpecification subclasses, never archived
 - [ ] PBXArchivingBinding/PBXUnarchivingBinding family: depends on AppKit
       NSKeyBinding and on a PListArchiver API (writeValueForObject:toPListArchiver:,
       pbxPlistArchiver:overrideValue:forArchivingKey:) that we do not expose.
@@ -58,16 +58,16 @@ only unless a real dependency appears.
        sourceDescription:inDomain:, _shouldRecurseIntoDirectoryNamed:ofType:,
        _tryRegisterLocalizationDictionaryForSpecification:bundle:; returns NSError arrays)
 - [x] DVTFilePath and DVTPlugInManager (DVTFoundation) partial shims used by spec loading
-- [ ] PBX*ProductType family: XCProductTypeSpecification, PBXPackageTypeSpecification and the
-      ten PBX*/XC*ProductType subclasses are decoded (type identity, plist keys, package
-      types, embedded-binary flags), but their initialisers need
-      DVTMacroDefinitionTable + DVTMacroExpansionScope + XCPropertyDefinition to build
-      DefaultBuildProperties/OverridingBuildSettings; blocked on item 4 (macro expansion)
+- [x] PBX*ProductType family: XCProductTypeSpecification, PBXPackageTypeSpecification and the
+      ten PBX*/XC*ProductType subclasses implement type identity, plist keys, inherited
+      DefaultBuildProperties/OverridingBuildSettings, package types, allowed build phases,
+      entitlements, scope expansion, and embedded-binary flags; verified with the
+      `pbxmodel xcproducttypes` parity harness
 - [x] XCMacroExpansionScope (DevToolsCore extension of DVTMacroExpansionScope;
       pbxmodel xcmacroexpansion harness matches Apple)
 
 ### 4) RuntimeSupport
-- [ ] Macro expansion (XCMacroExpansionExtensions), SDK/package handling
+- [x] Macro expansion (XCMacroExpansionExtensions), SDK/package handling
       Prerequisites, in order (work happens in the DVTFrameworks repo):
         [x] DVTMacroDefinitionTable, DVTMacroDefinitionCondition*, DVTMacroNameString,
             DVTMacroNameRegistry (+ DVTRegistry description)
