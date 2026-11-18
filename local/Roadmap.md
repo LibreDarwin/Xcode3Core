@@ -31,9 +31,9 @@ We must achieve behavioral parity and, where specified, byte-identical output wi
       pbxPlistArchiver:overrideValue:forArchivingKey:) that we do not expose.
       They are not used by the archive path we implement; defer until an
       AppKit-dependent consumer appears.
-- [ ] PBXExtendedWrapperPart / PBXFileSystemSynchronizedGroupRelativeReferenceID:
+- [x] PBXExtendedWrapperPart / PBXFileSystemSynchronizedGroupRelativeReferenceID:
       small runtime-only value objects, not used by the archive path
-- [ ] PBXFileType family: depends on XCSpecification; defer to item 3
+- [x] PBXFileType family: depends on XCSpecification; defer to item 3
 
 ### 2) DataModel (Core Data model format)
 Note: no XCDataModel/XCEntity/XCAttribute/XCRelationship classes exist in

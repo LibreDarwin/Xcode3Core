@@ -41,6 +41,7 @@
 		1A2B3C4D000000000000000EB /* XCMacroExpansionScope.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000E9 /* XCMacroExpansionScope.m */; };
 		1A2B3C4D000000000000000EC /* PBXPackageTypeSpecification.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000ED /* PBXPackageTypeSpecification.m */; };
 		1A2B3C4D000000000000000EF /* XCProductTypeSpecification.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000F0 /* XCProductTypeSpecification.m */; };
+		1A2B3C4D000000000000000F2 /* PBXRuntimeValues.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000F3 /* PBXRuntimeValues.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -118,6 +119,9 @@
 		1A2B3C4D000000000000000EE /* PBXPackageTypeSpecification.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PBXPackageTypeSpecification.h; sourceTree = "<group>"; };
 		1A2B3C4D000000000000000F0 /* XCProductTypeSpecification.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XCProductTypeSpecification.m; sourceTree = "<group>"; };
 		1A2B3C4D000000000000000F1 /* XCProductTypeSpecification.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XCProductTypeSpecification.h; sourceTree = "<group>"; };
+		1A2B3C4D000000000000000F3 /* PBXRuntimeValues.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PBXRuntimeValues.m; sourceTree = "<group>"; };
+		1A2B3C4D000000000000000F4 /* PBXExtendedWrapperPart.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PBXExtendedWrapperPart.h; sourceTree = "<group>"; };
+		1A2B3C4D000000000000000F5 /* PBXFileSystemSynchronizedGroupRelativeReferenceID.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PBXFileSystemSynchronizedGroupRelativeReferenceID.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -205,6 +209,7 @@
 				1A2B3C4D00000000000000093 /* PBXNamePath.m */,
 				1A2B3C4D00000000000000094 /* PBXPlatformFilterableItem.m */,
 				1A2B3C4D00000000000000095 /* PBXSupport.m */,
+				1A2B3C4D000000000000000F3 /* PBXRuntimeValues.m */,
 			);
 			path = ProjectModel;
 			sourceTree = "<group>";
@@ -248,6 +253,8 @@
 				1A2B3C4D0000000000000009D /* PBXPlatformFilter.h */,
 				1A2B3C4D0000000000000009E /* PBXPlatformFilterableItem.h */,
 				1A2B3C4D000000000000000EA /* XCMacroExpansionScope.h */,
+				1A2B3C4D000000000000000F4 /* PBXExtendedWrapperPart.h */,
+				1A2B3C4D000000000000000F5 /* PBXFileSystemSynchronizedGroupRelativeReferenceID.h */,
 				1A2B3C4D000000000000000AF /* BuildSystem */,
 			);
 			path = DevToolsCore;
@@ -459,6 +466,7 @@
 				1A2B3C4D000000000000000EB /* XCMacroExpansionScope.m in Sources */,
 				1A2B3C4D000000000000000EC /* PBXPackageTypeSpecification.m in Sources */,
 				1A2B3C4D000000000000000EF /* XCProductTypeSpecification.m in Sources */,
+				1A2B3C4D000000000000000F2 /* PBXRuntimeValues.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

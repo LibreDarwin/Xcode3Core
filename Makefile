@@ -55,7 +55,8 @@ PBXMODEL_OBJS := $(OBJDIR)/pbxmodel.o $(OBJDIR)/pbxproj.o \
 	$(OBJDIR)/DVTMacroDefinitionTable+XCMacroExpansionExtensions.o \
 	$(OBJDIR)/XCMacroExpansionScope.o \
 	$(OBJDIR)/PBXPackageTypeSpecification.o \
-	$(OBJDIR)/XCProductTypeSpecification.o
+	$(OBJDIR)/XCProductTypeSpecification.o \
+	$(OBJDIR)/PBXRuntimeValues.o
 
 PREFIX  ?= /usr/local
 DESTDIR ?=
@@ -209,6 +210,10 @@ $(OBJDIR)/XCProductTypeSpecification.o: Sources/DevToolsCore/BuildSystem/XCProdu
 	@mkdir -p $(OBJDIR)
 	$(CC) $(OBJCFLAGS) -c -o $@ Sources/DevToolsCore/BuildSystem/XCProductTypeSpecification.m
 
+$(OBJDIR)/PBXRuntimeValues.o: $(PROJECTMODEL)/PBXRuntimeValues.m
+	@mkdir -p $(OBJDIR)
+	$(CC) $(OBJCFLAGS) -c -o $@ $(PROJECTMODEL)/PBXRuntimeValues.m
+
 test: all
 	@ok=0; \
 	bash tools/difftest.sh $(AGVTOOL) || ok=1; \
@@ -217,6 +222,7 @@ test: all
 	PBXMODEL=$(PBXMODEL) bash tools/propertydomains.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/xcmacroexpansion.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/xcproducttypes.sh || ok=1; \
+	PBXMODEL=$(PBXMODEL) bash tools/runtimevalues.sh || ok=1; \
 	exit $$ok
 
 install: all

@@ -9,6 +9,8 @@
 #import "DevToolsCore/PBXProjectModel.h"
 #import "DevToolsCore/PBXObject.h"
 #import "DevToolsCore/BuildSystem/DVTMacroDefinitionTable+XCMacroExpansionExtensions.h"
+#import "DevToolsCore/PBXExtendedWrapperPart.h"
+#import "DevToolsCore/PBXFileSystemSynchronizedGroupRelativeReferenceID.h"
 #import "DevToolsCore/PBXPackageTypeSpecification.h"
 #import "DevToolsCore/XCMacroExpansionScope.h"
 #import "DevToolsCore/XCProductTypeSpecification.h"
@@ -28,7 +30,8 @@ usage(void)
 	    "       pbxmodel propertydefs\n"
 	    "       pbxmodel propertydomains\n"
 	    "       pbxmodel xcmacroexpansion\n"
-	    "       pbxmodel xcproducttypes\n");
+	    "       pbxmodel xcproducttypes\n"
+	    "       pbxmodel runtimevalues\n");
 	exit(2);
 }
 
@@ -824,6 +827,131 @@ cmdXCProductTypes(void)
 	return (0);
 }
 
+@interface PBXRuntimeValueBasePath : NSObject
+- (id)filePathForRelativePathString:(id)relativePath;
+@end
+
+@implementation PBXRuntimeValueBasePath
+- (id)filePathForRelativePathString:(id)relativePath
+{
+	return ([@"BASE/" stringByAppendingString:relativePath]);
+}
+@end
+
+static NSArray *
+SortedDescriptions(id collection)
+{
+	NSMutableArray *strings = [NSMutableArray array];
+
+	for (id value in collection)
+		[strings addObject:[value description]];
+	return ([strings sortedArrayUsingSelector:@selector(compare:)]);
+}
+
+static NSString *
+DictionaryDescription(NSDictionary *dictionary)
+{
+	NSMutableDictionary *described = [NSMutableDictionary dictionaryWithCapacity:
+	    [dictionary count]];
+
+	for (id key in dictionary)
+		[described setObject:[dictionary objectForKey:key]
+		    forKey:[key description]];
+	NSArray *keys = [[described allKeys]
+	    sortedArrayUsingSelector:@selector(compare:)];
+	NSMutableArray *parts = [NSMutableArray arrayWithCapacity:[keys count]];
+
+	for (id key in keys)
+		[parts addObject:[NSString stringWithFormat:@"%@=%@", key,
+		    [[described objectForKey:key] description]]];
+	return ([parts componentsJoinedByString:@"; "]);
+}
+
+static void
+PrintReferenceState(NSString *label,
+    PBXFileSystemSynchronizedGroupRelativeReferenceID *identifier)
+{
+	PrintNSStringValue([label stringByAppendingString:@".description"],
+	    [identifier description]);
+	PrintNSStringValue([label stringByAppendingString:@".plist"],
+	    [identifier propertyListRepresentation]);
+	PrintNSStringValue([label stringByAppendingString:@".variant"],
+	    @([identifier isVariantGroup]));
+	PrintNSStringValue([label stringByAppendingString:@".nested"],
+	    @([identifier isNestedVariantGroup]));
+	PrintNSStringValue([label stringByAppendingString:@".hash"],
+	    @([identifier hash]));
+}
+
+static int
+cmdRuntimeValues(void)
+{
+	PBXExtendedWrapperPart *part = [[PBXExtendedWrapperPart alloc]
+	    initWithBasedOnWrapperPart:42 subPath:@"a/b"];
+	Class refClass = [PBXFileSystemSynchronizedGroupRelativeReferenceID class];
+	PBXFileSystemSynchronizedGroupRelativeReferenceID *a = [[refClass alloc]
+	    initWithRelativePath:@"foo/bar.m" isVariantGroup:NO];
+	PBXFileSystemSynchronizedGroupRelativeReferenceID *b = [[refClass alloc]
+	    initWithRelativePath:@"foo/bar.m" isVariantGroup:NO];
+	PBXFileSystemSynchronizedGroupRelativeReferenceID *c = [[refClass alloc]
+	    initWithRelativePath:@"foo/baz.m" isVariantGroup:NO];
+	PBXFileSystemSynchronizedGroupRelativeReferenceID *v = [[refClass alloc]
+	    initWithRelativePath:@"foo/bar.m" isVariantGroup:YES];
+	id copy = [a copy];
+	PBXFileSystemSynchronizedGroupReferenceIDValueTransformer transformer =
+	    ^id(id value) { return value; };
+
+	PrintNSStringValue(@"part.based", @([part basedOnWrapperPart]));
+	PrintNSStringValue(@"part.subPath", [part subPath]);
+	PrintReferenceState(@"ref.a", a);
+	PrintReferenceState(@"ref.v", v);
+	PrintNSStringValue(@"ref.a.path", [a filePathForBasePath:
+	    [[PBXRuntimeValueBasePath alloc] init]]);
+	PrintNSStringValue(@"ref.a.eq.b", @([a isEqual:b]));
+	PrintNSStringValue(@"ref.a.eq.c", @([a isEqual:c]));
+	PrintNSStringValue(@"ref.a.eq.v", @([a isEqual:v]));
+	PrintNSStringValue(@"ref.a.eqType.v", @([a
+	    isEqualToFileSystemSynchronizedGroupReferenceID:v]));
+	PrintNSStringValue(@"ref.copy.eq", @([copy isEqual:a]));
+
+	for (NSString *representation in @[@"foo/bar.m", @"/Localized/foo/bar.m",
+	    @"foo/bar.m:variant", @"foo/bar.m (variant)", @"foo"]) {
+		NSError *error = nil;
+		NSString *label = [@"parse." stringByAppendingString:
+		    representation];
+		id identifier = [refClass
+		    referenceIDFromPropertyListRepresentation:representation
+		    error:&error];
+
+		PrintReferenceState(label, identifier);
+		PrintNSStringValue([label stringByAppendingString:@".error"],
+		    [error localizedDescription]);
+	}
+
+	NSSet *set = [NSSet setWithObjects:a, c, nil];
+	NSArray *archivedSet = [refClass
+	    translateSetToArchivedRepresentation:set];
+	NSSet *restoredSet = [refClass
+	    translateSetFromArchivedRepresentation:archivedSet];
+	PrintNSStringValue(@"set.archived", SortedDescriptions(archivedSet));
+	PrintNSStringValue(@"set.restored", SortedDescriptions(restoredSet));
+
+	NSDictionary *dictionary = @{a: @"v1", c: @"v2"};
+	NSDictionary *archivedNo = [refClass
+	    translateDictionaryToArchivedRepresentation:dictionary
+	    archiveEachValueOnSingleLine:NO valueTransformer:transformer];
+	NSDictionary *archivedYes = [refClass
+	    translateDictionaryToArchivedRepresentation:dictionary
+	    archiveEachValueOnSingleLine:YES valueTransformer:transformer];
+	PrintNSStringValue(@"dict.archived.no", DictionaryDescription(archivedNo));
+	PrintNSStringValue(@"dict.archived.yes",
+	    DictionaryDescription(archivedYes));
+	PrintNSStringValue(@"dict.restored", DictionaryDescription([refClass
+	    translateDictionaryFromArchivedRepresentation:archivedYes
+	    valueTransformer:transformer]));
+	return (0);
+}
+
 int
 main(int argc, char **argv)
 {
@@ -838,6 +966,8 @@ main(int argc, char **argv)
 			return (cmdXCMacroExpansion());
 		if (argc >= 2 && strcmp(argv[1], "xcproducttypes") == 0)
 			return (cmdXCProductTypes());
+		if (argc >= 2 && strcmp(argv[1], "runtimevalues") == 0)
+			return (cmdRuntimeValues());
 		if (argc < 3)
 			usage();
 		cmd = argv[1];

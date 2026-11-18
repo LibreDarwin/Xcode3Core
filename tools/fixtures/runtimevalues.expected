@@ -1,0 +1,59 @@
+part.based = <42>
+part.subPath = <a/b>
+ref.a.description = <foo/bar.m>
+ref.a.plist = <foo/bar.m>
+ref.a.variant = <0>
+ref.a.nested = <0>
+ref.a.hash = <18012856962360502092>
+ref.v.description = </Localized/foo/bar.m>
+ref.v.plist = </Localized/foo/bar.m>
+ref.v.variant = <1>
+ref.v.nested = <1>
+ref.v.hash = <18012856962360502092>
+ref.a.path = <BASE/foo/bar.m>
+ref.a.eq.b = <1>
+ref.a.eq.c = <0>
+ref.a.eq.v = <0>
+ref.a.eqType.v = <0>
+ref.copy.eq = <1>
+parse.foo/bar.m.description = <foo/bar.m>
+parse.foo/bar.m.plist = <foo/bar.m>
+parse.foo/bar.m.variant = <0>
+parse.foo/bar.m.nested = <0>
+parse.foo/bar.m.hash = <18012856962360502092>
+parse.foo/bar.m.error = <nil>
+parse./Localized/foo/bar.m.description = </Localized/foo/bar.m>
+parse./Localized/foo/bar.m.plist = </Localized/foo/bar.m>
+parse./Localized/foo/bar.m.variant = <1>
+parse./Localized/foo/bar.m.nested = <1>
+parse./Localized/foo/bar.m.hash = <18012856962360502092>
+parse./Localized/foo/bar.m.error = <nil>
+parse.foo/bar.m:variant.description = <foo/bar.m:variant>
+parse.foo/bar.m:variant.plist = <foo/bar.m:variant>
+parse.foo/bar.m:variant.variant = <0>
+parse.foo/bar.m:variant.nested = <0>
+parse.foo/bar.m:variant.hash = <385728549734460547>
+parse.foo/bar.m:variant.error = <nil>
+parse.foo/bar.m (variant).description = <foo/bar.m (variant)>
+parse.foo/bar.m (variant).plist = <foo/bar.m (variant)>
+parse.foo/bar.m (variant).variant = <0>
+parse.foo/bar.m (variant).nested = <0>
+parse.foo/bar.m (variant).hash = <7749617382759774652>
+parse.foo/bar.m (variant).error = <nil>
+parse.foo.description = <foo>
+parse.foo.plist = <foo>
+parse.foo.variant = <0>
+parse.foo.nested = <0>
+parse.foo.hash = <519204735>
+parse.foo.error = <nil>
+set.archived = <(
+    "foo/bar.m",
+    "foo/baz.m"
+)>
+set.restored = <(
+    "foo/bar.m",
+    "foo/baz.m"
+)>
+dict.archived.no = <foo/bar.m=v1; foo/baz.m=v2>
+dict.archived.yes = <___PlistArchiveAtomicDictionaryChildren=YES; foo/bar.m=v1; foo/baz.m=v2>
+dict.restored = <___PlistArchiveAtomicDictionaryChildren=YES; foo/bar.m=v1; foo/baz.m=v2>
