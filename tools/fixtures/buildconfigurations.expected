@@ -1,0 +1,129 @@
+class.buildStyle.attrs = <(
+    name,
+    buildSettings
+)>
+class.attrs = <(
+    "baseConfigurationReferenceRelativePath_forArchiving"
+)>
+class.rels = <(
+    "baseConfigurationReference_forArchiving",
+    "baseConfigurationReferenceAnchor_forArchiving"
+)>
+class.list.attrs = <(
+    defaultConfigurationName,
+    defaultConfigurationIsVisible
+)>
+class.archiveName.ref = <baseConfigurationReference>
+class.archiveName.anchor = <baseConfigurationReferenceAnchor>
+class.archiveName.path = <baseConfigurationReferenceRelativePath>
+class.list.rels = <(
+    buildConfigurations
+)>
+config.debug.name = <Debug>
+config.debug.settings = <{
+    "CLANG_ENABLE_OBJC_ARC" = YES;
+    "GCC_OPTIMIZATION_LEVEL" = 0;
+    "PRODUCT_NAME" = App;
+}>
+config.debug.hidden = <0>
+config.debug.could = <1>
+config.debug.display = <Debug>
+config.debug.label = <(null) configuration 'Debug'>
+config.debug.base = <nil>
+config.debug.resolved = <nil>
+config.debug.arch = <nil>
+config.release.name = <Release>
+config.release.settings = <{
+    "PRODUCT_NAME" = App;
+}>
+config.release.hidden = <0>
+config.release.could = <1>
+config.release.display = <Release>
+config.release.label = <(null) configuration 'Release'>
+config.release.base = <nil>
+config.release.resolved = <nil>
+config.release.arch = <nil>
+config.debug.get = <App>
+config.debug.set = <{
+    "CLANG_ENABLE_OBJC_ARC" = YES;
+    "GCC_OPTIMIZATION_LEVEL" = 0;
+    "PRODUCT_NAME" = Renamed;
+}>
+config.debug.remove = <{
+    "CLANG_ENABLE_OBJC_ARC" = YES;
+    "PRODUCT_NAME" = Renamed;
+}>
+config.debug.missing = <nil>
+list.configs = <(
+    Debug,
+    Release
+)>
+list.names = <(
+    Debug,
+    Release
+)>
+list.count = <2>
+list.defaultName = <nil>
+list.defaultVisible = <0>
+list.default = <nil>
+list.baseList = <nil>
+list.owner = <nil>
+list.debugLabel = <nil>
+list.exists.debug = <1>
+list.exists.missing = <0>
+list.for.debug = <Debug>
+list.for.missing = <nil>
+list.effective.debug = <Debug>
+list.effective.missing = <Debug>
+list.after.configs = <(
+    Debug,
+    Release
+)>
+list.after.names = <(
+    Debug,
+    Release
+)>
+list.after.count = <2>
+list.after.defaultName = <Release>
+list.after.defaultVisible = <0>
+list.after.default = <Release>
+list.after.baseList = <nil>
+list.after.owner = <nil>
+list.after.debugLabel = <nil>
+list.added = <(
+    Debug,
+    Release,
+    Custom
+)>
+list.removed = <(
+    Debug,
+    Custom
+)>
+list.inserted = <(
+    Release,
+    Debug,
+    Custom
+)>
+list.moved = <(
+    Debug,
+    Release,
+    Custom
+)>
+list.empty.configs = <(
+)>
+list.empty.names = <(
+)>
+list.empty.count = <0>
+list.empty.defaultName = <nil>
+list.empty.defaultVisible = <0>
+list.empty.default = <nil>
+list.empty.baseList = <nil>
+list.empty.owner = <nil>
+list.empty.debugLabel = <nil>
+list.empty.local = <(
+)>
+list.copy = <(
+    Debug,
+    Release,
+    Custom
+)>

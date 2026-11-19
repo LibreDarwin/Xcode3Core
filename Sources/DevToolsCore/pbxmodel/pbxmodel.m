@@ -8,6 +8,7 @@
 
 #import "DevToolsCore/PBXProjectModel.h"
 #import "DevToolsCore/PBXObject.h"
+#import "DevToolsCore/XCBuildConfiguration.h"
 #import "DevToolsCore/BuildSystem/DVTMacroDefinitionTable+XCMacroExpansionExtensions.h"
 #import "DevToolsCore/PBXExtendedWrapperPart.h"
 #import "DevToolsCore/PBXFileSystemSynchronizedGroupRelativeReferenceID.h"
@@ -31,7 +32,8 @@ usage(void)
 	    "       pbxmodel propertydomains\n"
 	    "       pbxmodel xcmacroexpansion\n"
 	    "       pbxmodel xcproducttypes\n"
-	    "       pbxmodel runtimevalues\n");
+	    "       pbxmodel runtimevalues\n"
+	    "       pbxmodel buildconfigurations\n");
 	exit(2);
 }
 
@@ -323,6 +325,77 @@ static void
 PrintNSStringValue(NSString *label, id value)
 {
 	PrintValue([label UTF8String], value);
+}
+
+static void
+PrintSettingsDictionary(NSString *label, NSDictionary *settings)
+{
+	printf("%s = <{\n", [label UTF8String]);
+	for (NSString *key in SortedDictionaryKeys(settings)) {
+		NSString *value = [[settings objectForKey:key] description] ?: @"nil";
+
+		printf("    \"%s\" = %s;\n", [key UTF8String], [value UTF8String]);
+	}
+	printf("}>\n");
+}
+
+static NSArray *
+ConfigurationNames(NSArray *configurations)
+{
+	NSMutableArray *names = [NSMutableArray array];
+	XCBuildConfiguration *configuration;
+
+	for (configuration in configurations) {
+		if ([configuration name] != nil)
+			[names addObject:[configuration name]];
+	}
+	return (names);
+}
+
+static void
+PrintConfigurationState(NSString *label, XCBuildConfiguration *configuration)
+{
+	PrintNSStringValue([label stringByAppendingString:@".name"],
+	    [configuration name]);
+	PrintSettingsDictionary([label stringByAppendingString:@".settings"],
+	    [configuration buildSettings]);
+	PrintNSStringValue([label stringByAppendingString:@".hidden"],
+	    @([configuration isHidden]));
+	PrintNSStringValue([label stringByAppendingString:@".could"],
+	    @([configuration couldBeActive]));
+	PrintNSStringValue([label stringByAppendingString:@".display"],
+	    [configuration inspectorDisplayName]);
+	PrintNSStringValue([label stringByAppendingString:@".label"],
+	    [configuration _buildSettingsLabel]);
+	PrintNSStringValue([label stringByAppendingString:@".base"],
+	    [configuration baseBuildConfiguration]);
+	PrintNSStringValue([label stringByAppendingString:@".resolved"],
+	    [configuration resolvedBaseConfigurationReference]);
+	PrintNSStringValue([label stringByAppendingString:@".arch"],
+	    [configuration baseConfigurationReference_forArchiving]);
+}
+
+static void
+PrintListState(NSString *label, XCConfigurationList *list)
+{
+	PrintNSStringValue([label stringByAppendingString:@".configs"],
+	    ConfigurationNames([list buildConfigurations]));
+	PrintNSStringValue([label stringByAppendingString:@".names"],
+	    [list buildConfigurationNames]);
+	PrintNSStringValue([label stringByAppendingString:@".count"],
+	    @([list countOfBuildConfigurations]));
+	PrintNSStringValue([label stringByAppendingString:@".defaultName"],
+	    [list defaultConfigurationName]);
+	PrintNSStringValue([label stringByAppendingString:@".defaultVisible"],
+	    @([list defaultConfigurationIsVisible]));
+	PrintNSStringValue([label stringByAppendingString:@".default"],
+	    [[list defaultConfiguration] name]);
+	PrintNSStringValue([label stringByAppendingString:@".baseList"],
+	    [list baseConfigurationList]);
+	PrintNSStringValue([label stringByAppendingString:@".owner"],
+	    [list owner]);
+	PrintNSStringValue([label stringByAppendingString:@".debugLabel"],
+	    [list configurationTableDebugLabel]);
 }
 
 static void
@@ -952,6 +1025,93 @@ cmdRuntimeValues(void)
 	return (0);
 }
 
+static int
+cmdBuildConfigurations(void)
+{
+	XCBuildConfiguration *debug = [XCBuildConfiguration
+	    buildConfigurationWithName:@"Debug" settings:@{
+		@"PRODUCT_NAME": @"App",
+		@"GCC_OPTIMIZATION_LEVEL": @"0",
+		@"CLANG_ENABLE_OBJC_ARC": @"YES",
+	    }];
+	XCBuildConfiguration *release = [[XCBuildConfiguration alloc]
+	    initWithName:@"Release" settings:@{@"PRODUCT_NAME": @"App"}
+	    makeImmutable:NO];
+	XCConfigurationList *list = [XCConfigurationList
+	    configurationListWithConfigurations:@[debug, release]];
+
+	PrintNSStringValue(@"class.buildStyle.attrs",
+	    [PBXBuildStyle archivableAttributes]);
+	PrintNSStringValue(@"class.attrs", [XCBuildConfiguration
+	    archivableAttributes]);
+	PrintNSStringValue(@"class.rels", [XCBuildConfiguration
+	    archivableRelationships]);
+	PrintNSStringValue(@"class.list.attrs", [XCConfigurationList
+	    archivableAttributes]);
+	PrintNSStringValue(@"class.archiveName.ref", [XCBuildConfiguration
+	    archiveNameForKey:@"baseConfigurationReference_forArchiving"]);
+	PrintNSStringValue(@"class.archiveName.anchor", [XCBuildConfiguration
+	    archiveNameForKey:@"baseConfigurationReferenceAnchor_forArchiving"]);
+	PrintNSStringValue(@"class.archiveName.path", [XCBuildConfiguration
+	    archiveNameForKey:@"baseConfigurationReferenceRelativePath_forArchiving"]);
+	PrintNSStringValue(@"class.list.rels", [XCConfigurationList
+	    archivableRelationships]);
+	PrintConfigurationState(@"config.debug", debug);
+	PrintConfigurationState(@"config.release", release);
+	PrintNSStringValue(@"config.debug.get", [debug
+	    buildSettingForKeyPath:@"PRODUCT_NAME"]);
+	[debug setBuildSetting:@"Renamed" forKeyPath:@"PRODUCT_NAME"];
+	PrintSettingsDictionary(@"config.debug.set", [debug buildSettings]);
+	[debug removeBuildSettingForKeyPath:@"GCC_OPTIMIZATION_LEVEL"];
+	PrintSettingsDictionary(@"config.debug.remove", [debug buildSettings]);
+	PrintNSStringValue(@"config.debug.missing", [debug
+	    buildSettingForKeyPath:@"MISSING"]);
+
+	PrintListState(@"list", list);
+	PrintNSStringValue(@"list.exists.debug", @([list
+	    buildConfigurationExistsForName:@"Debug"]));
+	PrintNSStringValue(@"list.exists.missing", @([list
+	    buildConfigurationExistsForName:@"Missing"]));
+	PrintNSStringValue(@"list.for.debug", [[list
+	    buildConfigurationForName:@"Debug"] name]);
+	PrintNSStringValue(@"list.for.missing", [[list
+	    buildConfigurationForName:@"Missing"] name]);
+	PrintNSStringValue(@"list.effective.debug", [[list
+	    effectiveBuildConfigurationForName:@"Debug"] name]);
+	PrintNSStringValue(@"list.effective.missing", [[list
+	    effectiveBuildConfigurationForName:@"Missing"] name]);
+
+	[list setDefaultConfigurationName:@"Release"];
+	[list setDefaultConfigurationIsVisible:NO];
+	PrintListState(@"list.after", list);
+
+	XCBuildConfiguration *added = [XCBuildConfiguration
+	    buildConfigurationWithName:@"Custom" settings:@{}];
+
+	[list addBuildConfiguration:added];
+	PrintNSStringValue(@"list.added", ConfigurationNames(
+	    [list buildConfigurations]));
+	[list removeObjectFromBuildConfigurationsAtIndex:1];
+	PrintNSStringValue(@"list.removed", ConfigurationNames(
+	    [list buildConfigurations]));
+	[list insertObject:release inBuildConfigurationsAtIndex:0];
+	PrintNSStringValue(@"list.inserted", ConfigurationNames(
+	    [list buildConfigurations]));
+	[list moveBuildConfigurationsAtIndexes:
+	    [NSIndexSet indexSetWithIndex:0] toIndex:2];
+	PrintNSStringValue(@"list.moved", ConfigurationNames(
+	    [list buildConfigurations]));
+
+	XCConfigurationList *empty = [[XCConfigurationList alloc] init];
+
+	PrintListState(@"list.empty", empty);
+	PrintNSStringValue(@"list.empty.local",
+	    [empty localBuildSettingsDictionariesForAllConfigurations]);
+	PrintNSStringValue(@"list.copy", ConfigurationNames(
+	    [[list copy] buildConfigurations]));
+	return (0);
+}
+
 int
 main(int argc, char **argv)
 {
@@ -968,6 +1128,8 @@ main(int argc, char **argv)
 			return (cmdXCProductTypes());
 		if (argc >= 2 && strcmp(argv[1], "runtimevalues") == 0)
 			return (cmdRuntimeValues());
+		if (argc >= 2 && strcmp(argv[1], "buildconfigurations") == 0)
+			return (cmdBuildConfigurations());
 		if (argc < 3)
 			usage();
 		cmd = argv[1];

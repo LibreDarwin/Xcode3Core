@@ -49,7 +49,9 @@ only unless a real dependency appears.
 - [x] PBXFileType and the PBXProject file-type sets (header/source/rezzable/linkable/appleScript)
 - [x] PBXBuildPhase family: identifiers, default names, archivable key tables,
       template construction, file-type filters, reference acceptance
-- [ ] Reverse-engineer XCBuildConfiguration/XCConfigurationList usage in build context
+- [x] Reverse-engineer XCBuildConfiguration/XCConfigurationList runtime behavior (build settings,
+      hidden/couldBeActive state, effective configuration lookup, list mutations, archivable
+      key tables and archive-name mapping; `pbxmodel buildconfigurations` oracle fixture)
 - [ ] XCDependencyGraph, build settings expansion, macro evaluation
 - [ ] Target dependencies/phase ordering
 - [x] Spec loading (.xcspec) compatibility

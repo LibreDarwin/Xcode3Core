@@ -223,6 +223,7 @@ test: all
 	PBXMODEL=$(PBXMODEL) bash tools/xcmacroexpansion.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/xcproducttypes.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/runtimevalues.sh || ok=1; \
+	PBXMODEL=$(PBXMODEL) bash tools/buildconfigurations.sh || ok=1; \
 	exit $$ok
 
 install: all
