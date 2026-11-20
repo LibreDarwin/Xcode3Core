@@ -10,6 +10,9 @@
 #import "DevToolsCore/PBXObject.h"
 #import "DevToolsCore/PBXTarget.h"
 #import "DevToolsCore/XCBuildConfiguration.h"
+#import <DVTMacroFoundation/DVTMacroDefinitionConditionSet.h>
+#import <DVTMacroFoundation/DVTMacroExpansion-Protocol.h>
+#import <DVTMacroFoundation/DVTMacroExpressionParser.h>
 #import "DevToolsCore/BuildSystem/DVTMacroDefinitionTable+XCMacroExpansionExtensions.h"
 #import "DevToolsCore/PBXExtendedWrapperPart.h"
 #import "DevToolsCore/PBXFileSystemSynchronizedGroupRelativeReferenceID.h"
@@ -32,6 +35,7 @@ usage(void)
 	    "       pbxmodel propertydefs\n"
 	    "       pbxmodel propertydomains\n"
 	    "       pbxmodel xcmacroexpansion\n"
+	    "       pbxmodel macroevaluation\n"
 	    "       pbxmodel xcproducttypes\n"
 	    "       pbxmodel runtimevalues\n"
 	    "       pbxmodel buildconfigurations\n"
@@ -516,6 +520,80 @@ ScopeConditionsDescription(DVTMacroExpansionScope *scope)
 		[entries addObject:[NSString stringWithFormat:@"%@=%@", key,
 		    [values objectForKey:key]]];
 	return ([entries componentsJoinedByString:@"|"]);
+}
+
+static id
+EvaluateMacroString(DVTMacroExpansionScope *scope, NSString *string)
+{
+	return ([scope evaluatedStringValueForMacroExpression:
+	    DVTMacroExpressionByParsingString(string)]);
+}
+
+static id
+EvaluateMacroList(DVTMacroExpansionScope *scope, NSString *string)
+{
+	return ([scope evaluatedStringListValueForMacroExpression:
+	    DVTMacroExpressionByParsingStringAsList(string)]);
+}
+
+static int
+cmdMacroEvaluation(void)
+{
+	DVTMacroDefinitionTable *table = [DVTMacroDefinitionTable newWithLabel:@"oracle"];
+	NSString *baseName = nil;
+	DVTMacroDefinitionConditionSet *macCondition =
+	    [DVTMacroDefinitionConditionSet conditionSetFromStringRepresentation:@"COND[sdk=macosx]"
+							     getBaseMacroName:&baseName error:NULL];
+	DVTMacroDefinitionConditionSet *iosCondition =
+	    [DVTMacroDefinitionConditionSet conditionSetFromStringRepresentation:@"COND[sdk=iphoneos]"
+							     getBaseMacroName:&baseName error:NULL];
+	DVTMacroExpansionScope *scope;
+	DVTMacroExpansionScope *preservingScope;
+
+	[table parseAndSetValue:@"bar" forMacroName:@"FOO" conditionSet:nil];
+	[table parseAndSetValue:@"foo bar" forMacroName:@"NAME" conditionSet:nil];
+	[table parseAndSetValue:@"/a/b/c.txt" forMacroName:@"PATH" conditionSet:nil];
+	[table parseAndSetValue:@"" forMacroName:@"EMPTY" conditionSet:nil];
+	[table parseAndSetValue:@"$(FOO)-$(MISSING)" forMacroName:@"RECURSIVE"
+	    conditionSet:nil];
+	[table setValue:@[@"a", @"b c", @"$(FOO)"] forMacroName:@"LIST"
+	    conditionSet:nil];
+	[table parseAndSetValue:@"mac" forMacroName:@"COND" conditionSet:macCondition];
+	[table parseAndSetValue:@"ios" forMacroName:@"COND" conditionSet:iosCondition];
+
+	scope = [DVTMacroExpansionScope newWithParentScope:nil macros:table
+	    definitionLevel:0 conditionParameterValues:@{@"sdk": @"macosx"}
+	    preserveUnresolvedReferences:NO];
+	for (NSString *string in @[@"literal", @"$(FOO)", @"$FOO", @"$(NAME)",
+	    @"$(MISSING)", @"$$", @"$(FOO)/$(MISSING)", @"$(FOO:quote)",
+	    @"$(FOO:upper)", @"$(FOO:lower)", @"$(FOO:identifier)",
+	    @"$(PATH:dir)", @"$(PATH:file)", @"$(PATH:base)", @"$(PATH:suffix)",
+	    @"$(FOO:default=baz)", @"$(MISSING:default=baz)",
+	    @"$(FOO:relativeto=/a)", @"$(COND)", @"$(RECURSIVE)", @"$(EMPTY)",
+	    @"$(LIST)", @"$(FOO:badop)"]) {
+		PrintNSStringValue([@"string." stringByAppendingString:string],
+		    EvaluateMacroString(scope, string));
+	}
+	for (NSString *string in @[@"a b c", @"\"a b\" 'c d'", @"a\\ b",
+	    @"$(NAME)", @"$(MISSING)", @"\"$(FOO) x\"", @""]) {
+		PrintNSStringValue([@"list." stringByAppendingString:string],
+		    EvaluateMacroList(scope, string));
+	}
+	PrintNSStringValue(@"arrayList", [scope evaluatedStringListValueForMacroExpression:
+	    DVTMacroExpressionByParsingStringArrayAsList(@[@"a", @"b c", @"$(FOO)"])]);
+	PrintNSStringValue(@"debug.simple", [DVTMacroExpressionByParsingString(@"$(FOO)")
+	    dvt_debugDescription]);
+	PrintNSStringValue(@"stringForm.list",
+	    [DVTMacroExpressionByParsingStringAsList(@"a $(FOO)") dvt_stringForm]);
+
+	preservingScope = [DVTMacroExpansionScope newWithParentScope:nil macros:table
+	    definitionLevel:0 conditionParameterValues:@{@"sdk": @"macosx"}
+	    preserveUnresolvedReferences:YES];
+	PrintNSStringValue(@"preserving.MISSING",
+	    EvaluateMacroString(preservingScope, @"$(MISSING)"));
+	PrintNSStringValue(@"preserving.RECURSIVE",
+	    EvaluateMacroString(preservingScope, @"$(RECURSIVE)"));
+	return (0);
 }
 
 static int
@@ -1247,6 +1325,8 @@ main(int argc, char **argv)
 			return (cmdPropertyDomains());
 		if (argc >= 2 && strcmp(argv[1], "xcmacroexpansion") == 0)
 			return (cmdXCMacroExpansion());
+		if (argc >= 2 && strcmp(argv[1], "macroevaluation") == 0)
+			return (cmdMacroEvaluation());
 		if (argc >= 2 && strcmp(argv[1], "xcproducttypes") == 0)
 			return (cmdXCProductTypes());
 		if (argc >= 2 && strcmp(argv[1], "runtimevalues") == 0)

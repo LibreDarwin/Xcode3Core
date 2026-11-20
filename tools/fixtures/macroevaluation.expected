@@ -1,0 +1,55 @@
+string.literal = <literal>
+string.$(FOO) = <bar>
+string.$FOO = <bar>
+string.$(NAME) = <foo bar>
+string.$(MISSING) = <>
+string.$$ = <$>
+string.$(FOO)/$(MISSING) = <bar/>
+string.$(FOO:quote) = <bar>
+string.$(FOO:upper) = <BAR>
+string.$(FOO:lower) = <bar>
+string.$(FOO:identifier) = <bar>
+string.$(PATH:dir) = </a/b/>
+string.$(PATH:file) = <c.txt>
+string.$(PATH:base) = <c>
+string.$(PATH:suffix) = <.txt>
+string.$(FOO:default=baz) = <bar>
+string.$(MISSING:default=baz) = <baz>
+string.$(FOO:relativeto=/a) = <bar>
+string.$(COND) = <mac>
+string.$(RECURSIVE) = <bar->
+string.$(EMPTY) = <>
+string.$(LIST) = <a b\ c $(FOO)>
+string.$(FOO:badop) = <bar>
+list.a b c = <(
+    a,
+    b,
+    c
+)>
+list."a b" 'c d' = <(
+    "a b",
+    "c d"
+)>
+list.a\ b = <(
+    "a b"
+)>
+list.$(NAME) = <(
+    foo,
+    bar
+)>
+list.$(MISSING) = <(
+)>
+list."$(FOO) x" = <(
+    "bar x"
+)>
+list. = <(
+)>
+arrayList = <(
+    a,
+    "b c",
+    bar
+)>
+debug.simple = <【𝗦𝘁𝗿𝗶𝗻𝗴𝗦𝘂𝗯𝘀𝘁𝗶𝘁𝘂𝘁𝗶𝗼𝗻:【FOO】】>
+stringForm.list = <a $(FOO)>
+preserving.MISSING = <$(MISSING)>
+preserving.RECURSIVE = <bar-$(MISSING)>

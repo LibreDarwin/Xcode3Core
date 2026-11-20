@@ -57,6 +57,10 @@ only unless a real dependency appears.
       dependency registration/lookup/missing APIs, recursive ordering with cycle
       detection, PBXProject allTargetsInDependencyOrder; `pbxmodel targetdependencies`
       oracle fixture)
+- [x] Macro expression parsing/evaluation scopes (Apple DVTMacroFoundation oracle:
+      string/list parsing, built-in retrieval/replacement operators, condition sets,
+      definition tables, unresolved-reference preservation;
+      `pbxmodel macroevaluation` oracle fixture)
 - [x] Spec loading (.xcspec) compatibility
       (+registerSpecificationProxiesFromPropertyListsInDirectory:recursively:inDomain:inBundle:,
        _registerSpecificationProxiesOfType:fromDictionaryOrArray:inDirectory:bundle:
