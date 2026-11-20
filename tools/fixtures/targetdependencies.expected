@@ -1,0 +1,104 @@
+class.dependency.attrs = <(
+    name
+)>
+class.dependency.rels = <(
+    target,
+    targetProxy,
+    productReference
+)>
+class.proxy.attrs = <(
+    proxyType,
+    remoteGlobalIDString,
+    remoteInfo
+)>
+class.proxy.rels = <(
+    containerPortal
+)>
+class.target.attrs = <(
+    name,
+    productName,
+    productType,
+    productInstallPath,
+    buildSettings,
+    productSettingsXML,
+    productSettings
+)>
+class.target.rels = <(
+    dependencies,
+    packageProductDependencies,
+    buildPhases,
+    productReference,
+    buildRules,
+    productBuildLocation,
+    productInstallLocation,
+    buildConfigurationList,
+    fileSystemSynchronizedGroupsArray
+)>
+project.targets = <(
+    A,
+    B,
+    C
+)>
+a.project = <1>
+dep.ab.target = <(
+    B
+)>
+dep.ab.name = <B>
+dep.ab.owner = <(null)>
+dep.ab.needsSync = <0>
+dep.ab.productReference = <(null)>
+dep.ab.recursive = <(
+    B
+)>
+a.deps = <(
+    B
+)>
+a.direct = <(
+    B
+)>
+a.recursive = <(
+    C,
+    B
+)>
+a.recursive.self = <(
+    C,
+    B,
+    A
+)>
+a.depends.b = <1>
+a.depends.c = <0>
+a.dependencyFor.b = <(
+    B
+)>
+a.dependencyFor.c = <(
+    "<nil>"
+)>
+a.missing = <(
+)>
+a.owner.ab = <1>
+b.owner.bc = <1>
+project.order = <(
+    C,
+    B,
+    A
+)>
+b.depending = <(
+    A
+)>
+a.after.remove = <(
+)>
+a.owner.after.remove = <(null)>
+a.after.readd = <(
+    B
+)>
+cycle.d.recursive = <(
+    E
+)>
+cycle.d.recursive.self = <(
+    E,
+    D
+)>
+cycle.order = <(
+    E,
+    D
+)>

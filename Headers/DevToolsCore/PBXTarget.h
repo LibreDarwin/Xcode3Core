@@ -36,11 +36,12 @@
 @end
 
 /* A dependency of one target on another. */
-@interface PBXTargetDependency : PBXProjectItem
+@interface PBXTargetDependency : PBXPlatformFilterableItem
 {
 	PBXTarget *_target;
 	PBXContainerItemProxy *_targetProxy;
 	NSString *_name;
+	PBXObject *_productReference;
 	__weak PBXTarget *_owner;
 	BOOL _needsSync;
 }
@@ -55,6 +56,7 @@
 - (NSString *)name;
 - (void)setName:(NSString *)name;
 - (PBXObject *)productReference;
+- (void)setProductReference:(PBXObject *)reference;
 - (NSArray *)orderedRecursiveDependencies;
 - (PBXTarget *)owner;
 - (void)setOwner:(PBXTarget *)owner;
@@ -81,6 +83,8 @@
 	NSMutableArray *_dependencies;
 	NSMutableArray *_packageProductDependencies;
 	NSMutableArray *_fileSystemSynchronizedGroups;
+	NSArray *_cachedOrderedRecursiveDependencies;
+	BOOL _dependencyCycleDetected;
 }
 - (NSString *)name;
 - (void)setName:(NSString *)name;
@@ -118,10 +122,24 @@
 - (BOOL)allowsCopyFilesBuildPhases;
 - (BOOL)allowsZeroBuildPhases;
 - (NSArray *)buildPhasesContainingReference:(PBXReference *)reference;
+- (NSArray *)buildFiles;
+- (NSArray *)buildFilesForReference:(PBXReference *)reference;
+- (NSArray *)buildFilesForReferenceIdenticalTo:(PBXReference *)reference;
 - (BOOL)containsBuildFileForReferenceIdenticalTo:(PBXReference *)reference
     inBuildPhase:(PBXBuildPhase *)phase;
 - (NSArray *)dependencies;
 - (void)setDependencies:(NSArray *)dependencies;
+- (void)insertDependencies:(NSArray *)dependencies atIndex:(NSUInteger)index;
+- (void)addDependency:(PBXTargetDependency *)dependency;
+- (void)removeDependency:(PBXTargetDependency *)dependency;
+- (void)removeDependencies:(NSArray *)dependencies;
+- (NSArray *)directDependencies;
+- (BOOL)dependsOnTarget:(PBXTarget *)target;
+- (PBXTargetDependency *)dependencyForTarget:(PBXTarget *)target;
+- (NSArray *)findDependingTargetsInProject:(PBXProject *)project;
+- (NSArray *)missingDependencies;
+- (NSArray *)orderedRecursiveDependenciesIncludingSelf:(BOOL)includeSelf;
+- (PBXProject *)project;
 - (NSArray *)buildRules;
 - (void)setBuildRules:(NSArray *)rules;
 - (NSString *)productInstallPath;
@@ -140,6 +158,8 @@
 - (void)setPackageProductDependencies:(NSArray *)dependencies;
 - (NSArray *)fileSystemSynchronizedGroups;
 - (void)setFileSystemSynchronizedGroups:(NSArray *)groups;
+- (NSArray *)fileSystemSynchronizedGroupsArray;
+- (void)setFileSystemSynchronizedGroupsArray:(NSArray *)groups;
 - (NSString *)displayName;
 @end
 

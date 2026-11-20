@@ -53,7 +53,10 @@ only unless a real dependency appears.
       hidden/couldBeActive state, effective configuration lookup, list mutations, archivable
       key tables and archive-name mapping; `pbxmodel buildconfigurations` oracle fixture)
 - [ ] XCDependencyGraph, build settings expansion, macro evaluation
-- [ ] Target dependencies/phase ordering
+- [x] Target dependencies/phase ordering (PBXTargetDependency/PBXContainerItemProxy,
+      dependency registration/lookup/missing APIs, recursive ordering with cycle
+      detection, PBXProject allTargetsInDependencyOrder; `pbxmodel targetdependencies`
+      oracle fixture)
 - [x] Spec loading (.xcspec) compatibility
       (+registerSpecificationProxiesFromPropertyListsInDirectory:recursively:inDomain:inBundle:,
        _registerSpecificationProxiesOfType:fromDictionaryOrArray:inDirectory:bundle:

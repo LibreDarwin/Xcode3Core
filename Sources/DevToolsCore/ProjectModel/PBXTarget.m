@@ -88,16 +88,43 @@
 {
 	if ([_containerPortal isKindOfClass:[PBXContainer class]])
 		return ((PBXContainer *)_containerPortal);
+	if ([_containerPortal respondsToSelector:@selector(loadedContainer)])
+		return ([_containerPortal performSelector:@selector(loadedContainer)]);
 	return (nil);
 }
 
 - (PBXObject *)remoteContainerItem
 {
-	PBXProjectModel *model = [_containerPortal projectModel];
+	PBXContainer *container = [self remoteContainer];
+	NSInteger type = [_proxyType integerValue];
+	PBXObject *item;
+	PBXTarget *target;
 
-	if (model == nil || _remoteGlobalIDString == nil)
+	if (container == nil)
 		return (nil);
-	return ([model objectForID:_remoteGlobalIDString]);
+	if (type == 1) {
+		item = [container itemForGlobalIDHexString:_remoteGlobalIDString];
+		if (item != nil)
+			return (item);
+		if (_remoteInfo == nil ||
+		    ![container isKindOfClass:[PBXProject class]])
+			return (nil);
+		target = [(PBXProject *)container targetNamed:_remoteInfo];
+		if (target == nil)
+			return (nil);
+		_remoteGlobalIDString = [[target objectID] copy];
+		if (_remoteGlobalIDString == nil)
+			return (target);
+		return ([container itemForGlobalIDHexString:_remoteGlobalIDString]);
+	}
+	if (type == 2) {
+		if (_remoteInfo == nil ||
+		    ![container isKindOfClass:[PBXProject class]])
+			return (nil);
+		target = [(PBXProject *)container targetNamed:_remoteInfo];
+		return ([target productReference]);
+	}
+	return (nil);
 }
 
 - (BOOL)isEqualToProxy:(PBXContainerItemProxy *)proxy
@@ -135,7 +162,38 @@
 
 + (NSArray *)archivableRelationships
 {
-	return (@[@"target", @"targetProxy"]);
+	return (@[@"target", @"targetProxy", @"productReference"]);
+}
+
++ (NSArray *)archivableKeys
+{
+	NSMutableArray *keys = [[super archivableKeys] mutableCopy];
+	NSUInteger index = [keys indexOfObject:@"name"];
+
+	if (index == NSNotFound)
+		[keys addObjectsFromArray:@[@"platformFilter",
+		    @"platformFilters"]];
+	else {
+		[keys insertObject:@"platformFilter" atIndex:index + 1];
+		[keys insertObject:@"platformFilters" atIndex:index + 2];
+	}
+	return (keys);
+}
+
+static PBXContainerItemProxy *
+LocalTargetProxy(PBXTarget *target)
+{
+	PBXContainer *container = [target container];
+	NSString *identifier = [target objectID];
+	NSString *info = [target displayName];
+
+	if (![container isKindOfClass:[PBXProject class]])
+		return (nil);
+	if (identifier == nil)
+		identifier = info;
+	return ([[PBXContainerItemProxy alloc]
+	    initWithType:1 portal:container
+	    remoteGlobalIDString:identifier remoteInfo:info]);
 }
 
 - (instancetype)initWithLocalTarget:(PBXTarget *)target
@@ -143,10 +201,9 @@
 	self = [self init];
 	if (self != nil) {
 		_target = target;
-		_targetProxy = [[PBXContainerItemProxy alloc]
-		    initWithType:1 portal:[target container]
-		    remoteGlobalIDString:[target objectID]
-		    remoteInfo:[target displayName]];
+		_name = [[target displayName] copy];
+		_productReference = [target productReference];
+		_targetProxy = LocalTargetProxy(target);
 	}
 	return (self);
 }
@@ -157,8 +214,8 @@
 	self = [self init];
 	if (self != nil) {
 		_targetProxy = [[PBXContainerItemProxy alloc]
-		    initWithType:2 portal:reference remoteGlobalIDString:target
-		    remoteInfo:nil];
+		    initWithType:2 portal:reference remoteGlobalIDString:nil
+		    remoteInfo:target];
 	}
 	return (self);
 }
@@ -177,12 +234,24 @@
 
 - (PBXTarget *)target
 {
-	return (_target);
+	PBXObject *remote;
+
+	if (_target != nil)
+		return (_target);
+	remote = [_targetProxy remoteContainerItem];
+	if ([remote isKindOfClass:[PBXTarget class]]) {
+		_target = (PBXTarget *)remote;
+		return (_target);
+	}
+	return (nil);
 }
 
 - (void)setTarget:(PBXTarget *)target
 {
 	_target = target;
+	if (target != nil)
+		_targetProxy = LocalTargetProxy(target);
+	[[self owner] performSelector:@selector(_invalidateDependencyOrderCaches)];
 }
 
 - (PBXContainerItemProxy *)targetProxy
@@ -193,6 +262,12 @@
 - (void)setTargetProxy:(PBXContainerItemProxy *)proxy
 {
 	_targetProxy = proxy;
+	if (_target == nil) {
+		PBXObject *remote = [_targetProxy remoteContainerItem];
+
+		if ([remote isKindOfClass:[PBXTarget class]])
+			_target = (PBXTarget *)remote;
+	}
 }
 
 - (NSString *)name
@@ -207,31 +282,21 @@
 
 - (PBXObject *)productReference
 {
-	PBXObject *remote = [_targetProxy remoteContainerItem];
+	return (_productReference);
+}
 
-	if ([remote isKindOfClass:[PBXProductDependency class]])
-		return (remote);
-	return (nil);
+- (void)setProductReference:(PBXObject *)reference
+{
+	_productReference = reference;
 }
 
 - (NSArray *)orderedRecursiveDependencies
 {
-	NSMutableArray *result = [NSMutableArray array];
-	NSMutableSet *seen = [NSMutableSet set];
-	NSMutableArray *stack = [NSMutableArray arrayWithArray:
-	    ([_target dependencies] ?: @[])];
+	PBXTarget *target = [self target];
 
-	while ([stack count] > 0) {
-		PBXTargetDependency *dep = [stack objectAtIndex:0];
-
-		[stack removeObjectAtIndex:0];
-		if ([seen containsObject:dep])
-			continue;
-		[seen addObject:dep];
-		[result addObject:dep];
-		[stack addObjectsFromArray:([dep->_target dependencies] ?: @[])];
-	}
-	return (result);
+	if (target == nil)
+		return (@[]);
+	return ([target orderedRecursiveDependenciesIncludingSelf:YES]);
 }
 
 - (PBXTarget *)owner
@@ -256,7 +321,12 @@
 
 - (NSString *)archiveComment
 {
-	return (([_target displayName] != nil) ? [_target displayName] : _name);
+	return ([self name]);
+}
+
+- (NSString *)description
+{
+	return ([self name] ?: [super description]);
 }
 
 @end
@@ -265,16 +335,30 @@
 
 + (NSArray *)archivableAttributes
 {
-	return (@[@"name", @"productName", @"productInstallPath", @"productType",
-	    @"buildArgumentsString", @"buildToolPath", @"buildWorkingDirectory",
-	    @"passBuildSettingsInEnvironment"]);
+	return (@[@"name", @"productName", @"productType", @"productInstallPath",
+	    @"buildSettings", @"productSettingsXML", @"productSettings"]);
 }
 
 + (NSArray *)archivableRelationships
 {
-	return (@[@"buildConfigurationList", @"buildPhases", @"buildRules",
-	    @"dependencies", @"productReference", @"packageProductDependencies",
-	    @"fileSystemSynchronizedGroups"]);
+	return (@[@"dependencies", @"packageProductDependencies", @"buildPhases",
+	    @"productReference", @"buildRules", @"productBuildLocation",
+	    @"productInstallLocation", @"buildConfigurationList",
+	    @"fileSystemSynchronizedGroupsArray"]);
+}
+
++ (NSString *)archiveNameForKey:(NSString *)key
+{
+	if ([key isEqualToString:@"fileSystemSynchronizedGroupsArray"])
+		return (@"fileSystemSynchronizedGroups");
+	return ([super archiveNameForKey:key]);
+}
+
+- (BOOL)setArchiveValue:(id)value forKey:(NSString *)key
+{
+	if ([key isEqualToString:@"fileSystemSynchronizedGroups"])
+		key = @"fileSystemSynchronizedGroupsArray";
+	return ([super setArchiveValue:value forKey:key]);
 }
 
 - (NSString *)name
@@ -531,10 +615,60 @@ static PBXBuildPhase *DefaultBuildPhase(PBXTarget *target, Class aClass)
 	return (result);
 }
 
+- (NSArray *)buildFiles
+{
+	NSMutableArray *result = [NSMutableArray array];
+	PBXBuildPhase *phase;
+
+	for (phase in _buildPhases) {
+		if ([phase isKindOfClass:[PBXBuildPhase class]])
+			[result addObjectsFromArray:[phase buildFiles]];
+	}
+	return (result);
+}
+
+- (NSArray *)buildFilesForReference:(PBXReference *)reference
+{
+	NSMutableArray *result = [NSMutableArray array];
+	PBXBuildFile *file;
+
+	for (file in [self buildFiles]) {
+		if ([file fileRef] == reference || [file productRef] == reference)
+			[result addObject:file];
+	}
+	return (result);
+}
+
+- (NSArray *)buildFilesForReferenceIdenticalTo:(PBXReference *)reference
+{
+	return ([self buildFilesForReference:reference]);
+}
+
 - (BOOL)containsBuildFileForReferenceIdenticalTo:(PBXReference *)reference
     inBuildPhase:(PBXBuildPhase *)phase
 {
 	return ([phase buildFileForReference:reference] != nil);
+}
+
+static NSString *
+ArchiveProductName(PBXObject *object)
+{
+	if (object == nil || ![object respondsToSelector:@selector(productName)])
+		return (nil);
+	return ([object performSelector:@selector(productName)]);
+}
+
+- (void)_invalidateDependencyOrderCaches
+{
+	PBXProject *project = [self project];
+	PBXTarget *target;
+
+	_cachedOrderedRecursiveDependencies = nil;
+	_dependencyCycleDetected = NO;
+	for (target in [project targets]) {
+		target->_cachedOrderedRecursiveDependencies = nil;
+		target->_dependencyCycleDetected = NO;
+	}
 }
 
 - (NSArray *)dependencies
@@ -544,7 +678,225 @@ static PBXBuildPhase *DefaultBuildPhase(PBXTarget *target, Class aClass)
 
 - (void)setDependencies:(NSArray *)dependencies
 {
+	PBXTargetDependency *dependency;
+
 	_dependencies = (dependencies != nil) ? [dependencies mutableCopy] : nil;
+	for (dependency in _dependencies) {
+		if (![dependency isKindOfClass:[PBXTargetDependency class]])
+			continue;
+		[dependency setOwner:self];
+	}
+	[self _invalidateDependencyOrderCaches];
+}
+
+- (void)insertDependencies:(NSArray *)dependencies atIndex:(NSUInteger)index
+{
+	PBXTargetDependency *dependency;
+
+	if (_dependencies == nil)
+		_dependencies = [[NSMutableArray alloc] init];
+	if (index > [_dependencies count])
+		index = [_dependencies count];
+	for (dependency in dependencies) {
+		NSUInteger existing;
+
+		if (![dependency isKindOfClass:[PBXTargetDependency class]])
+			continue;
+		existing = [_dependencies indexOfObjectIdenticalTo:dependency];
+		if (existing != NSNotFound) {
+			if (existing != index) {
+				[_dependencies removeObjectAtIndex:existing];
+				if (index > [_dependencies count])
+					index = [_dependencies count];
+				[_dependencies insertObject:dependency atIndex:index];
+			}
+		} else {
+			PBXTarget *depTarget = [dependency target];
+			PBXFileReference *product = [depTarget productReference];
+			NSArray *buildFiles;
+			PBXBuildFile *buildFile;
+
+			[_dependencies insertObject:dependency atIndex:index];
+			[dependency setOwner:self];
+			[dependency setContainer:[self container]];
+			if (product != nil) {
+				buildFiles = [self buildFilesForReference:product];
+				buildFile = [buildFiles firstObject];
+				[dependency setPlatformFilters:[buildFile platformFilters]];
+			} else {
+				for (buildFile in [self buildFiles]) {
+					PBXReference *reference =
+					    [buildFile productReference];
+
+					if ([ArchiveProductName(reference)
+					    isEqualToString:ArchiveProductName(
+					        [dependency productReference])]) {
+						[dependency setPlatformFilters:
+						    [buildFile platformFilters]];
+						break;
+					}
+				}
+			}
+		}
+		index++;
+	}
+	[self _invalidateDependencyOrderCaches];
+}
+
+- (void)addDependency:(PBXTargetDependency *)dependency
+{
+	if (dependency == nil)
+		return;
+	[self insertDependencies:@[ dependency ]
+	    atIndex:[_dependencies count]];
+}
+
+- (void)removeDependency:(PBXTargetDependency *)dependency
+{
+	NSUInteger index;
+
+	if (dependency == nil || _dependencies == nil)
+		return;
+	index = [_dependencies indexOfObjectIdenticalTo:dependency];
+	if (index == NSNotFound)
+		return;
+	[_dependencies removeObjectAtIndex:index];
+	if ([dependency owner] == self)
+		[dependency setOwner:nil];
+	[self _invalidateDependencyOrderCaches];
+}
+
+- (void)removeDependencies:(NSArray *)dependencies
+{
+	PBXTargetDependency *dependency;
+
+	for (dependency in dependencies)
+		[self removeDependency:dependency];
+}
+
+- (NSArray *)directDependencies
+{
+	NSMutableArray *result = [NSMutableArray array];
+	PBXTargetDependency *dependency;
+
+	for (dependency in _dependencies) {
+		PBXTarget *depTarget = [dependency target];
+
+		if (depTarget != nil)
+			[result addObject:depTarget];
+	}
+	return (result);
+}
+
+- (BOOL)dependsOnTarget:(PBXTarget *)target
+{
+	return ([self dependencyForTarget:target] != nil);
+}
+
+- (PBXTargetDependency *)dependencyForTarget:(PBXTarget *)target
+{
+	PBXTargetDependency *dependency;
+
+	if (target == nil)
+		return (nil);
+	for (dependency in _dependencies) {
+		if ([dependency target] == target)
+			return (dependency);
+	}
+	return (nil);
+}
+
+- (NSArray *)findDependingTargetsInProject:(PBXProject *)project
+{
+	NSMutableArray *result = [NSMutableArray array];
+	PBXTarget *candidate;
+
+	for (candidate in [project targets]) {
+		if ([candidate isKindOfClass:[PBXTarget class]] &&
+		    [candidate dependsOnTarget:self])
+			[result addObject:candidate];
+	}
+	return (result);
+}
+
+- (NSArray *)missingDependencies
+{
+	NSMutableArray *result = [NSMutableArray array];
+	PBXTargetDependency *dependency;
+
+	for (dependency in _dependencies) {
+		PBXContainerItemProxy *proxy = [dependency targetProxy];
+		PBXObject *portal = [proxy containerPortal];
+
+		if ([portal isKindOfClass:[PBXFileReference class]] &&
+		    ![(PBXFileReference *)portal fileExists]) {
+			[result addObject:dependency];
+			continue;
+		}
+		if ([dependency target] != nil)
+			continue;
+		if ([dependency productReference] == nil)
+			[result addObject:dependency];
+	}
+	return (result);
+}
+
+- (BOOL)_uncachedOrderedRecursiveDependencies:(NSMutableArray *)result
+    visited:(NSMutableSet *)visited cycleCheck:(NSMutableSet *)cycleCheck
+{
+	PBXTargetDependency *dependency;
+
+	if ([cycleCheck containsObject:self]) {
+		_dependencyCycleDetected = YES;
+		return (NO);
+	}
+	if ([visited containsObject:self])
+		return (NO);
+	[visited addObject:self];
+	[cycleCheck addObject:self];
+	for (dependency in _dependencies) {
+		PBXTarget *depTarget = [dependency target];
+
+		if (depTarget == nil)
+			continue;
+		if ([depTarget _uncachedOrderedRecursiveDependencies:result
+		    visited:visited cycleCheck:cycleCheck])
+			[result addObject:depTarget];
+	}
+	[cycleCheck removeObject:self];
+	return (YES);
+}
+
+- (NSArray *)orderedRecursiveDependenciesIncludingSelf:(BOOL)includeSelf
+{
+	NSMutableArray *result = [NSMutableArray array];
+	NSMutableSet *visited = [NSMutableSet set];
+	NSMutableSet *cycleCheck = [NSMutableSet set];
+	NSArray *ordered;
+
+	if (_cachedOrderedRecursiveDependencies == nil) {
+		[self _uncachedOrderedRecursiveDependencies:result
+		    visited:visited cycleCheck:cycleCheck];
+		_cachedOrderedRecursiveDependencies = [result copy];
+	}
+	ordered = _cachedOrderedRecursiveDependencies;
+	if (includeSelf)
+		return ([ordered arrayByAddingObject:self]);
+	return (ordered);
+}
+
+- (NSArray *)orderedRecursiveDependencies
+{
+	return ([self orderedRecursiveDependenciesIncludingSelf:YES]);
+}
+
+- (PBXProject *)project
+{
+	PBXContainer *container = [self container];
+
+	if ([container isKindOfClass:[PBXProject class]])
+		return ((PBXProject *)container);
+	return (nil);
 }
 
 - (NSArray *)buildRules
@@ -637,6 +989,16 @@ static PBXBuildPhase *DefaultBuildPhase(PBXTarget *target, Class aClass)
 	_fileSystemSynchronizedGroups = (groups != nil) ? [groups mutableCopy] : nil;
 }
 
+- (NSArray *)fileSystemSynchronizedGroupsArray
+{
+	return (_fileSystemSynchronizedGroups);
+}
+
+- (void)setFileSystemSynchronizedGroupsArray:(NSArray *)groups
+{
+	[self setFileSystemSynchronizedGroups:groups];
+}
+
 - (NSString *)displayName
 {
 	if (_name != nil)
@@ -647,6 +1009,11 @@ static PBXBuildPhase *DefaultBuildPhase(PBXTarget *target, Class aClass)
 - (NSString *)archiveComment
 {
 	return ([self displayName]);
+}
+
+- (NSString *)description
+{
+	return ([self displayName] ?: [super description]);
 }
 
 @end
@@ -679,6 +1046,12 @@ static PBXBuildPhase *DefaultBuildPhase(PBXTarget *target, Class aClass)
 + (NSString *)classNameForPListArchive
 {
 	return (@"PBXLegacyTarget");
+}
+
++ (NSArray *)archivableAttributes
+{
+	return (@[@"buildArgumentsString", @"buildToolPath",
+	    @"buildWorkingDirectory", @"passBuildSettingsInEnvironment"]);
 }
 
 @end

@@ -8,6 +8,7 @@
 
 #import "DevToolsCore/PBXProjectModel.h"
 #import "DevToolsCore/PBXObject.h"
+#import "DevToolsCore/PBXTarget.h"
 #import "DevToolsCore/XCBuildConfiguration.h"
 #import "DevToolsCore/BuildSystem/DVTMacroDefinitionTable+XCMacroExpansionExtensions.h"
 #import "DevToolsCore/PBXExtendedWrapperPart.h"
@@ -33,7 +34,8 @@ usage(void)
 	    "       pbxmodel xcmacroexpansion\n"
 	    "       pbxmodel xcproducttypes\n"
 	    "       pbxmodel runtimevalues\n"
-	    "       pbxmodel buildconfigurations\n");
+	    "       pbxmodel buildconfigurations\n"
+	    "       pbxmodel targetdependencies\n");
 	exit(2);
 }
 
@@ -1112,6 +1114,127 @@ cmdBuildConfigurations(void)
 	return (0);
 }
 
+static id
+OrNull(id value)
+{
+	return (value != nil ? value : @"(null)");
+}
+
+static NSArray *
+TargetNames(NSArray *targets)
+{
+	NSMutableArray *names = [NSMutableArray array];
+	id target;
+
+	for (target in targets) {
+		if ([target isKindOfClass:[PBXTarget class]])
+			[names addObject:[target name] ?: [target displayName]];
+		else
+			[names addObject:OrNull(target)];
+	}
+	return (names);
+}
+
+static PBXTarget *
+MakeNamedTarget(NSString *name, NSString *identifier)
+{
+	PBXTarget *target = [[PBXTarget alloc] init];
+
+	[target setName:name];
+	[target setObjectID:identifier];
+	return (target);
+}
+
+static int
+cmdTargetDependencies(void)
+{
+	PBXProject *project = [[PBXProject alloc] init];
+	PBXTarget *a = MakeNamedTarget(@"A", @"AAAAAAAAAAAAAAAAAAAAAAAA");
+	PBXTarget *b = MakeNamedTarget(@"B", @"BBBBBBBBBBBBBBBBBBBBBBBB");
+	PBXTarget *c = MakeNamedTarget(@"C", @"CCCCCCCCCCCCCCCCCCCCCCCC");
+	PBXTargetDependency *depAB;
+	PBXTargetDependency *depBC;
+
+	PrintNSStringValue(@"class.dependency.attrs",
+	    [PBXTargetDependency archivableAttributes]);
+	PrintNSStringValue(@"class.dependency.rels",
+	    [PBXTargetDependency archivableRelationships]);
+	PrintNSStringValue(@"class.proxy.attrs",
+	    [PBXContainerItemProxy archivableAttributes]);
+	PrintNSStringValue(@"class.proxy.rels",
+	    [PBXContainerItemProxy archivableRelationships]);
+	PrintNSStringValue(@"class.target.attrs",
+	    [PBXTarget archivableAttributes]);
+	PrintNSStringValue(@"class.target.rels",
+	    [PBXTarget archivableRelationships]);
+
+	[project addTarget:a];
+	[project addTarget:b];
+	[project addTarget:c];
+	PrintNSStringValue(@"project.targets", TargetNames([project targets]));
+	PrintNSStringValue(@"a.project", @((BOOL)([a project] == project)));
+
+	depAB = [[PBXTargetDependency alloc] initWithLocalTarget:b];
+	depBC = [[PBXTargetDependency alloc] initWithLocalTarget:c];
+	PrintNSStringValue(@"dep.ab.target",
+	    @[ [depAB target] ?: @"<nil>" ]);
+	PrintNSStringValue(@"dep.ab.name", OrNull([depAB name]));
+	PrintNSStringValue(@"dep.ab.owner", OrNull([depAB owner]));
+	PrintNSStringValue(@"dep.ab.needsSync", @([depAB needsSync]));
+	PrintNSStringValue(@"dep.ab.productReference",
+	    OrNull([depAB productReference]));
+	PrintNSStringValue(@"dep.ab.recursive",
+	    TargetNames([depAB orderedRecursiveDependencies]));
+
+	[a addDependency:depAB];
+	[b addDependency:depBC];
+	PrintNSStringValue(@"a.deps", TargetNames([a dependencies]));
+	PrintNSStringValue(@"a.direct", TargetNames([a directDependencies]));
+	PrintNSStringValue(@"a.recursive", TargetNames([a
+	    orderedRecursiveDependenciesIncludingSelf:NO]));
+	PrintNSStringValue(@"a.recursive.self", TargetNames([a
+	    orderedRecursiveDependenciesIncludingSelf:YES]));
+	PrintNSStringValue(@"a.depends.b", @([a dependsOnTarget:b]));
+	PrintNSStringValue(@"a.depends.c", @([a dependsOnTarget:c]));
+	PrintNSStringValue(@"a.dependencyFor.b",
+	    @[ [a dependencyForTarget:b] ?: @"<nil>" ]);
+	PrintNSStringValue(@"a.dependencyFor.c",
+	    @[ [a dependencyForTarget:c] ?: @"<nil>" ]);
+	PrintNSStringValue(@"a.missing", TargetNames([a missingDependencies]));
+	PrintNSStringValue(@"a.owner.ab", @((BOOL)([depAB owner] == a)));
+	PrintNSStringValue(@"b.owner.bc", @((BOOL)([depBC owner] == b)));
+	PrintNSStringValue(@"project.order", TargetNames([project
+	    allTargetsInDependencyOrder]));
+	PrintNSStringValue(@"b.depending", TargetNames([b
+	    findDependingTargetsInProject:project]));
+
+	[a removeDependency:depAB];
+	PrintNSStringValue(@"a.after.remove", TargetNames([a dependencies]));
+	PrintNSStringValue(@"a.owner.after.remove", OrNull([depAB owner]));
+	[a addDependency:depAB];
+	PrintNSStringValue(@"a.after.readd", TargetNames([a dependencies]));
+
+	{
+		PBXProject *cycleProject = [[PBXProject alloc] init];
+		PBXTarget *d = MakeNamedTarget(@"D", @"DDDDDDDDDDDDDDDDDDDDDDDD");
+		PBXTarget *e = MakeNamedTarget(@"E", @"EEEEEEEEEEEEEEEEEEEEEEEE");
+
+		[cycleProject addTarget:d];
+		[cycleProject addTarget:e];
+		[d addDependency:[[PBXTargetDependency alloc]
+		    initWithLocalTarget:e]];
+		[e addDependency:[[PBXTargetDependency alloc]
+		    initWithLocalTarget:d]];
+		PrintNSStringValue(@"cycle.d.recursive", TargetNames([d
+		    orderedRecursiveDependenciesIncludingSelf:NO]));
+		PrintNSStringValue(@"cycle.d.recursive.self", TargetNames([d
+		    orderedRecursiveDependenciesIncludingSelf:YES]));
+		PrintNSStringValue(@"cycle.order", TargetNames([cycleProject
+		    allTargetsInDependencyOrder]));
+	}
+	return (0);
+}
+
 int
 main(int argc, char **argv)
 {
@@ -1130,6 +1253,8 @@ main(int argc, char **argv)
 			return (cmdRuntimeValues());
 		if (argc >= 2 && strcmp(argv[1], "buildconfigurations") == 0)
 			return (cmdBuildConfigurations());
+		if (argc >= 2 && strcmp(argv[1], "targetdependencies") == 0)
+			return (cmdTargetDependencies());
 		if (argc < 3)
 			usage();
 		cmd = argv[1];

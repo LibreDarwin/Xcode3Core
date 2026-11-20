@@ -900,6 +900,18 @@ static void AddExcluded(XCSpecificationFilter *filter, NSString *identifier)
 	return (nil);
 }
 
+static BOOL
+ContainsIdenticalObject(NSArray *array, id object)
+{
+	id value;
+
+	for (value in array) {
+		if (value == object)
+			return (YES);
+	}
+	return (NO);
+}
+
 - (void)insertTargets:(NSArray *)targets atIndex:(NSUInteger)index
 {
 	PBXTarget *target;
@@ -912,6 +924,7 @@ static void AddExcluded(XCSpecificationFilter *filter, NSString *identifier)
 		if (![target isKindOfClass:[PBXTarget class]])
 			continue;
 		[_targets insertObject:target atIndex:index++];
+		[self addItem:target];
 	}
 }
 
@@ -919,45 +932,31 @@ static void AddExcluded(XCSpecificationFilter *filter, NSString *identifier)
 {
 	if (target == nil)
 		return;
-	if (_targets == nil)
-		_targets = [[NSMutableArray alloc] init];
-	[_targets addObject:target];
+	[self insertTargets:@[ target ] atIndex:[_targets count]];
 }
 
 - (void)removeTarget:(PBXTarget *)target
 {
 	if (target == nil || _targets == nil)
 		return;
-	[_targets removeObject:target];
-}
-
-static void VisitTarget(PBXTarget *target, NSMutableSet *visited,
-    NSMutableArray *order, NSSet *targetSet)
-{
-	PBXTargetDependency *dependency;
-
-	if ([visited containsObject:target])
-		return;
-	[visited addObject:target];
-	for (dependency in [target dependencies]) {
-		PBXTarget *depTarget = [dependency target];
-
-		if (depTarget != nil && [targetSet containsObject:depTarget])
-			VisitTarget(depTarget, visited, order, targetSet);
-	}
-	[order addObject:target];
+	[_targets removeObjectIdenticalTo:target];
+	[self removeItem:target];
 }
 
 - (NSArray *)allTargetsInDependencyOrder
 {
 	NSMutableArray *order = [NSMutableArray array];
-	NSMutableSet *visited = [NSMutableSet set];
-	NSSet *targetSet = [NSSet setWithArray:_targets ?: @[]];
 	PBXTarget *target;
+	id dependency;
 
 	for (target in _targets) {
-		if ([target isKindOfClass:[PBXTarget class]])
-			VisitTarget(target, visited, order, targetSet);
+		if (![target isKindOfClass:[PBXTarget class]])
+			continue;
+		for (dependency in [target
+		    orderedRecursiveDependenciesIncludingSelf:YES]) {
+			if (!ContainsIdenticalObject(order, dependency))
+				[order addObject:dependency];
+		}
 	}
 	return (order);
 }
