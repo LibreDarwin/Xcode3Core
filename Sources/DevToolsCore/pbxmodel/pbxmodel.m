@@ -17,6 +17,7 @@
 #import "DevToolsCore/PBXExtendedWrapperPart.h"
 #import "DevToolsCore/PBXFileSystemSynchronizedGroupRelativeReferenceID.h"
 #import "DevToolsCore/PBXPackageTypeSpecification.h"
+#import "DevToolsCore/PBXPlistArchiverAdditions.h"
 #import "DevToolsCore/XCMacroExpansionScope.h"
 #import "DevToolsCore/XCObjectGraphPath.h"
 #import "DevToolsCore/XCProductTypeSpecification.h"
@@ -40,6 +41,7 @@ usage(void)
 	    "       pbxmodel xcmacroexpansion\n"
 	    "       pbxmodel macroevaluation\n"
 	    "       pbxmodel objectgraphpath\n"
+	    "       pbxmodel plistwrappers\n"
 	    "       pbxmodel stringlist\n"
 	    "       pbxmodel tsstringbom\n"
 	    "       pbxmodel xcproducttypes\n"
@@ -1320,6 +1322,145 @@ cmdTargetDependencies(void)
 }
 
 static void
+PrintWrapperValue(const char *label, id value)
+{
+	printf("%s = <%s>\n", label,
+	    (value != nil) ? [[value description] UTF8String] : "nil");
+}
+
+static void
+PrintWrapperPList(const char *label, id value, NSUInteger level)
+{
+	NSMutableData *data = [NSMutableData data];
+
+	[value _appendPListDescriptionToUTF8Data:data withIndentLevel:level];
+	printf("%s.%lu = <%.*s>\n", label, (unsigned long)level,
+	    (int)[data length], (const char *)[data bytes]);
+}
+
+static int
+cmdPlistWrappers(void)
+{
+	NSString *plain = @"abc";
+	NSString *spaced = @"a b";
+	NSString *quoted = @"a\"b";
+	NSString *unicode = @"αβ";
+	PBXPlistArchiverAlwaysQuotedString *always =
+	    [PBXPlistArchiverAlwaysQuotedString wrapString:spaced];
+	PBXPlistArchiverAlwaysQuotedString *alwaysInit =
+	    [[PBXPlistArchiverAlwaysQuotedString alloc] initWithString:spaced];
+
+	PrintWrapperValue("always.class", NSStringFromClass([always class]));
+	PrintWrapperValue("always.description", [always description]);
+	PrintWrapperValue("always.string", [always description]);
+	PrintWrapperValue("always.length", @([always length]));
+	PrintWrapperValue("always.char0", @([always characterAtIndex:0]));
+	PrintWrapperValue("always.equal.raw", @([always isEqual:spaced]));
+	PrintWrapperValue("always.equal.init", @([always isEqual:alwaysInit]));
+	PrintWrapperValue("always.equal.plain", @([always isEqual:plain]));
+	PrintWrapperValue("always.hash.raw", @([always hash] == [spaced hash]));
+	PrintWrapperValue("always.copy.class",
+	    NSStringFromClass([[always copy] class]));
+	PrintWrapperValue("always.init.description", [alwaysInit description]);
+	PrintWrapperPList("always.plist", always, 0);
+	PrintWrapperPList("always.plist", always, 2);
+	PrintWrapperPList("always.plist.init", alwaysInit, 1);
+
+	for (NSString *string in @[@"", plain, spaced, quoted, unicode,
+	    @"line1\nline2", @"tab\there", @"back\\slash"]) {
+		PBXPlistArchiverAlwaysQuotedString *wrapped =
+		    [PBXPlistArchiverAlwaysQuotedString wrapString:string];
+
+		printf("always.case = <%s> => ", [string UTF8String]);
+		PrintWrapperPList("wrapped", wrapped, 0);
+	}
+
+	PBXPListArchiverStringWithComment *commented =
+	    [[PBXPListArchiverStringWithComment alloc] initWithString:spaced
+	    comment:@"note"];
+	PBXPListArchiverStringWithComment *commentedOther =
+	    [[PBXPListArchiverStringWithComment alloc] initWithString:spaced
+	    comment:@"other"];
+	PrintWrapperValue("comment.class", NSStringFromClass([commented class]));
+	PrintWrapperValue("comment.description", [commented description]);
+	PrintWrapperValue("comment.length", @([commented length]));
+	PrintWrapperValue("comment.equal.raw", @([commented isEqual:spaced]));
+	PrintWrapperValue("comment.equal.same", @([commented isEqual:commented]));
+	PrintWrapperValue("comment.equal.comment",
+	    @([commented isEqual:commentedOther]));
+	PrintWrapperValue("comment.hash.raw",
+	    @([commented hash] == [spaced hash]));
+	PrintWrapperValue("comment.copy.class",
+	    NSStringFromClass([[commented copy] class]));
+	PrintWrapperPList("comment.plist", commented, 0);
+	PrintWrapperPList("comment.plist", commented, 2);
+	PrintWrapperPList("comment.plist.other", commentedOther, 0);
+
+	for (NSString *string in @[@"", plain, spaced, quoted, unicode,
+	    @"line1\nline2", @"tab\there", @"back\\slash"]) {
+		PBXPListArchiverStringWithComment *wrapped =
+		    [[PBXPListArchiverStringWithComment alloc]
+		    initWithString:string comment:@"c"];
+
+		printf("comment.case = <%s> => ", [string UTF8String]);
+		PrintWrapperPList("wrapped", wrapped, 0);
+	}
+
+	for (NSString *string in @[@"A", @"ABC", @"a_b", @"a-b", @"a.b",
+	    @"a/b", @"1abc", @"abc1", @"a$b", @"a:b", @"a+b", @"a@b",
+	    @"a#b", @"A1", @"1", @"_", @"-", @".", @"YES", @"NO", @"nil",
+	    @"NULL", @"a=b", @"a,b", @"a;b", @"a?b", @"a!b"]) {
+		PBXPListArchiverStringWithComment *wrapped =
+		    [[PBXPListArchiverStringWithComment alloc]
+		    initWithString:string comment:@"c"];
+
+		printf("comment.identifier = <%s> => ", [string UTF8String]);
+		PrintWrapperPList("wrapped", wrapped, 0);
+	}
+
+	for (id comment in @[@"", @"multi word", @"line1\nline2",
+	    @"note */ end", @"start /* here", @"(*), (*)/", [NSNull null]]) {
+		NSString *actual = (comment == [NSNull null]) ? nil : comment;
+		PBXPListArchiverStringWithComment *wrapped =
+		    [[PBXPListArchiverStringWithComment alloc]
+		    initWithString:plain comment:actual];
+
+		printf("comment.comment = <%s> => ",
+		    actual ? [actual UTF8String] : "(nil)");
+		PrintWrapperPList("wrapped", wrapped, 0);
+	}
+
+	NSArray *rawArray = @[plain, spaced, @1, @[@"nested"]];
+	PBXPlistArchiverSingleLineArray *array =
+	    [PBXPlistArchiverSingleLineArray wrapArray:rawArray];
+	PBXPlistArchiverSingleLineArray *arrayInit =
+	    [[PBXPlistArchiverSingleLineArray alloc] initWithArray:rawArray];
+	PrintWrapperValue("array.class", NSStringFromClass([array class]));
+	PrintWrapperValue("array.description", [array description]);
+	PrintWrapperValue("array.count", @([array count]));
+	PrintWrapperValue("array.object0", [array objectAtIndex:0]);
+	PrintWrapperValue("array.object1", [array objectAtIndex:1]);
+	PrintWrapperValue("array.equal.raw", @([array isEqual:rawArray]));
+	PrintWrapperValue("array.equal.init", @([array isEqual:arrayInit]));
+	PrintWrapperValue("array.hash.raw",
+	    @([array hash] == [rawArray hash]));
+	PrintWrapperValue("array.copy.class",
+	    NSStringFromClass([[array copy] class]));
+	PrintWrapperPList("array.plist", array, 0);
+	PrintWrapperPList("array.plist", array, 2);
+	PrintWrapperPList("array.plist.init", arrayInit, 1);
+
+	PrintWrapperPList("array.empty",
+	    [PBXPlistArchiverSingleLineArray wrapArray:@[]], 0);
+	PrintWrapperPList("array.one",
+	    [PBXPlistArchiverSingleLineArray wrapArray:@[@"x"]], 0);
+	PrintWrapperPList("array.commented", [PBXPlistArchiverSingleLineArray
+	    wrapArray:@[[[PBXPListArchiverStringWithComment alloc]
+	    initWithString:@"x" comment:@"c"], @1]], 0);
+	return (0);
+}
+
+static void
 DumpStringList(NSString *label, XCStringList *list)
 {
 	PrintNSStringValue([label stringByAppendingString:@".class"],
@@ -1607,6 +1748,8 @@ main(int argc, char **argv)
 			return (cmdMacroEvaluation());
 		if (argc >= 2 && strcmp(argv[1], "objectgraphpath") == 0)
 			return (cmdObjectGraphPath());
+		if (argc >= 2 && strcmp(argv[1], "plistwrappers") == 0)
+			return (cmdPlistWrappers());
 		if (argc >= 2 && strcmp(argv[1], "stringlist") == 0)
 			return (cmdStringList());
 		if (argc >= 2 && strcmp(argv[1], "tsstringbom") == 0)

@@ -1,0 +1,101 @@
+always.class = <PBXPlistArchiverAlwaysQuotedString>
+always.description = <a b>
+always.string = <a b>
+always.length = <3>
+always.char0 = <97>
+always.equal.raw = <1>
+always.equal.init = <1>
+always.equal.plain = <0>
+always.hash.raw = <1>
+always.copy.class = <PBXPlistArchiverAlwaysQuotedString>
+always.init.description = <a b>
+always.plist.0 = <"a b">
+always.plist.2 = <"a b">
+always.plist.init.1 = <"a b">
+always.case = <> => wrapped.0 = <"">
+always.case = <abc> => wrapped.0 = <"abc">
+always.case = <a b> => wrapped.0 = <"a b">
+always.case = <a"b> => wrapped.0 = <"a\"b">
+always.case = <αβ> => wrapped.0 = <"αβ">
+always.case = <line1
+line2> => wrapped.0 = <"line1\nline2">
+always.case = <tab	here> => wrapped.0 = <"tab\there">
+always.case = <back\slash> => wrapped.0 = <"back\\slash">
+comment.class = <PBXPListArchiverStringWithComment>
+comment.description = <a b>
+comment.length = <3>
+comment.equal.raw = <1>
+comment.equal.same = <1>
+comment.equal.comment = <1>
+comment.hash.raw = <1>
+comment.copy.class = <PBXPListArchiverStringWithComment>
+comment.plist.0 = <"a b" /* note */>
+comment.plist.2 = <"a b" /* note */>
+comment.plist.other.0 = <"a b" /* other */>
+comment.case = <> => wrapped.0 = <"" /* c */>
+comment.case = <abc> => wrapped.0 = <abc /* c */>
+comment.case = <a b> => wrapped.0 = <"a b" /* c */>
+comment.case = <a"b> => wrapped.0 = <"a\"b" /* c */>
+comment.case = <αβ> => wrapped.0 = <"αβ" /* c */>
+comment.case = <line1
+line2> => wrapped.0 = <"line1\nline2" /* c */>
+comment.case = <tab	here> => wrapped.0 = <"tab\there" /* c */>
+comment.case = <back\slash> => wrapped.0 = <"back\\slash" /* c */>
+comment.identifier = <A> => wrapped.0 = <A /* c */>
+comment.identifier = <ABC> => wrapped.0 = <ABC /* c */>
+comment.identifier = <a_b> => wrapped.0 = <a_b /* c */>
+comment.identifier = <a-b> => wrapped.0 = <"a-b" /* c */>
+comment.identifier = <a.b> => wrapped.0 = <a.b /* c */>
+comment.identifier = <a/b> => wrapped.0 = <a/b /* c */>
+comment.identifier = <1abc> => wrapped.0 = <1abc /* c */>
+comment.identifier = <abc1> => wrapped.0 = <abc1 /* c */>
+comment.identifier = <a$b> => wrapped.0 = <a$b /* c */>
+comment.identifier = <a:b> => wrapped.0 = <"a:b" /* c */>
+comment.identifier = <a+b> => wrapped.0 = <"a+b" /* c */>
+comment.identifier = <a@b> => wrapped.0 = <"a@b" /* c */>
+comment.identifier = <a#b> => wrapped.0 = <"a#b" /* c */>
+comment.identifier = <A1> => wrapped.0 = <A1 /* c */>
+comment.identifier = <1> => wrapped.0 = <1 /* c */>
+comment.identifier = <_> => wrapped.0 = <_ /* c */>
+comment.identifier = <-> => wrapped.0 = <"-" /* c */>
+comment.identifier = <.> => wrapped.0 = <. /* c */>
+comment.identifier = <YES> => wrapped.0 = <YES /* c */>
+comment.identifier = <NO> => wrapped.0 = <NO /* c */>
+comment.identifier = <nil> => wrapped.0 = <nil /* c */>
+comment.identifier = <NULL> => wrapped.0 = <NULL /* c */>
+comment.identifier = <a=b> => wrapped.0 = <"a=b" /* c */>
+comment.identifier = <a,b> => wrapped.0 = <"a,b" /* c */>
+comment.identifier = <a;b> => wrapped.0 = <"a;b" /* c */>
+comment.identifier = <a?b> => wrapped.0 = <"a?b" /* c */>
+comment.identifier = <a!b> => wrapped.0 = <"a!b" /* c */>
+comment.comment = <> => wrapped.0 = <abc /*  */>
+comment.comment = <multi word> => wrapped.0 = <abc /* multi word */>
+comment.comment = <line1
+line2> => wrapped.0 = <abc /* line1
+line2 */>
+comment.comment = <note */ end> => wrapped.0 = <abc /* note (*)/ end */>
+comment.comment = <start /* here> => wrapped.0 = <abc /* start /* here */>
+comment.comment = <(*), (*)/> => wrapped.0 = <abc /* (*), (*)/ */>
+comment.comment = <(nil)> => wrapped.0 = <abc>
+array.class = <PBXPlistArchiverSingleLineArray>
+array.description = <(
+    abc,
+    "a b",
+    1,
+        (
+        nested
+    )
+)>
+array.count = <4>
+array.object0 = <abc>
+array.object1 = <a b>
+array.equal.raw = <1>
+array.equal.init = <1>
+array.hash.raw = <1>
+array.copy.class = <PBXPlistArchiverSingleLineArray>
+array.plist.0 = <(abc, "a b", 1, (nested, ), )>
+array.plist.2 = <(abc, "a b", 1, (nested, ), )>
+array.plist.init.1 = <(abc, "a b", 1, (nested, ), )>
+array.empty.0 = <()>
+array.one.0 = <(x, )>
+array.commented.0 = <(x /* c */, 1, )>

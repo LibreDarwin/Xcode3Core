@@ -41,6 +41,7 @@
 		1A2B3C4D000000000000000EB /* XCMacroExpansionScope.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000E9 /* XCMacroExpansionScope.m */; };
 		1A2B3C4D000000000000000F6 /* XCObjectGraphPath.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000F7 /* XCObjectGraphPath.m */; };
 		1A2B3C4D0000000000000100 /* XCStringList.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000101 /* XCStringList.m */; };
+		1A2B3C4D0000000000000103 /* PBXPlistArchiverAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000104 /* PBXPlistArchiverAdditions.m */; };
 		1A2B3C4D000000000000000EC /* PBXPackageTypeSpecification.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000ED /* PBXPackageTypeSpecification.m */; };
 		1A2B3C4D000000000000000EF /* XCProductTypeSpecification.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000F0 /* XCProductTypeSpecification.m */; };
 		1A2B3C4D000000000000000F2 /* PBXRuntimeValues.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000F3 /* PBXRuntimeValues.m */; };
@@ -121,6 +122,8 @@
 		1A2B3C4D000000000000000F8 /* XCObjectGraphPath.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XCObjectGraphPath.h; sourceTree = "<group>"; };
 		1A2B3C4D0000000000000101 /* XCStringList.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XCStringList.m; sourceTree = "<group>"; };
 		1A2B3C4D0000000000000102 /* XCStringList.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XCStringList.h; sourceTree = "<group>"; };
+		1A2B3C4D0000000000000104 /* PBXPlistArchiverAdditions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PBXPlistArchiverAdditions.m; sourceTree = "<group>"; };
+		1A2B3C4D0000000000000105 /* PBXPlistArchiverAdditions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PBXPlistArchiverAdditions.h; sourceTree = "<group>"; };
 		1A2B3C4D000000000000000ED /* PBXPackageTypeSpecification.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PBXPackageTypeSpecification.m; sourceTree = "<group>"; };
 		1A2B3C4D000000000000000EE /* PBXPackageTypeSpecification.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PBXPackageTypeSpecification.h; sourceTree = "<group>"; };
 		1A2B3C4D000000000000000F0 /* XCProductTypeSpecification.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XCProductTypeSpecification.m; sourceTree = "<group>"; };
@@ -218,6 +221,7 @@
 				1A2B3C4D00000000000000094 /* PBXPlatformFilterableItem.m */,
 				1A2B3C4D00000000000000095 /* PBXSupport.m */,
 				1A2B3C4D000000000000000F3 /* PBXRuntimeValues.m */,
+				1A2B3C4D0000000000000104 /* PBXPlistArchiverAdditions.m */,
 			);
 			path = ProjectModel;
 			sourceTree = "<group>";
@@ -263,6 +267,7 @@
 				1A2B3C4D000000000000000EA /* XCMacroExpansionScope.h */,
 				1A2B3C4D000000000000000F8 /* XCObjectGraphPath.h */,
 				1A2B3C4D0000000000000102 /* XCStringList.h */,
+				1A2B3C4D0000000000000105 /* PBXPlistArchiverAdditions.h */,
 				1A2B3C4D000000000000000F4 /* PBXExtendedWrapperPart.h */,
 				1A2B3C4D000000000000000F5 /* PBXFileSystemSynchronizedGroupRelativeReferenceID.h */,
 				1A2B3C4D000000000000000AF /* BuildSystem */,
@@ -476,6 +481,7 @@
 				1A2B3C4D000000000000000EB /* XCMacroExpansionScope.m in Sources */,
 				1A2B3C4D000000000000000F6 /* XCObjectGraphPath.m in Sources */,
 				1A2B3C4D0000000000000100 /* XCStringList.m in Sources */,
+				1A2B3C4D0000000000000103 /* PBXPlistArchiverAdditions.m in Sources */,
 				1A2B3C4D000000000000000EC /* PBXPackageTypeSpecification.m in Sources */,
 				1A2B3C4D000000000000000EF /* XCProductTypeSpecification.m in Sources */,
 				1A2B3C4D000000000000000F2 /* PBXRuntimeValues.m in Sources */,

@@ -100,6 +100,9 @@ only unless a real dependency appears.
       oracle fixture; reversed `stringRepresentation`, identity equality)
 - [x] XCStringList storage/parsing/pattern semantics (Apple `pbxmodel stringlist`
       oracle fixture; escaping, pattern/filename matching, mutation, equality)
+- [x] PBXPlistArchiver wrapper value objects (Apple `pbxmodel plistwrappers`
+      oracle fixture; always-quoted strings, commented strings, single-line arrays,
+      copying/equality/hash and private plist append behavior)
 
 ### 6) DevToolsSupport / XcodePlugIns
 - [ ] Reverse-engineer and implement needed APIs

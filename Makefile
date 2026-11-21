@@ -55,6 +55,7 @@ PBXMODEL_OBJS := $(OBJDIR)/pbxmodel.o $(OBJDIR)/pbxproj.o \
 	$(OBJDIR)/DVTMacroDefinitionTable+XCMacroExpansionExtensions.o \
 	$(OBJDIR)/XCMacroExpansionScope.o $(OBJDIR)/XCObjectGraphPath.o \
 	$(OBJDIR)/XCStringList.o \
+	$(OBJDIR)/PBXPlistArchiverAdditions.o \
 	$(OBJDIR)/PBXPackageTypeSpecification.o \
 	$(OBJDIR)/XCProductTypeSpecification.o \
 	$(OBJDIR)/PBXRuntimeValues.o
@@ -211,6 +212,10 @@ $(OBJDIR)/XCStringList.o: Sources/DevToolsCore/XCStringList.m
 	@mkdir -p $(OBJDIR)
 	$(CC) $(OBJCFLAGS) -c -o $@ Sources/DevToolsCore/XCStringList.m
 
+$(OBJDIR)/PBXPlistArchiverAdditions.o: Sources/DevToolsCore/ProjectModel/PBXPlistArchiverAdditions.m
+	@mkdir -p $(OBJDIR)
+	$(CC) $(OBJCFLAGS) -c -o $@ Sources/DevToolsCore/ProjectModel/PBXPlistArchiverAdditions.m
+
 $(OBJDIR)/PBXPackageTypeSpecification.o: Sources/DevToolsCore/BuildSystem/PBXPackageTypeSpecification.m
 	@mkdir -p $(OBJDIR)
 	$(CC) $(OBJCFLAGS) -c -o $@ Sources/DevToolsCore/BuildSystem/PBXPackageTypeSpecification.m
@@ -232,6 +237,7 @@ test: all
 	PBXMODEL=$(PBXMODEL) bash tools/xcmacroexpansion.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/macroevaluation.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/objectgraphpath.sh || ok=1; \
+	PBXMODEL=$(PBXMODEL) bash tools/plistwrappers.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/stringlist.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/tsstringbom.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/xcproducttypes.sh || ok=1; \
