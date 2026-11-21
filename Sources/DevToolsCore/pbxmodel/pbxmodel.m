@@ -20,6 +20,7 @@
 #import "DevToolsCore/XCMacroExpansionScope.h"
 #import "DevToolsCore/XCObjectGraphPath.h"
 #import "DevToolsCore/XCProductTypeSpecification.h"
+#import "DevToolsCore/XCStringList.h"
 #import "DevToolsCore/BuildSystem/XCPropertyDefinition.h"
 #import "DevToolsCore/BuildSystem/XCPropertyDomainSpecification.h"
 #import "DevToolsCore/ProjectModel/pbxproj.h"
@@ -39,6 +40,7 @@ usage(void)
 	    "       pbxmodel xcmacroexpansion\n"
 	    "       pbxmodel macroevaluation\n"
 	    "       pbxmodel objectgraphpath\n"
+	    "       pbxmodel stringlist\n"
 	    "       pbxmodel tsstringbom\n"
 	    "       pbxmodel xcproducttypes\n"
 	    "       pbxmodel runtimevalues\n"
@@ -1318,6 +1320,139 @@ cmdTargetDependencies(void)
 }
 
 static void
+DumpStringList(NSString *label, XCStringList *list)
+{
+	PrintNSStringValue([label stringByAppendingString:@".class"],
+	    NSStringFromClass([list class]));
+	PrintNSStringValue([label stringByAppendingString:@".count"],
+	    @([list count]));
+	PrintNSStringValue([label stringByAppendingString:@".array"],
+	    [list arrayRepresentation]);
+	PrintNSStringValue([label stringByAppendingString:@".string"],
+	    [list stringRepresentation]);
+	PrintNSStringValue([label stringByAppendingString:@".debug"],
+	    [list stringRepresentationForDebugging]);
+	PrintNSStringValue([label stringByAppendingString:@".description"],
+	    [list description]);
+}
+
+static int
+cmdStringList(void)
+{
+	XCStringList *empty = [XCStringList stringList];
+	XCStringList *single = [XCStringList stringListWithString:@"alpha"];
+	XCStringList *three = [[XCStringList alloc] initWithStringArray:
+	    @[@"alpha", @"beta one", @"gamma"]];
+	XCStringList *parsed = [XCStringList
+	    stringListFromStringRepresentation:@"'alpha', \"beta one\", gamma"];
+
+	DumpStringList(@"empty", empty);
+	DumpStringList(@"single", single);
+	DumpStringList(@"three", three);
+	DumpStringList(@"parsed", parsed);
+
+	NSUInteger count = [three count];
+	const char *pointers[16] = {0};
+
+	[three getUTF8StringPtrs:pointers];
+	for (NSUInteger i = 0; i < count; i++)
+		PrintNSStringValue([NSString stringWithFormat:@"ptr.%lu",
+		    (unsigned long)i], [NSString stringWithUTF8String:
+		    pointers[i]]);
+
+	__block NSUInteger blockIndex = 0;
+	[three enumerateUTF8StringsUsingBlock:^(const char *string) {
+		PrintNSStringValue([NSString stringWithFormat:@"enum.%lu",
+		    (unsigned long)blockIndex++],
+		    [NSString stringWithUTF8String:string]);
+	}];
+
+	const char *representations[] = {
+		"", "  ", "alpha beta", "alpha\\ beta",
+		"'alpha', \"beta one\", gamma", "a\\b", "a\\\\b", NULL
+	};
+	NSString *labels[] = {
+		@"parse.empty", @"parse.spaces", @"parse.plain", @"parse.escaped",
+		@"parse.quoted", @"parse.backslash", @"parse.backslash2", nil
+	};
+	for (NSUInteger i = 0; labels[i] != nil; i++) {
+		XCStringList *list = [XCStringList
+		    stringListFromStringRepresentation:
+		    [NSString stringWithUTF8String:representations[i]]];
+
+		PrintNSStringValue([labels[i]
+		    stringByAppendingString:@".array"],
+		    [list arrayRepresentation]);
+		PrintNSStringValue([labels[i]
+		    stringByAppendingString:@".string"],
+		    [list stringRepresentation]);
+	}
+
+	XCStringList *patterns = [[XCStringList alloc] initWithStringArray:
+	    @[@"alpha", @"*.h", @"beta one", @"dir/file"]];
+	const char *patternInputs[] = {
+		"alpha", "ALPHA", " alpha", "alpha ", "xalpha",
+		"alpha/beta", "/tmp/alpha", "*.h", "x.h", "/tmp/x.h",
+		"beta one", "/tmp/beta one", "dir/file", "/tmp/dir/file",
+		"file", "/tmp/file", NULL
+	};
+	NSString *patternLabels[] = {
+		@"alpha", @"ALPHA", @"leadingSpace", @"trailingSpace", @"xalpha",
+		@"alphaSlashBeta", @"tmpAlpha", @"starDotH", @"xDotH", @"tmpXDotH",
+		@"betaOne", @"tmpBetaOne", @"dirFile", @"tmpDirFile",
+		@"file", @"tmpFile", nil
+	};
+	for (NSUInteger i = 0; patternLabels[i] != nil; i++) {
+		PrintNSStringValue([NSString stringWithFormat:
+		    @"pattern.string.%@", patternLabels[i]],
+		    @([patterns areStringPatternsMatchedByUTF8String:
+		    patternInputs[i]]));
+		PrintNSStringValue([NSString stringWithFormat:
+		    @"pattern.filename.%@", patternLabels[i]],
+		    @([patterns areFilenamePatternsMatchedByUTF8String:
+		    patternInputs[i]]));
+	}
+
+	XCStringList *mutated = [XCStringList stringListWithString:@"a"];
+	[mutated appendUTF8String:"b c"];
+	[mutated appendUTF8String:"d" length:1];
+	DumpStringList(@"append", mutated);
+
+	XCStringList *appendList = [XCStringList stringListWithString:@"a"];
+	[appendList appendStringList:three];
+	DumpStringList(@"append.list", appendList);
+
+	XCStringList *transferList = [XCStringList stringListWithString:@"a"];
+	[transferList appendElementsByTransferringFromStringList:three];
+	DumpStringList(@"transfer.list", transferList);
+
+	XCStringList *prepended = [XCStringList stringListWithString:@"b"];
+	[prepended prependUTF8String:"a"];
+	DumpStringList(@"prepend", prepended);
+
+	XCStringList *removed = [[XCStringList alloc] initWithStringArray:
+	    @[@"a", @"b", @"a"]];
+	[removed removeUTF8String:"a" length:1];
+	DumpStringList(@"remove", removed);
+
+	XCStringList *replaced = [[XCStringList alloc] initWithStringArray:
+	    @[@"abc", @"xabc", @"abc"]];
+	[replaced replaceUTF8String:"abc" length:3
+	    withUTF8String:"Z" length:1];
+	DumpStringList(@"replace", replaced);
+
+	XCStringList *copy = [three copy];
+	PrintNSStringValue(@"equal.same", @([three isEqual:three]));
+	PrintNSStringValue(@"equal.copy", @([three isEqual:copy]));
+	PrintNSStringValue(@"equal.short", @([three isEqual:single]));
+	PrintNSStringValue(@"equal.nonList", @([three isEqual:
+	    [three arrayRepresentation]]));
+	PrintNSStringValue(@"hash.copy", @([three hash] == [copy hash]));
+	PrintNSStringValue(@"hash.short", @([three hash] == [single hash]));
+	return (0);
+}
+
+static void
 PrintObjectGraphPath(NSString *label, XCObjectGraphPath *path)
 {
 	NSUInteger count = [path segmentCount];
@@ -1472,6 +1607,8 @@ main(int argc, char **argv)
 			return (cmdMacroEvaluation());
 		if (argc >= 2 && strcmp(argv[1], "objectgraphpath") == 0)
 			return (cmdObjectGraphPath());
+		if (argc >= 2 && strcmp(argv[1], "stringlist") == 0)
+			return (cmdStringList());
 		if (argc >= 2 && strcmp(argv[1], "tsstringbom") == 0)
 			return (cmdTSStringBOM());
 		if (argc >= 2 && strcmp(argv[1], "xcproducttypes") == 0)

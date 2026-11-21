@@ -1,0 +1,167 @@
+empty.class = <XCStringList>
+empty.count = <0>
+empty.array = <(
+)>
+empty.string = <>
+empty.debug = <[]>
+empty.description = <[]>
+single.class = <XCStringList>
+single.count = <1>
+single.array = <(
+    alpha
+)>
+single.string = <alpha>
+single.debug = <[5L:alpha]>
+single.description = <[5L:alpha]>
+three.class = <XCStringList>
+three.count = <3>
+three.array = <(
+    alpha,
+    "beta one",
+    gamma
+)>
+three.string = <alpha beta\ one gamma>
+three.debug = <[5L:alpha|8L:beta one|5L:gamma]>
+three.description = <[5L:alpha|8L:beta one|5L:gamma]>
+parsed.class = <XCStringList>
+parsed.count = <3>
+parsed.array = <(
+    "alpha,",
+    "beta one,",
+    gamma
+)>
+parsed.string = <alpha, beta\ one, gamma>
+parsed.debug = <[6L:alpha,|9L:beta one,|5L:gamma]>
+parsed.description = <[6L:alpha,|9L:beta one,|5L:gamma]>
+ptr.0 = <alpha>
+ptr.1 = <beta one>
+ptr.2 = <gamma>
+enum.0 = <alpha>
+enum.1 = <beta one>
+enum.2 = <gamma>
+parse.empty.array = <(
+)>
+parse.empty.string = <>
+parse.spaces.array = <(
+)>
+parse.spaces.string = <>
+parse.plain.array = <(
+    alpha,
+    beta
+)>
+parse.plain.string = <alpha beta>
+parse.escaped.array = <(
+    "alpha beta"
+)>
+parse.escaped.string = <alpha\ beta>
+parse.quoted.array = <(
+    "alpha,",
+    "beta one,",
+    gamma
+)>
+parse.quoted.string = <alpha, beta\ one, gamma>
+parse.backslash.array = <(
+    ab
+)>
+parse.backslash.string = <ab>
+parse.backslash2.array = <(
+    "a\\b"
+)>
+parse.backslash2.string = <a\\b>
+pattern.string.alpha = <1>
+pattern.filename.alpha = <0>
+pattern.string.ALPHA = <0>
+pattern.filename.ALPHA = <0>
+pattern.string.leadingSpace = <0>
+pattern.filename.leadingSpace = <0>
+pattern.string.trailingSpace = <0>
+pattern.filename.trailingSpace = <0>
+pattern.string.xalpha = <0>
+pattern.filename.xalpha = <0>
+pattern.string.alphaSlashBeta = <0>
+pattern.filename.alphaSlashBeta = <0>
+pattern.string.tmpAlpha = <0>
+pattern.filename.tmpAlpha = <1>
+pattern.string.starDotH = <1>
+pattern.filename.starDotH = <0>
+pattern.string.xDotH = <1>
+pattern.filename.xDotH = <0>
+pattern.string.tmpXDotH = <1>
+pattern.filename.tmpXDotH = <1>
+pattern.string.betaOne = <1>
+pattern.filename.betaOne = <0>
+pattern.string.tmpBetaOne = <0>
+pattern.filename.tmpBetaOne = <1>
+pattern.string.dirFile = <1>
+pattern.filename.dirFile = <0>
+pattern.string.tmpDirFile = <0>
+pattern.filename.tmpDirFile = <1>
+pattern.string.file = <0>
+pattern.filename.file = <0>
+pattern.string.tmpFile = <0>
+pattern.filename.tmpFile = <0>
+append.class = <XCStringList>
+append.count = <3>
+append.array = <(
+    a,
+    "b c",
+    d
+)>
+append.string = <a b\ c d>
+append.debug = <[1L:a|3L:b c|1L:d]>
+append.description = <[1L:a|3L:b c|1L:d]>
+append.list.class = <XCStringList>
+append.list.count = <4>
+append.list.array = <(
+    a,
+    alpha,
+    "beta one",
+    gamma
+)>
+append.list.string = <a alpha beta\ one gamma>
+append.list.debug = <[1L:a|5L:alpha|8L:beta one|5L:gamma]>
+append.list.description = <[1L:a|5L:alpha|8L:beta one|5L:gamma]>
+transfer.list.class = <XCStringList>
+transfer.list.count = <4>
+transfer.list.array = <(
+    a,
+    alpha,
+    "beta one",
+    gamma
+)>
+transfer.list.string = <a alpha beta\ one gamma>
+transfer.list.debug = <[1L:a|5L:alpha|8L:beta one|5L:gamma]>
+transfer.list.description = <[1L:a|5L:alpha|8L:beta one|5L:gamma]>
+prepend.class = <XCStringList>
+prepend.count = <2>
+prepend.array = <(
+    a,
+    b
+)>
+prepend.string = <a b>
+prepend.debug = <[1L:a|1L:b]>
+prepend.description = <[1L:a|1L:b]>
+remove.class = <XCStringList>
+remove.count = <1>
+remove.array = <(
+    b
+)>
+remove.string = <b>
+remove.debug = <[1L:b]>
+remove.description = <[1L:b]>
+replace.class = <XCStringList>
+replace.count = <3>
+replace.array = <(
+    Z,
+    xabc,
+    Z
+)>
+replace.string = <Z xabc Z>
+replace.debug = <[1L:Z|4L:xabc|1L:Z]>
+replace.description = <[1L:Z|4L:xabc|1L:Z]>
+equal.same = <1>
+equal.copy = <1>
+equal.short = <0>
+equal.nonList = <0>
+hash.copy = <1>
+hash.short = <0>
