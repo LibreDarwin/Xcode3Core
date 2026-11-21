@@ -13,6 +13,8 @@
 	NSData *data = fileData;
 
 	if (data == nil) {
+		if (path == nil)
+			return (NO);
 		/* Apple maps the file with -initWithContentsOfMappedFile:; that
 		 * selector is deprecated, so the mapped-read options are used. */
 		data = [NSData dataWithContentsOfFile:path
@@ -36,6 +38,8 @@
 	NSData *data = fileData;
 
 	if (data == nil) {
+		if (path == nil)
+			return (NO);
 		/* Apple maps the file with -initWithContentsOfMappedFile:; that
 		 * selector is deprecated, so the mapped-read options are used. */
 		data = [NSData dataWithContentsOfFile:path

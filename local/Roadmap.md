@@ -94,6 +94,8 @@ only unless a real dependency appears.
 - [ ] Eliminate any remaining byte differences on Apple-written projects
 - [ ] Strengthen roundtrip harness against larger corpora
 - [ ] Handle all edge cases in OPP parser/writer
+- [x] NSString (TSStringAdditions) BOM sniffing parity (Apple `pbxmodel tsstringbom`
+      oracle fixture; nil path and nil fileData return NO)
 
 ### 6) DevToolsSupport / XcodePlugIns
 - [ ] Reverse-engineer and implement needed APIs

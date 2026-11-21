@@ -22,6 +22,7 @@
 #import "DevToolsCore/BuildSystem/XCPropertyDefinition.h"
 #import "DevToolsCore/BuildSystem/XCPropertyDomainSpecification.h"
 #import "DevToolsCore/ProjectModel/pbxproj.h"
+#import "DevToolsSupport/NSString+TSStringAdditions.h"
 #import "DevToolsSupport/TSPropertyListDictionary.h"
 #import "PBXPListCoding.h"
 
@@ -36,6 +37,7 @@ usage(void)
 	    "       pbxmodel propertydomains\n"
 	    "       pbxmodel xcmacroexpansion\n"
 	    "       pbxmodel macroevaluation\n"
+	    "       pbxmodel tsstringbom\n"
 	    "       pbxmodel xcproducttypes\n"
 	    "       pbxmodel runtimevalues\n"
 	    "       pbxmodel buildconfigurations\n"
@@ -1313,6 +1315,90 @@ cmdTargetDependencies(void)
 	return (0);
 }
 
+static void
+PrintBOMState(NSString *label, NSData *data, NSString *path)
+{
+	PrintNSStringValue([label stringByAppendingString:@".unicode"],
+	    @([NSString isFileUnicode:path fileData:data]));
+	PrintNSStringValue([label stringByAppendingString:@".utf8"],
+	    @([NSString isFileUTF8WithBOM:path fileData:data]));
+}
+
+static NSString *
+WriteBOMFixtureFile(NSString *name, NSData *data)
+{
+	NSString *path = [[NSTemporaryDirectory() stringByAppendingPathComponent:
+	    @"xcode3core-bom-oracle"]
+	    stringByAppendingPathComponent:name];
+
+	[[NSFileManager defaultManager] createDirectoryAtPath:
+	    [path stringByDeletingLastPathComponent]
+	    withIntermediateDirectories:YES attributes:nil error:NULL];
+	[data writeToFile:path atomically:YES];
+	return (path);
+}
+
+static int
+cmdTSStringBOM(void)
+{
+	NSData *empty = [NSData data];
+	NSData *fe = [NSData dataWithBytes:"\xFE" length:1];
+	NSData *ff = [NSData dataWithBytes:"\xFF" length:1];
+	NSData *ef = [NSData dataWithBytes:"\xEF" length:1];
+	NSData *feff = [NSData dataWithBytes:"\xFE\xFF" length:2];
+	NSData *fffe = [NSData dataWithBytes:"\xFF\xFE" length:2];
+	NSData *fefe = [NSData dataWithBytes:"\xFE\xFE" length:2];
+	NSData *ffff = [NSData dataWithBytes:"\xFF\xFF" length:2];
+	NSData *efbb = [NSData dataWithBytes:"\xEF\xBB" length:2];
+	NSData *efbbbf = [NSData dataWithBytes:"\xEF\xBB\xBF" length:3];
+	NSData *efbbbe = [NSData dataWithBytes:"\xEF\xBB\xBE" length:3];
+	NSData *feff00 = [NSData dataWithBytes:"\xFE\xFF\x00" length:3];
+	NSData *fffe00 = [NSData dataWithBytes:"\xFF\xFE\x00" length:3];
+	NSData *efbbbf41 = [NSData dataWithBytes:"\xEF\xBB\xBF\x41" length:4];
+	NSData *plain = [@"ABC" dataUsingEncoding:NSUTF8StringEncoding];
+	NSData *utf32be = [NSData dataWithBytes:"\x00\x00\xFE\xFF" length:4];
+	NSData *utf32le = [NSData dataWithBytes:"\xFF\xFE\x00\x00" length:4];
+	NSString *dir = NSTemporaryDirectory();
+	NSString *utf16Path = WriteBOMFixtureFile(@"utf16", feff);
+	NSString *utf8Path = WriteBOMFixtureFile(@"utf8", efbbbf);
+	NSString *plainPath = WriteBOMFixtureFile(@"plain", plain);
+	NSString *emptyPath = WriteBOMFixtureFile(@"empty", empty);
+	NSString *missing = [dir stringByAppendingPathComponent:
+	    @"xcode3core-bom-oracle-missing"];
+
+	PrintBOMState(@"data.empty", empty, nil);
+	PrintBOMState(@"data.fe", fe, nil);
+	PrintBOMState(@"data.ff", ff, nil);
+	PrintBOMState(@"data.ef", ef, nil);
+	PrintBOMState(@"data.feff", feff, nil);
+	PrintBOMState(@"data.fffe", fffe, nil);
+	PrintBOMState(@"data.fefe", fefe, nil);
+	PrintBOMState(@"data.ffff", ffff, nil);
+	PrintBOMState(@"data.efbb", efbb, nil);
+	PrintBOMState(@"data.efbbbf", efbbbf, nil);
+	PrintBOMState(@"data.efbbbe", efbbbe, nil);
+	PrintBOMState(@"data.feff00", feff00, nil);
+	PrintBOMState(@"data.fffe00", fffe00, nil);
+	PrintBOMState(@"data.efbbbf41", efbbbf41, nil);
+	PrintBOMState(@"data.plain", plain, nil);
+	PrintBOMState(@"data.utf32be", utf32be, nil);
+	PrintBOMState(@"data.utf32le", utf32le, nil);
+
+	PrintBOMState(@"path.utf16", nil, utf16Path);
+	PrintBOMState(@"path.utf8", nil, utf8Path);
+	PrintBOMState(@"path.plain", nil, plainPath);
+	PrintBOMState(@"path.empty", nil, emptyPath);
+	PrintBOMState(@"path.missing", nil, missing);
+	PrintBOMState(@"path.directory", nil, dir);
+	PrintBOMState(@"path.nil", nil, nil);
+	PrintBOMState(@"data.overrides.path", efbbbf, utf16Path);
+
+	[[NSFileManager defaultManager] removeItemAtPath:
+	    [dir stringByAppendingPathComponent:@"xcode3core-bom-oracle"]
+	    error:NULL];
+	return (0);
+}
+
 int
 main(int argc, char **argv)
 {
@@ -1327,6 +1413,8 @@ main(int argc, char **argv)
 			return (cmdXCMacroExpansion());
 		if (argc >= 2 && strcmp(argv[1], "macroevaluation") == 0)
 			return (cmdMacroEvaluation());
+		if (argc >= 2 && strcmp(argv[1], "tsstringbom") == 0)
+			return (cmdTSStringBOM());
 		if (argc >= 2 && strcmp(argv[1], "xcproducttypes") == 0)
 			return (cmdXCProductTypes());
 		if (argc >= 2 && strcmp(argv[1], "runtimevalues") == 0)
