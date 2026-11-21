@@ -17,6 +17,7 @@
 #import "DevToolsCore/PBXExtendedWrapperPart.h"
 #import "DevToolsCore/PBXFileSystemSynchronizedGroupRelativeReferenceID.h"
 #import "DevToolsCore/PBXPackageTypeSpecification.h"
+#import "DevToolsCore/XCCompatibilityFeature.h"
 #import "DevToolsCore/PBXPlistArchiverAdditions.h"
 #import "DevToolsCore/XCMacroExpansionScope.h"
 #import "DevToolsCore/XCObjectGraphPath.h"
@@ -41,6 +42,7 @@ usage(void)
 	    "       pbxmodel xcmacroexpansion\n"
 	    "       pbxmodel macroevaluation\n"
 	    "       pbxmodel objectgraphpath\n"
+	    "       pbxmodel compatfeatures\n"
 	    "       pbxmodel plistwrappers\n"
 	    "       pbxmodel stringlist\n"
 	    "       pbxmodel tsstringbom\n"
@@ -1321,6 +1323,119 @@ cmdTargetDependencies(void)
 	return (0);
 }
 
+static NSString *
+NormalizedCompatibilityDescription(id value)
+{
+	NSString *description = [value description];
+	NSRange range = [description rangeOfString:@"0x[0-9a-f]+"
+	    options:NSRegularExpressionSearch];
+
+	if (range.location == NSNotFound)
+		return (description);
+	return ([description stringByReplacingCharactersInRange:range
+	    withString:@"0xADDR"]);
+}
+
+static void
+PrintCompatibilityValue(NSString *label, id value)
+{
+	printf("%s = <%s>\n", [label UTF8String],
+	    value != nil ? [NormalizedCompatibilityDescription(value) UTF8String]
+	    : "nil");
+}
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+static int
+cmdCompatibilityFeatures(void)
+{
+	NSArray *names = @[@"XCPerArchitectureSettingsFeature",
+	    @"XCPerSDKSettingsFeature", @"XCDataModelVersionGroupsFeature",
+	    @"XCParallelTargetBuildsFeature", @"XCCompositeSDKsFeature",
+	    @"XCWeakLinkFrameworkAttributeFeature",
+	    @"XCGCCUseStandardIncludeSearchingFeature",
+	    @"XCGCCRecognizeBuiltinFunctionsFeature",
+	    @"XCGCCEnableLinkingWithSharedLibrariesFeature",
+	    @"XCGCCGenerateIndirectFunctionCallsFeature",
+	    @"XCGCCGenerateRegisterSubroutineFunctionCallsFeature",
+	    @"XCGCCKernelDevelopmentModeFeature",
+	    @"XCGCCGenerateFloatingPointLibraryCallsFeature",
+	    @"XCCodeSigningIdentityFeature",
+	    @"XCCodeSigningEntitlementsFeature",
+	    @"XCCodeSigningResourceRulesPathFeature",
+	    @"XCCodeSigningOtherFlagsFeature", @"XCMultipleProjectRootsFeature",
+	    @"XCProvisioningProfileFeature", @"XCBuildRuleCompilerFlagsFeature",
+	    @"XCLocalSwiftPackageReferenceFeature",
+	    @"XCRemoteSwiftPackageReferenceFeature",
+	    @"XCRegistrySwiftPackageReferenceFeature",
+	    @"XCSwiftPackageTraitsFeature",
+	    @"XCSwiftPackageProductDependencyFeature",
+	    @"XCPackageProductDependenciesInBuildFilesFeature",
+	    @"XCScriptPhaseInputFileListFeature",
+	    @"XCScriptPhaseOutputFileListFeature",
+	    @"XCScriptPhaseDependencyFileFeature",
+	    @"XCScriptPhaseAlwaysOutOfDateFeature",
+	    @"XCExtendedBuildFilePlatformFilterSupportFeature",
+	    @"XCInternalXROSPlatformFilterSupportFeature",
+	    @"XCBuildRuleInputDependenciesFeature",
+	    @"XCBuildRuleArchitectureNeutralFlagFeature",
+	    @"XCBuildRuleFileListFeature", @"XCXCFrameworkSupportFeature",
+	    @"XCBuildFilePlatformFilterSupportFeature",
+	    @"XCBuildFileProductReferenceSupportFeature",
+	    @"XCProjectArchivingDelegateFeature",
+	    @"XCXCFrameworkFileReferenceSignatureFeature",
+	    @"XCLocalizationStringCatalogVariantGroupFeature",
+	    @"XCMinimizedProjectReferenceProxiesFeature",
+	    @"XCFileSystemSynchronizedGroupFeature",
+	    @"XCFileSystemSynchronizedGroupWithBuildPhaseExceptions",
+	    @"XCConfigFilesAnchoredReferenceFeature",
+	    @"XCFileSystemSynchronizedGroupVariantGroupExceptions",
+	    @"XCFileSystemSynchronizedGroupNestedVariantGroupExceptions",
+	    @"XCFileSystemSynchronizedPlatformFilterInExceptionalBuildPhase",
+	    @"XCFileSystemSynchronizedExtraAttributesInDefaultBuildPhase",
+	    @"XCFileSystemSynchronizedGroupWithReferencesWithAssetTags"];
+
+	for (NSString *selectorName in names) {
+		SEL selector = NSSelectorFromString(selectorName);
+		XCCompatibilityFeature *feature =
+		    [XCCompatibilityFeature performSelector:selector];
+		XCCompatibilityFeature *again =
+		    [XCCompatibilityFeature performSelector:selector];
+		XCCompatibilityFeature *fresh = [[XCCompatibilityFeature alloc]
+		    initWithName:[feature name]];
+		id copy = [feature copy];
+
+		printf("== %s ==\n", [selectorName UTF8String]);
+		PrintCompatibilityValue(@"feature.class",
+		    NSStringFromClass([feature class]));
+		PrintCompatibilityValue(@"feature.name", [feature name]);
+		PrintCompatibilityValue(@"feature.description", [feature description]);
+		printf("feature.hash = <%lu>\n", (unsigned long)[feature hash]);
+		printf("feature.same_ptr = <%d>\n", feature == again);
+		printf("feature.equal.again = <%d>\n", [feature isEqual:again]);
+		printf("feature.equal.fresh = <%d>\n", [feature isEqual:fresh]);
+		printf("feature.equal.string = <%d>\n",
+		    [feature isEqual:[feature name]]);
+		printf("feature.copy.class = <%s>\n",
+		    [NSStringFromClass([copy class]) UTF8String]);
+		printf("feature.copy.equal = <%d>\n", [feature isEqual:copy]);
+	}
+
+	XCCompatibilityFeature *named = [[XCCompatibilityFeature alloc]
+	    initWithName:@"Custom Feature"];
+	XCCompatibilityFeatureUse *use = [[XCCompatibilityFeatureUse alloc]
+	    initWithFeature:named path:@"/tmp/project.pbxproj"];
+
+	printf("== feature.use ==\n");
+	PrintCompatibilityValue(@"use.class", NSStringFromClass([use class]));
+	PrintCompatibilityValue(@"use.description", [use description]);
+	PrintCompatibilityValue(@"use.feature", [use feature]);
+	PrintCompatibilityValue(@"use.feature.name", [[use feature] name]);
+	PrintCompatibilityValue(@"use.path", [use path]);
+	return (0);
+}
+#pragma clang diagnostic pop
+
 static void
 PrintWrapperValue(const char *label, id value)
 {
@@ -1748,6 +1863,8 @@ main(int argc, char **argv)
 			return (cmdMacroEvaluation());
 		if (argc >= 2 && strcmp(argv[1], "objectgraphpath") == 0)
 			return (cmdObjectGraphPath());
+		if (argc >= 2 && strcmp(argv[1], "compatfeatures") == 0)
+			return (cmdCompatibilityFeatures());
 		if (argc >= 2 && strcmp(argv[1], "plistwrappers") == 0)
 			return (cmdPlistWrappers());
 		if (argc >= 2 && strcmp(argv[1], "stringlist") == 0)

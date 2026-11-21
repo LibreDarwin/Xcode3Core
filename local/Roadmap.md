@@ -103,6 +103,9 @@ only unless a real dependency appears.
 - [x] PBXPlistArchiver wrapper value objects (Apple `pbxmodel plistwrappers`
       oracle fixture; always-quoted strings, commented strings, single-line arrays,
       copying/equality/hash and private plist append behavior)
+- [x] XCCompatibilityFeature/Use factory objects (Apple `pbxmodel compatfeatures`
+      oracle fixture; 49 feature factories, name/hash/equality/copy semantics,
+      singleton caching except package traits, and feature-use descriptions)
 
 ### 6) DevToolsSupport / XcodePlugIns
 - [ ] Reverse-engineer and implement needed APIs
