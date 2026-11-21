@@ -1,0 +1,68 @@
+empty.class = <XCObjectGraphPath>
+empty.count = <0>
+empty.string = <nil>
+empty.gids = <(
+)>
+empty.names = <(
+)>
+one.class = <XCObjectGraphPath>
+one.count = <1>
+one.string = <Alpha>
+one.gids = <(
+    G1
+)>
+one.names = <(
+    Alpha
+)>
+one.name.0 = <Alpha>
+three.class = <XCObjectGraphPath>
+three.count = <3>
+three.string = <Gamma of Beta of Alpha>
+three.gids = <(
+    G1,
+    G2,
+    G3
+)>
+three.names = <(
+    Alpha,
+    Beta,
+    Gamma
+)>
+three.name.0 = <Alpha>
+three.name.1 = <Beta>
+three.name.2 = <Gamma>
+empty.add.class = <XCObjectGraphPath>
+empty.add.count = <1>
+empty.add.string = <Nine>
+empty.add.gids = <(
+    G9
+)>
+empty.add.names = <(
+    Nine
+)>
+empty.add.name.0 = <Nine>
+three.add.class = <XCObjectGraphPath>
+three.add.count = <4>
+three.add.string = <Delta of Gamma of Beta of Alpha>
+three.add.gids = <(
+    G1,
+    G2,
+    G3,
+    G4
+)>
+three.add.names = <(
+    Alpha,
+    Beta,
+    Gamma,
+    Delta
+)>
+three.add.name.0 = <Alpha>
+three.add.name.1 = <Beta>
+three.add.name.2 = <Gamma>
+three.add.name.3 = <Delta>
+three.copy.equal = <1>
+three.equal.equal = <0>
+three.equal.gids = <0>
+three.equal.names = <0>
+one.three.equal = <0>
+three.equal.hash = <0>

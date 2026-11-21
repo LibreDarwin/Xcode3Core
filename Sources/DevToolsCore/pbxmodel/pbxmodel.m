@@ -18,6 +18,7 @@
 #import "DevToolsCore/PBXFileSystemSynchronizedGroupRelativeReferenceID.h"
 #import "DevToolsCore/PBXPackageTypeSpecification.h"
 #import "DevToolsCore/XCMacroExpansionScope.h"
+#import "DevToolsCore/XCObjectGraphPath.h"
 #import "DevToolsCore/XCProductTypeSpecification.h"
 #import "DevToolsCore/BuildSystem/XCPropertyDefinition.h"
 #import "DevToolsCore/BuildSystem/XCPropertyDomainSpecification.h"
@@ -37,6 +38,7 @@ usage(void)
 	    "       pbxmodel propertydomains\n"
 	    "       pbxmodel xcmacroexpansion\n"
 	    "       pbxmodel macroevaluation\n"
+	    "       pbxmodel objectgraphpath\n"
 	    "       pbxmodel tsstringbom\n"
 	    "       pbxmodel xcproducttypes\n"
 	    "       pbxmodel runtimevalues\n"
@@ -1316,6 +1318,61 @@ cmdTargetDependencies(void)
 }
 
 static void
+PrintObjectGraphPath(NSString *label, XCObjectGraphPath *path)
+{
+	NSUInteger count = [path segmentCount];
+
+	PrintNSStringValue([label stringByAppendingString:@".class"],
+	    NSStringFromClass([path class]));
+	PrintNSStringValue([label stringByAppendingString:@".count"], @(count));
+	PrintNSStringValue([label stringByAppendingString:@".string"],
+	    [path stringRepresentation]);
+	PrintNSStringValue([label stringByAppendingString:@".gids"],
+	    [path pathSegmentGIDs]);
+	PrintNSStringValue([label stringByAppendingString:@".names"],
+	    [path pathSegmentNames]);
+	for (NSUInteger i = 0; i < count; i++) {
+		PrintNSStringValue([NSString stringWithFormat:@"%@.name.%lu",
+		    label, (unsigned long)i], [path segmentNameAtIndex:i]);
+	}
+}
+
+static int
+cmdObjectGraphPath(void)
+{
+	XCObjectGraphPath *empty = [[XCObjectGraphPath alloc] init];
+	XCObjectGraphPath *one = [[XCObjectGraphPath alloc]
+	    initWithSegmentGIDs:@[@"G1"] names:@[@"Alpha"]];
+	XCObjectGraphPath *three = [[XCObjectGraphPath alloc]
+	    initWithSegmentGIDs:@[@"G1", @"G2", @"G3"]
+	    names:@[@"Alpha", @"Beta", @"Gamma"]];
+	XCObjectGraphPath *equal = [[XCObjectGraphPath alloc]
+	    initWithSegmentGIDs:@[@"G1", @"G2", @"G3"]
+	    names:@[@"Alpha", @"Beta", @"Gamma"]];
+	XCObjectGraphPath *differentGIDs = [[XCObjectGraphPath alloc]
+	    initWithSegmentGIDs:@[@"X1", @"X2", @"X3"]
+	    names:@[@"Alpha", @"Beta", @"Gamma"]];
+	XCObjectGraphPath *differentNames = [[XCObjectGraphPath alloc]
+	    initWithSegmentGIDs:@[@"G1", @"G2", @"G3"]
+	    names:@[@"A", @"B", @"C"]];
+
+	PrintObjectGraphPath(@"empty", empty);
+	PrintObjectGraphPath(@"one", one);
+	PrintObjectGraphPath(@"three", three);
+	PrintObjectGraphPath(@"empty.add", [empty
+	    pathByAddingSegmentWithGID:@"G9" name:@"Nine"]);
+	PrintObjectGraphPath(@"three.add", [three
+	    pathByAddingSegmentWithGID:@"G4" name:@"Delta"]);
+	PrintNSStringValue(@"three.copy.equal", @([[three copy] isEqual:three]));
+	PrintNSStringValue(@"three.equal.equal", @([three isEqual:equal]));
+	PrintNSStringValue(@"three.equal.gids", @([three isEqual:differentGIDs]));
+	PrintNSStringValue(@"three.equal.names", @([three isEqual:differentNames]));
+	PrintNSStringValue(@"one.three.equal", @([one isEqual:three]));
+	PrintNSStringValue(@"three.equal.hash", @([three hash] == [equal hash]));
+	return (0);
+}
+
+static void
 PrintBOMState(NSString *label, NSData *data, NSString *path)
 {
 	PrintNSStringValue([label stringByAppendingString:@".unicode"],
@@ -1413,6 +1470,8 @@ main(int argc, char **argv)
 			return (cmdXCMacroExpansion());
 		if (argc >= 2 && strcmp(argv[1], "macroevaluation") == 0)
 			return (cmdMacroEvaluation());
+		if (argc >= 2 && strcmp(argv[1], "objectgraphpath") == 0)
+			return (cmdObjectGraphPath());
 		if (argc >= 2 && strcmp(argv[1], "tsstringbom") == 0)
 			return (cmdTSStringBOM());
 		if (argc >= 2 && strcmp(argv[1], "xcproducttypes") == 0)

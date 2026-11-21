@@ -96,6 +96,8 @@ only unless a real dependency appears.
 - [ ] Handle all edge cases in OPP parser/writer
 - [x] NSString (TSStringAdditions) BOM sniffing parity (Apple `pbxmodel tsstringbom`
       oracle fixture; nil path and nil fileData return NO)
+- [x] XCObjectGraphPath value semantics (Apple `pbxmodel objectgraphpath`
+      oracle fixture; reversed `stringRepresentation`, identity equality)
 
 ### 6) DevToolsSupport / XcodePlugIns
 - [ ] Reverse-engineer and implement needed APIs

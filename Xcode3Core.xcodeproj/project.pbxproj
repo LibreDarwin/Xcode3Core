@@ -39,6 +39,7 @@
 		1A2B3C4D000000000000000E1 /* XCPropertyDomainSpecification.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000E4 /* XCPropertyDomainSpecification.m */; };
 		1A2B3C4D000000000000000E6 /* DVTMacroDefinitionTable+XCMacroExpansionExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000E7 /* DVTMacroDefinitionTable+XCMacroExpansionExtensions.m */; };
 		1A2B3C4D000000000000000EB /* XCMacroExpansionScope.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000E9 /* XCMacroExpansionScope.m */; };
+		1A2B3C4D000000000000000F6 /* XCObjectGraphPath.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000F7 /* XCObjectGraphPath.m */; };
 		1A2B3C4D000000000000000EC /* PBXPackageTypeSpecification.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000ED /* PBXPackageTypeSpecification.m */; };
 		1A2B3C4D000000000000000EF /* XCProductTypeSpecification.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000F0 /* XCProductTypeSpecification.m */; };
 		1A2B3C4D000000000000000F2 /* PBXRuntimeValues.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000F3 /* PBXRuntimeValues.m */; };
@@ -115,6 +116,8 @@
 		1A2B3C4D000000000000000E8 /* DVTMacroDefinitionTable+XCMacroExpansionExtensions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "DVTMacroDefinitionTable+XCMacroExpansionExtensions.h"; sourceTree = "<group>"; };
 		1A2B3C4D000000000000000E9 /* XCMacroExpansionScope.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XCMacroExpansionScope.m; sourceTree = "<group>"; };
 		1A2B3C4D000000000000000EA /* XCMacroExpansionScope.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XCMacroExpansionScope.h; sourceTree = "<group>"; };
+		1A2B3C4D000000000000000F7 /* XCObjectGraphPath.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XCObjectGraphPath.m; sourceTree = "<group>"; };
+		1A2B3C4D000000000000000F8 /* XCObjectGraphPath.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XCObjectGraphPath.h; sourceTree = "<group>"; };
 		1A2B3C4D000000000000000ED /* PBXPackageTypeSpecification.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PBXPackageTypeSpecification.m; sourceTree = "<group>"; };
 		1A2B3C4D000000000000000EE /* PBXPackageTypeSpecification.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PBXPackageTypeSpecification.h; sourceTree = "<group>"; };
 		1A2B3C4D000000000000000F0 /* XCProductTypeSpecification.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XCProductTypeSpecification.m; sourceTree = "<group>"; };
@@ -165,6 +168,7 @@
 				1A2B3C4D0000000000000085 /* pbxmodel */,
 				1A2B3C4D000000000000004B /* pbxtool */,
 				1A2B3C4D000000000000000E9 /* XCMacroExpansionScope.m */,
+				1A2B3C4D000000000000000F7 /* XCObjectGraphPath.m */,
 				1A2B3C4D000000000000000AD /* BuildSystem */,
 			);
 			path = DevToolsCore;
@@ -253,6 +257,7 @@
 				1A2B3C4D0000000000000009D /* PBXPlatformFilter.h */,
 				1A2B3C4D0000000000000009E /* PBXPlatformFilterableItem.h */,
 				1A2B3C4D000000000000000EA /* XCMacroExpansionScope.h */,
+				1A2B3C4D000000000000000F8 /* XCObjectGraphPath.h */,
 				1A2B3C4D000000000000000F4 /* PBXExtendedWrapperPart.h */,
 				1A2B3C4D000000000000000F5 /* PBXFileSystemSynchronizedGroupRelativeReferenceID.h */,
 				1A2B3C4D000000000000000AF /* BuildSystem */,
@@ -464,6 +469,7 @@
 				1A2B3C4D000000000000000E1 /* XCPropertyDomainSpecification.m in Sources */,
 				1A2B3C4D000000000000000E6 /* DVTMacroDefinitionTable+XCMacroExpansionExtensions.m in Sources */,
 				1A2B3C4D000000000000000EB /* XCMacroExpansionScope.m in Sources */,
+				1A2B3C4D000000000000000F6 /* XCObjectGraphPath.m in Sources */,
 				1A2B3C4D000000000000000EC /* PBXPackageTypeSpecification.m in Sources */,
 				1A2B3C4D000000000000000EF /* XCProductTypeSpecification.m in Sources */,
 				1A2B3C4D000000000000000F2 /* PBXRuntimeValues.m in Sources */,
