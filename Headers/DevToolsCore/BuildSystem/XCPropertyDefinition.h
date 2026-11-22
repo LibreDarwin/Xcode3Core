@@ -18,6 +18,16 @@
 
 @class XCPropertyDefinition_SupportedVersionRange, XCPropertyDomainSpecification;
 
+@interface XCPropertyValueDefinition : NSObject
+- (instancetype)initFromPListDictionary:(NSDictionary *)dictionary
+			     forPropertyName:(NSString *)name;
+@property (readonly) NSDictionary *properties;
+@property (readonly) id value;
+@property (readonly) id localizedValue;
+@property (readonly) NSString *localizedDescription;
+@property (readonly) id commandArgumentGenerationInfo;
+@end
+
 @protocol XCPropertyTypes
 + (NSString *)identifier;
 + (NSString *)localizedName;
@@ -137,6 +147,7 @@
 @interface XCPathListPropertyDefinition : XCPropertyDefinition <XCPropertyTypes>
 @end
 @interface XCEnumerationPropertyDefinition : XCPropertyDefinition <XCPropertyTypes>
+- (NSArray *)_filteredValueDefinitionsForTarget:(id)target;
 @end
 @interface XCSDKRootPropertyDefinition : XCPropertyDefinition <XCPropertyTypes>
 @end

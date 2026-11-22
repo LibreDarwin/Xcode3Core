@@ -109,6 +109,9 @@ only unless a real dependency appears.
 - [x] XCPropertyDefinition supported version ranges (Apple
       `pbxmodel supportedversionranges` oracle fixture; inclusive bounded and
       open-ended ranges, pointer identity, xcspec string/pair parsing)
+- [x] XCPropertyValueDefinition and XCEnumerationPropertyDefinition value maps
+      (Apple `pbxmodel propertyvalues` oracle fixture; dictionary Values mapping,
+      DisplayName/Description/CommandLineArgs value metadata)
 
 ### 6) DevToolsSupport / XcodePlugIns
 - [ ] Reverse-engineer and implement needed APIs

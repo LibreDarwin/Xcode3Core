@@ -1,0 +1,46 @@
+== strings ==
+definition = XCEnumerationPropertyDefinition
+allowed = one,two
+localized = one,two
+valueDefs = 2
+value[0] = one|one||
+value[1] = two|two||
+== dictionaries-value-only ==
+definition = XCEnumerationPropertyDefinition
+allowed = one,two
+localized = one,two
+valueDefs = 2
+value[0] = one|one||
+value[1] = two|two||
+== dictionaries-rich ==
+definition = XCEnumerationPropertyDefinition
+allowed = one,two
+localized = First,Second
+valueDefs = 2
+value[0] = one|First|First value|-first
+value[1] = two|Second|Second value|[-second|$(VALUE)]
+== mixed ==
+definition = XCEnumerationPropertyDefinition
+allowed = one,two
+localized = one,Second
+valueDefs = 2
+value[0] = one|one||
+value[1] = two|Second||
+== missing-value ==
+definition = XCEnumerationPropertyDefinition
+allowed = 
+localized = Missing
+valueDefs = 1
+value[0] = |Missing||
+== empty-dictionary ==
+definition = XCEnumerationPropertyDefinition
+allowed = 
+localized = 
+valueDefs = 1
+value[0] = |||
+== alias-keys ==
+definition = XCEnumerationPropertyDefinition
+allowed = one
+localized = one
+valueDefs = 1
+value[0] = one|one||

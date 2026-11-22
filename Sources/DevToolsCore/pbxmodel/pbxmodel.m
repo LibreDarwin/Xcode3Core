@@ -46,6 +46,7 @@ usage(void)
 	    "       pbxmodel objectgraphpath\n"
 	    "       pbxmodel compatfeatures\n"
 	    "       pbxmodel supportedversionranges\n"
+	    "       pbxmodel propertyvalues\n"
 	    "       pbxmodel plistwrappers\n"
 	    "       pbxmodel stringlist\n"
 	    "       pbxmodel tsstringbom\n"
@@ -1570,6 +1571,121 @@ cmdSupportedVersionRanges(void)
 	return (0);
 }
 
+static NSString *
+PropertyValueFlat(id object)
+{
+	if (object == nil)
+		return (@"");
+	if ([object isKindOfClass:[NSArray class]]) {
+		NSMutableArray *parts = [NSMutableArray array];
+
+		for (id item in object)
+			[parts addObject:PropertyValueFlat(item)];
+		return ([NSString stringWithFormat:@"[%@]",
+		    [parts componentsJoinedByString:@"|"]]);
+	}
+	return ([object description]);
+}
+
+static NSString *
+PropertyValuesJoined(NSArray *values)
+{
+	NSMutableArray *parts = [NSMutableArray array];
+
+	for (id value in values)
+		[parts addObject:PropertyValueFlat(value)];
+	return ([parts componentsJoinedByString:@","]);
+}
+
+static void
+ProbePropertyValues(NSString *name, NSDictionary *dictionary)
+{
+	TSPropertyListDictionary *plist = [TSPropertyListDictionary
+	    propertyListDictionaryWithDictionary:dictionary];
+	XCPropertyDefinition *definition = [XCPropertyDefinition
+	    propertyDefinitionFromPListDictionary:plist];
+	NSArray *valueDefinitions = [(XCEnumerationPropertyDefinition *)definition
+	    _filteredValueDefinitionsForTarget:nil];
+
+	printf("== %s ==\n", [name UTF8String]);
+	printf("definition = %s\n",
+	    [NSStringFromClass([definition class]) UTF8String]);
+	printf("allowed = %s\n",
+	    [PropertyValuesJoined([definition allowedValues]) UTF8String]);
+	printf("localized = %s\n",
+	    [PropertyValuesJoined([definition localizedAllowedValues]) UTF8String]);
+	printf("valueDefs = %lu\n", (unsigned long)[valueDefinitions count]);
+	for (NSUInteger i = 0; i < [valueDefinitions count]; i++) {
+		XCPropertyValueDefinition *valueDefinition =
+		    [valueDefinitions objectAtIndex:i];
+
+		printf("value[%lu] = %s|%s|%s|%s\n", (unsigned long)i,
+		    [PropertyValueFlat([valueDefinition value]) UTF8String],
+		    [PropertyValueFlat([valueDefinition localizedValue]) UTF8String],
+		    [PropertyValueFlat([valueDefinition localizedDescription])
+			UTF8String],
+		    [PropertyValueFlat([valueDefinition
+			commandArgumentGenerationInfo]) UTF8String]);
+	}
+}
+
+static int
+cmdPropertyValues(void)
+{
+	ProbePropertyValues(@"strings", @{
+		@"Name": @"TEST_SETTING", @"Type": @"Enumeration",
+		@"Values": @[@"one", @"two"],
+	});
+	ProbePropertyValues(@"dictionaries-value-only", @{
+		@"Name": @"TEST_SETTING", @"Type": @"Enumeration",
+		@"Values": @[@{@"Value": @"one"}, @{@"Value": @"two"}],
+	});
+	ProbePropertyValues(@"dictionaries-rich", @{
+		@"Name": @"TEST_SETTING", @"Type": @"Enumeration",
+		@"Values": @[
+			@{
+				@"Value": @"one",
+				@"DisplayName": @"First",
+				@"Description": @"First value",
+				@"CommandLineArgs": @"-first",
+				@"CommandLineFlag": @"--first",
+				@"CommandLinePrefixFlag": @"-pf",
+			},
+			@{
+				@"Value": @"two",
+				@"DisplayName": @"Second",
+				@"Description": @"Second value",
+				@"CommandLineArgs": @[@"-second", @"$(VALUE)"],
+				@"CommandLineFlag": @"--second",
+				@"CommandLinePrefixFlag": @"-ps",
+			},
+		],
+	});
+	ProbePropertyValues(@"mixed", @{
+		@"Name": @"TEST_SETTING", @"Type": @"Enumeration",
+		@"Values": @[@"one",
+		    @{@"Value": @"two", @"DisplayName": @"Second"}],
+	});
+	ProbePropertyValues(@"missing-value", @{
+		@"Name": @"TEST_SETTING", @"Type": @"Enumeration",
+		@"Values": @[@{@"DisplayName": @"Missing"}],
+	});
+	ProbePropertyValues(@"empty-dictionary", @{
+		@"Name": @"TEST_SETTING", @"Type": @"Enumeration",
+		@"Values": @[@{}],
+	});
+	ProbePropertyValues(@"alias-keys", @{
+		@"Name": @"TEST_SETTING", @"Type": @"Enumeration",
+		@"Values": @[@{
+			@"Value": @"one",
+			@"Name": @"AliasName",
+			@"LocalizedValue": @"AliasLocalized",
+			@"CommandArgumentGenerationInfo": @"AliasCAGI",
+		}],
+	});
+	return (0);
+}
+
 static void
 PrintWrapperValue(const char *label, id value)
 {
@@ -2001,6 +2117,8 @@ main(int argc, char **argv)
 			return (cmdCompatibilityFeatures());
 		if (argc >= 2 && strcmp(argv[1], "supportedversionranges") == 0)
 			return (cmdSupportedVersionRanges());
+		if (argc >= 2 && strcmp(argv[1], "propertyvalues") == 0)
+			return (cmdPropertyValues());
 		if (argc >= 2 && strcmp(argv[1], "plistwrappers") == 0)
 			return (cmdPlistWrappers());
 		if (argc >= 2 && strcmp(argv[1], "stringlist") == 0)
