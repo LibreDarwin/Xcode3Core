@@ -1,0 +1,202 @@
+== def none ==
+condition = <nil>
+expr = (null)|<nil>
+flavors = -
+enabled = YES
+== def condition-simple ==
+condition = $(FOO) == YES
+expr = XCPropertyMacroEqualityExpression|('$(FOO)' EQ 'YES')
+flavors = -
+enabled = NO
+== def condition-empty ==
+condition = 
+expr = XCPropertyMacroStringConstantExpression|''
+flavors = -
+enabled = NO
+== def condition-space ==
+condition =   $(FOO)  
+expr = XCPropertyMacroStringConstantExpression|'$(FOO)'
+flavors = -
+enabled = NO
+== def condition-complex ==
+condition = $(FOO) == YES && !$(BAR)
+expr = XCPropertyMacroLogicalANDExpression|(('$(FOO)' EQ 'YES') AND (NOT '$(BAR)'))
+flavors = -
+enabled = NO
+== def condition-flavors ==
+condition = <nil>
+expr = (null)|<nil>
+flavors = arch,sdk
+enabled = YES
+== def option-condition-flavors ==
+condition = <nil>
+expr = (null)|<nil>
+flavors = -
+enabled = YES
+== def condition-and-flavors ==
+condition = $(FOO)
+expr = XCPropertyMacroStringConstantExpression|'$(FOO)'
+flavors = arch
+enabled = NO
+== def flavors-unknown ==
+condition = <nil>
+expr = (null)|<nil>
+flavors = sdk
+enabled = YES
+== def flavors-empty ==
+condition = <nil>
+expr = (null)|<nil>
+flavors = -
+enabled = YES
+== expr <YES> ==
+class = XCPropertyMacroStringConstantExpression
+desc = 'YES'
+error = <nil>
+== expr <NO> ==
+class = XCPropertyMacroStringConstantExpression
+desc = 'NO'
+error = <nil>
+== expr <"YES"> ==
+class = XCPropertyMacroStringConstantExpression
+desc = 'YES'
+error = <nil>
+== expr <'YES'> ==
+class = XCPropertyMacroStringConstantExpression
+desc = 'YES'
+error = <nil>
+== expr <$(FOO)> ==
+class = XCPropertyMacroStringConstantExpression
+desc = '$(FOO)'
+error = <nil>
+== expr <$(FOO) == YES> ==
+class = XCPropertyMacroEqualityExpression
+desc = ('$(FOO)' EQ 'YES')
+error = <nil>
+== expr <$(FOO) != YES> ==
+class = XCPropertyMacroInequalityExpression
+desc = ('$(FOO)' NEQ 'YES')
+error = <nil>
+== expr <$(FOO) == 'YES'> ==
+class = XCPropertyMacroEqualityExpression
+desc = ('$(FOO)' EQ 'YES')
+error = <nil>
+== expr <$(FOO) = YES> ==
+class = (null)
+desc = <nil>
+error = expected operator or end-of-string, but found '=' at offset 7
+== expr <!$(FOO)> ==
+class = XCPropertyMacroLogicalNOTExpression
+desc = (NOT '$(FOO)')
+error = <nil>
+== expr <! $(FOO)> ==
+class = XCPropertyMacroLogicalNOTExpression
+desc = (NOT '$(FOO)')
+error = <nil>
+== expr <$(FOO) && $(BAR)> ==
+class = XCPropertyMacroLogicalANDExpression
+desc = ('$(FOO)' AND '$(BAR)')
+error = <nil>
+== expr <$(FOO) || $(BAR)> ==
+class = XCPropertyMacroLogicalORExpression
+desc = ('$(FOO)' OR '$(BAR)')
+error = <nil>
+== expr <$(FOO) xor $(BAR)> ==
+class = (null)
+desc = <nil>
+error = expected operator or end-of-string, but found 'xor' at offset 7
+== expr <$(FOO) && !$(BAR)> ==
+class = XCPropertyMacroLogicalANDExpression
+desc = ('$(FOO)' AND (NOT '$(BAR)'))
+error = <nil>
+== expr <( $(FOO) && $(BAR) ) || $(BAZ)> ==
+class = XCPropertyMacroLogicalORExpression
+desc = (('$(FOO)' AND '$(BAR)') OR '$(BAZ)')
+error = <nil>
+== expr <$(FOO) ? $(BAR) : $(BAZ)> ==
+class = XCPropertyMacroConditionalExpression
+desc = ('$(FOO)' ? '$(BAR)' : '$(BAZ)')
+error = <nil>
+== expr <$(FOO) contains bar> ==
+class = XCPropertyMacroContainsExpression
+desc = ('$(FOO)' CONTAINS 'bar')
+error = <nil>
+== expr <$(FOO) CONTAINS bar> ==
+class = (null)
+desc = <nil>
+error = expected operator or end-of-string, but found 'CONTAINS' at offset 7
+== expr <$(FOO) == YES && $(BAR) != NO> ==
+class = XCPropertyMacroLogicalANDExpression
+desc = (('$(FOO)' EQ 'YES') AND ('$(BAR)' NEQ 'NO'))
+error = <nil>
+== expr <  $(FOO)  > ==
+class = XCPropertyMacroStringConstantExpression
+desc = '$(FOO)'
+error = <nil>
+== expr <> ==
+class = XCPropertyMacroStringConstantExpression
+desc = ''
+error = <nil>
+== expr <$(FOO) == YES $(BAR)> ==
+class = (null)
+desc = <nil>
+error = expected operator or end-of-string, but found '$(BAR)' at offset 14
+== expr <$(FOO) &&> ==
+class = XCPropertyMacroLogicalANDExpression
+desc = ('$(FOO)' AND (null))
+error = <nil>
+== expr <( YES )> ==
+class = XCPropertyMacroStringConstantExpression
+desc = 'YES'
+error = <nil>
+== expr <( $(FOO) == YES )> ==
+class = XCPropertyMacroEqualityExpression
+desc = ('$(FOO)' EQ 'YES')
+error = <nil>
+== expr <! ( $(FOO) == YES )> ==
+class = XCPropertyMacroLogicalNOTExpression
+desc = (NOT ('$(FOO)' EQ 'YES'))
+error = <nil>
+== expr <$(FOO) || $(BAR) && $(BAZ)> ==
+class = XCPropertyMacroLogicalORExpression
+desc = ('$(FOO)' OR ('$(BAR)' AND '$(BAZ)'))
+error = <nil>
+== expr <$(FOO) && $(BAR) == $(BAZ)> ==
+class = XCPropertyMacroLogicalANDExpression
+desc = ('$(FOO)' AND ('$(BAR)' EQ '$(BAZ)'))
+error = <nil>
+== expr <$(FOO) == $(BAR) == $(BAZ)> ==
+class = XCPropertyMacroEqualityExpression
+desc = (('$(FOO)' EQ '$(BAR)') EQ '$(BAZ)')
+error = <nil>
+== expr <$(FOO) ? $(BAR) : $(BAZ) && $(QUX)> ==
+class = XCPropertyMacroConditionalExpression
+desc = ('$(FOO)' ? '$(BAR)' : ('$(BAZ)' AND '$(QUX)'))
+error = <nil>
+== expr <$(FOO) && $(BAR) ? $(BAZ) : $(QUX)> ==
+class = XCPropertyMacroConditionalExpression
+desc = (('$(FOO)' AND '$(BAR)') ? '$(BAZ)' : '$(QUX)')
+error = <nil>
+== expr <"hello world"> ==
+class = XCPropertyMacroStringConstantExpression
+desc = 'hello world'
+error = <nil>
+== expr <'hello world'> ==
+class = XCPropertyMacroStringConstantExpression
+desc = 'hello world'
+error = <nil>
+== expr <"a\"b"> ==
+class = XCPropertyMacroStringConstantExpression
+desc = 'a"b'
+error = <nil>
+== expr <$(FOO) == -Onone> ==
+class = XCPropertyMacroEqualityExpression
+desc = ('$(FOO)' EQ '-Onone')
+error = <nil>
+== expr <$(FOO) != ""> ==
+class = XCPropertyMacroInequalityExpression
+desc = ('$(FOO)' NEQ '')
+error = <nil>
+== expr <$(FOO) && ( $(BAR) == YES )> ==
+class = XCPropertyMacroLogicalANDExpression
+desc = ('$(FOO)' AND ('$(BAR)' EQ 'YES'))
+error = <nil>

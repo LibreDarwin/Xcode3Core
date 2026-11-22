@@ -112,6 +112,10 @@ only unless a real dependency appears.
 - [x] XCPropertyValueDefinition and XCEnumerationPropertyDefinition value maps
       (Apple `pbxmodel propertyvalues` oracle fixture; dictionary Values mapping,
       DisplayName/Description/CommandLineArgs value metadata)
+- [x] XCPropertyDefinition condition expressions and flavors (Apple
+      `pbxmodel propertyconditions` oracle fixture; macro expression classes,
+      parser/descriptions/precedence/errors, ConditionFlavors parameters,
+      nil-scope enablement)
 
 ### 6) DevToolsSupport / XcodePlugIns
 - [ ] Reverse-engineer and implement needed APIs

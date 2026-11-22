@@ -11,6 +11,7 @@
 #import "DevToolsCore/PBXTarget.h"
 #import "DevToolsCore/XCBuildConfiguration.h"
 #import <DVTFoundation/DVTVersion.h>
+#import <DVTMacroFoundation/DVTMacroDefinitionConditionParameter.h>
 #import <DVTMacroFoundation/DVTMacroDefinitionConditionSet.h>
 #import <DVTMacroFoundation/DVTMacroExpansion-Protocol.h>
 #import <DVTMacroFoundation/DVTMacroExpressionParser.h>
@@ -47,6 +48,7 @@ usage(void)
 	    "       pbxmodel compatfeatures\n"
 	    "       pbxmodel supportedversionranges\n"
 	    "       pbxmodel propertyvalues\n"
+	    "       pbxmodel propertyconditions\n"
 	    "       pbxmodel plistwrappers\n"
 	    "       pbxmodel stringlist\n"
 	    "       pbxmodel tsstringbom\n"
@@ -1686,6 +1688,129 @@ cmdPropertyValues(void)
 	return (0);
 }
 
+static NSString *
+PropertyConditionText(id object)
+{
+	if (object == nil)
+		return (@"<nil>");
+	return ([object description]);
+}
+
+static void
+ProbePropertyCondition(NSString *name, NSDictionary *dictionary)
+{
+	TSPropertyListDictionary *plist = [TSPropertyListDictionary
+	    propertyListDictionaryWithDictionary:dictionary];
+	XCPropertyDefinition *definition = [XCPropertyDefinition
+	    propertyDefinitionFromPListDictionary:plist];
+	id expression = [definition conditionExpression];
+	NSMutableArray *flavorNames = [NSMutableArray array];
+
+	for (id parameter in [definition conditionFlavors]) {
+		NSString *flavor = [parameter valueForKey:@"name"];
+
+		if (flavor != nil)
+			[flavorNames addObject:flavor];
+	}
+	[flavorNames sortUsingSelector:@selector(compare:)];
+
+	printf("== def %s ==\n", [name UTF8String]);
+	printf("condition = %s\n", [PropertyConditionText(
+	    [definition valueForUndefinedKey:@"Condition"]) UTF8String]);
+	printf("expr = %s|%s\n",
+	    [NSStringFromClass([expression class]) UTF8String],
+	    [PropertyConditionText(expression) UTF8String]);
+	printf("flavors = %s\n", ([flavorNames count] == 0)
+	    ? "-" : [[flavorNames componentsJoinedByString:@","]
+		UTF8String]);
+	printf("enabled = %s\n",
+	    [definition propertyIsEnabledWithMacroExpansionScope:nil]
+	    ? "YES" : "NO");
+}
+
+static void
+ProbePropertyConditionExpression(NSString *string)
+{
+	NSError *error = nil;
+	id expression = [XCPropertyMacroExpression
+	    propertyMacroExpressionFromString:string error:&error];
+
+	printf("== expr <%s> ==\n", [string UTF8String]);
+	printf("class = %s\n",
+	    [NSStringFromClass([expression class]) UTF8String]);
+	printf("desc = %s\n",
+	    [PropertyConditionText(expression) UTF8String]);
+	printf("error = %s\n",
+	    [PropertyConditionText([error localizedDescription]) UTF8String]);
+}
+
+static int
+cmdPropertyConditions(void)
+{
+	ProbePropertyCondition(@"none", @{});
+	ProbePropertyCondition(@"condition-simple",
+	    @{@"Condition": @"$(FOO) == YES"});
+	ProbePropertyCondition(@"condition-empty", @{@"Condition": @""});
+	ProbePropertyCondition(@"condition-space",
+	    @{@"Condition": @"  $(FOO)  "});
+	ProbePropertyCondition(@"condition-complex",
+	    @{@"Condition": @"$(FOO) == YES && !$(BAR)"});
+	ProbePropertyCondition(@"condition-flavors",
+	    @{@"ConditionFlavors": @[@"arch", @"sdk"]});
+	ProbePropertyCondition(@"option-condition-flavors",
+	    @{@"OptionConditionFlavors": @[@"product"]});
+	ProbePropertyCondition(@"condition-and-flavors", @{
+		@"Condition": @"$(FOO)",
+		@"ConditionFlavors": @[@"arch"],
+		@"OptionConditionFlavors": @[@"product"],
+	});
+	ProbePropertyCondition(@"flavors-unknown",
+	    @{@"ConditionFlavors": @[@"bogus", @"sdk"]});
+	ProbePropertyCondition(@"flavors-empty", @{@"ConditionFlavors": @[]});
+
+	ProbePropertyConditionExpression(@"YES");
+	ProbePropertyConditionExpression(@"NO");
+	ProbePropertyConditionExpression(@"\"YES\"");
+	ProbePropertyConditionExpression(@"'YES'");
+	ProbePropertyConditionExpression(@"$(FOO)");
+	ProbePropertyConditionExpression(@"$(FOO) == YES");
+	ProbePropertyConditionExpression(@"$(FOO) != YES");
+	ProbePropertyConditionExpression(@"$(FOO) == 'YES'");
+	ProbePropertyConditionExpression(@"$(FOO) = YES");
+	ProbePropertyConditionExpression(@"!$(FOO)");
+	ProbePropertyConditionExpression(@"! $(FOO)");
+	ProbePropertyConditionExpression(@"$(FOO) && $(BAR)");
+	ProbePropertyConditionExpression(@"$(FOO) || $(BAR)");
+	ProbePropertyConditionExpression(@"$(FOO) xor $(BAR)");
+	ProbePropertyConditionExpression(@"$(FOO) && !$(BAR)");
+	ProbePropertyConditionExpression(@"( $(FOO) && $(BAR) ) || $(BAZ)");
+	ProbePropertyConditionExpression(@"$(FOO) ? $(BAR) : $(BAZ)");
+	ProbePropertyConditionExpression(@"$(FOO) contains bar");
+	ProbePropertyConditionExpression(@"$(FOO) CONTAINS bar");
+	ProbePropertyConditionExpression(@"$(FOO) == YES && $(BAR) != NO");
+	ProbePropertyConditionExpression(@"  $(FOO)  ");
+	ProbePropertyConditionExpression(@"");
+	ProbePropertyConditionExpression(@"$(FOO) == YES $(BAR)");
+	ProbePropertyConditionExpression(@"$(FOO) &&");
+	ProbePropertyConditionExpression(@"( YES )");
+	ProbePropertyConditionExpression(@"( $(FOO) == YES )");
+	ProbePropertyConditionExpression(@"! ( $(FOO) == YES )");
+	ProbePropertyConditionExpression(@"$(FOO) || $(BAR) && $(BAZ)");
+	ProbePropertyConditionExpression(@"$(FOO) && $(BAR) == $(BAZ)");
+	ProbePropertyConditionExpression(@"$(FOO) == $(BAR) == $(BAZ)");
+	ProbePropertyConditionExpression(
+	    @"$(FOO) ? $(BAR) : $(BAZ) && $(QUX)");
+	ProbePropertyConditionExpression(
+	    @"$(FOO) && $(BAR) ? $(BAZ) : $(QUX)");
+	ProbePropertyConditionExpression(@"\"hello world\"");
+	ProbePropertyConditionExpression(@"'hello world'");
+	ProbePropertyConditionExpression(@"\"a\\\"b\"");
+	ProbePropertyConditionExpression(@"$(FOO) == -Onone");
+	ProbePropertyConditionExpression(@"$(FOO) != \"\"");
+	ProbePropertyConditionExpression(@"$(FOO) && ( $(BAR) == YES )");
+	return (0);
+}
+
 static void
 PrintWrapperValue(const char *label, id value)
 {
@@ -2119,6 +2244,8 @@ main(int argc, char **argv)
 			return (cmdSupportedVersionRanges());
 		if (argc >= 2 && strcmp(argv[1], "propertyvalues") == 0)
 			return (cmdPropertyValues());
+		if (argc >= 2 && strcmp(argv[1], "propertyconditions") == 0)
+			return (cmdPropertyConditions());
 		if (argc >= 2 && strcmp(argv[1], "plistwrappers") == 0)
 			return (cmdPlistWrappers());
 		if (argc >= 2 && strcmp(argv[1], "stringlist") == 0)

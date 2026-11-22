@@ -18,6 +18,12 @@
 
 @class XCPropertyDefinition_SupportedVersionRange, XCPropertyDomainSpecification;
 
+@interface XCPropertyMacroExpression : NSObject
++ (id)propertyMacroExpressionFromString:(NSString *)string error:(NSError **)error;
+- (id)evaluateWithMacroExpansionScope:(id)scope;
+- (BOOL)evaluateAsBooleanWithMacroExpansionScope:(id)scope;
+@end
+
 @interface XCPropertyValueDefinition : NSObject
 - (instancetype)initFromPListDictionary:(NSDictionary *)dictionary
 			     forPropertyName:(NSString *)name;
@@ -47,6 +53,7 @@
     NSString *_localizedDescription;
     NSString *_definitionLocationDescription;
     NSSet *_conditionFlavors;
+    id _conditionExpression;
     NSArray *_commandLineArgs;
     NSString *_commandLineFlag;
     NSString *_commandLinePrefixFlag;
