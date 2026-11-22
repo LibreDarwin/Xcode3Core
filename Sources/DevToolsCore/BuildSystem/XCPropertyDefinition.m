@@ -8,13 +8,58 @@
  */
 
 #import "DevToolsCore/BuildSystem/XCPropertyDefinition.h"
+#import "DevToolsCore/BuildSystem/XCPropertyDefinition_SupportedVersionRange.h"
 
+#import <DVTFoundation/DVTVersion.h>
 #import <objc/runtime.h>
 #import <stdio.h>
 
 #import <DVTMacroFoundation/DVTMacroExpressionParser.h>
 
 static NSMutableDictionary<NSString *, Class> *sPropertyTypesByName = nil;
+
+static NSSet *
+XCPropertySupportedVersionRanges(TSPropertyListDictionary *properties)
+{
+	NSArray *rawRanges = [properties arrayOrNilForKey:@"SupportedVersionRanges"];
+	NSMutableSet *ranges;
+
+	if (rawRanges == nil || [rawRanges count] == 0)
+		return (nil);
+	ranges = [NSMutableSet set];
+	for (id entry in rawRanges) {
+		NSString *startString;
+		NSString *endString = nil;
+		DVTVersion *start;
+		DVTVersion *end = nil;
+		XCPropertyDefinition_SupportedVersionRange *range;
+
+		if ([entry isKindOfClass:[NSString class]]) {
+			startString = entry;
+		} else if ([entry isKindOfClass:[NSArray class]]) {
+			if ([entry count] < 1 || [entry count] > 2)
+				return (nil);
+			if (![[entry objectAtIndex:0] isKindOfClass:[NSString class]])
+				return (nil);
+			startString = [entry objectAtIndex:0];
+			if ([entry count] == 2) {
+				if (![[entry objectAtIndex:1] isKindOfClass:
+				    [NSString class]])
+					return (nil);
+				endString = [entry objectAtIndex:1];
+			}
+		} else {
+			return (nil);
+		}
+		start = [DVTVersion versionWithStringValue:startString];
+		if (endString != nil)
+			end = [DVTVersion versionWithStringValue:endString];
+		range = [[XCPropertyDefinition_SupportedVersionRange alloc]
+		    initWithStartOfRange:start endOfRange:end];
+		[ranges addObject:range];
+	}
+	return (([ranges count] == 0) ? nil : ranges);
+}
 
 static NSArray *
 XCPropertyListWords(NSString *string)
@@ -257,6 +302,7 @@ XCPropertyListWords(NSString *string)
 		return (nil);
 
 	_properties = dictionary;
+	_supportedVersionRanges = XCPropertySupportedVersionRanges(dictionary);
 	_name = [dictionary stringOrNilForKey:@"Name"];
 	typeString = [dictionary stringOrNilForKey:@"Type"];
 	_typeClass = [[self class] classForPropertyNamed:_name typeString:typeString];
@@ -390,14 +436,16 @@ XCPropertyListWords(NSString *string)
 
 - (BOOL)hasSupportedVersionRanges
 {
-	return ([_properties arrayOrNilForKey:@"SupportedVersionRanges"] != nil);
+	return (_supportedVersionRanges != nil);
 }
 
 - (BOOL)supportsVersion:(id)version
 {
-	NSArray *ranges = [_properties arrayOrNilForKey:@"SupportedVersionRanges"];
-
-	return ((ranges != nil) && [ranges containsObject:version]);
+	for (XCPropertyDefinition_SupportedVersionRange *range in _supportedVersionRanges) {
+		if ([range supportsVersion:version])
+			return (YES);
+	}
+	return (_supportedVersionRanges == nil);
 }
 
 - (XCPropertyDomainSpecification *)propertyDomain

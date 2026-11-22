@@ -43,6 +43,7 @@
 		1A2B3C4D0000000000000100 /* XCStringList.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000101 /* XCStringList.m */; };
 		1A2B3C4D0000000000000103 /* PBXPlistArchiverAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000104 /* PBXPlistArchiverAdditions.m */; };
 		1A2B3C4D0000000000000106 /* XCCompatibilityFeature.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000107 /* XCCompatibilityFeature.m */; };
+		1A2B3C4D0000000000000109 /* XCPropertyDefinition_SupportedVersionRange.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000010A /* XCPropertyDefinition_SupportedVersionRange.m */; };
 		1A2B3C4D000000000000000EC /* PBXPackageTypeSpecification.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000ED /* PBXPackageTypeSpecification.m */; };
 		1A2B3C4D000000000000000EF /* XCProductTypeSpecification.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000F0 /* XCProductTypeSpecification.m */; };
 		1A2B3C4D000000000000000F2 /* PBXRuntimeValues.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000F3 /* PBXRuntimeValues.m */; };
@@ -127,6 +128,8 @@
 		1A2B3C4D0000000000000105 /* PBXPlistArchiverAdditions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PBXPlistArchiverAdditions.h; sourceTree = "<group>"; };
 		1A2B3C4D0000000000000107 /* XCCompatibilityFeature.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XCCompatibilityFeature.m; sourceTree = "<group>"; };
 		1A2B3C4D0000000000000108 /* XCCompatibilityFeature.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XCCompatibilityFeature.h; sourceTree = "<group>"; };
+		1A2B3C4D000000000000010A /* XCPropertyDefinition_SupportedVersionRange.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XCPropertyDefinition_SupportedVersionRange.m; sourceTree = "<group>"; };
+		1A2B3C4D000000000000010B /* XCPropertyDefinition_SupportedVersionRange.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XCPropertyDefinition_SupportedVersionRange.h; sourceTree = "<group>"; };
 		1A2B3C4D000000000000000ED /* PBXPackageTypeSpecification.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PBXPackageTypeSpecification.m; sourceTree = "<group>"; };
 		1A2B3C4D000000000000000EE /* PBXPackageTypeSpecification.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PBXPackageTypeSpecification.h; sourceTree = "<group>"; };
 		1A2B3C4D000000000000000F0 /* XCProductTypeSpecification.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XCProductTypeSpecification.m; sourceTree = "<group>"; };
@@ -309,6 +312,7 @@
 				1A2B3C4D000000000000000E2 /* XCPropertyCategory.m */,
 				1A2B3C4D000000000000000E4 /* XCPropertyDomainSpecification.m */,
 				1A2B3C4D000000000000000E7 /* DVTMacroDefinitionTable+XCMacroExpansionExtensions.m */,
+				1A2B3C4D000000000000010A /* XCPropertyDefinition_SupportedVersionRange.m */,
 				1A2B3C4D000000000000000ED /* PBXPackageTypeSpecification.m */,
 				1A2B3C4D000000000000000F0 /* XCProductTypeSpecification.m */,
 			);
@@ -334,6 +338,7 @@
 				1A2B3C4D000000000000000E3 /* XCPropertyCategory.h */,
 				1A2B3C4D000000000000000E5 /* XCPropertyDomainSpecification.h */,
 				1A2B3C4D000000000000000E8 /* DVTMacroDefinitionTable+XCMacroExpansionExtensions.h */,
+				1A2B3C4D000000000000010B /* XCPropertyDefinition_SupportedVersionRange.h */,
 				1A2B3C4D000000000000000EE /* PBXPackageTypeSpecification.h */,
 				1A2B3C4D000000000000000F1 /* XCProductTypeSpecification.h */,
 			);
@@ -488,6 +493,7 @@
 				1A2B3C4D0000000000000100 /* XCStringList.m in Sources */,
 				1A2B3C4D0000000000000103 /* PBXPlistArchiverAdditions.m in Sources */,
 				1A2B3C4D0000000000000106 /* XCCompatibilityFeature.m in Sources */,
+				1A2B3C4D0000000000000109 /* XCPropertyDefinition_SupportedVersionRange.m in Sources */,
 				1A2B3C4D000000000000000EC /* PBXPackageTypeSpecification.m in Sources */,
 				1A2B3C4D000000000000000EF /* XCProductTypeSpecification.m in Sources */,
 				1A2B3C4D000000000000000F2 /* PBXRuntimeValues.m in Sources */,

@@ -16,7 +16,7 @@
 #import "DevToolsSupport/TSPropertyListDictionary.h"
 #import <DVTMacroFoundation/DVTMacroExpansion-Protocol.h>
 
-@class XCPropertyDomainSpecification;
+@class XCPropertyDefinition_SupportedVersionRange, XCPropertyDomainSpecification;
 
 @protocol XCPropertyTypes
 + (NSString *)identifier;
@@ -42,6 +42,7 @@
     NSString *_commandLinePrefixFlag;
     NSDictionary *_additionalBuildSettings;
     TSPropertyListDictionary *_properties;
+    NSSet *_supportedVersionRanges;
     XCPropertyDomainSpecification *_domain;
     BOOL _isUserDefined;
     BOOL _isAppleInternalOnly;

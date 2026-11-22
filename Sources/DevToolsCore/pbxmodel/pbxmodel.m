@@ -10,6 +10,7 @@
 #import "DevToolsCore/PBXObject.h"
 #import "DevToolsCore/PBXTarget.h"
 #import "DevToolsCore/XCBuildConfiguration.h"
+#import <DVTFoundation/DVTVersion.h>
 #import <DVTMacroFoundation/DVTMacroDefinitionConditionSet.h>
 #import <DVTMacroFoundation/DVTMacroExpansion-Protocol.h>
 #import <DVTMacroFoundation/DVTMacroExpressionParser.h>
@@ -17,6 +18,7 @@
 #import "DevToolsCore/PBXExtendedWrapperPart.h"
 #import "DevToolsCore/PBXFileSystemSynchronizedGroupRelativeReferenceID.h"
 #import "DevToolsCore/PBXPackageTypeSpecification.h"
+#import "DevToolsCore/BuildSystem/XCPropertyDefinition_SupportedVersionRange.h"
 #import "DevToolsCore/XCCompatibilityFeature.h"
 #import "DevToolsCore/PBXPlistArchiverAdditions.h"
 #import "DevToolsCore/XCMacroExpansionScope.h"
@@ -43,6 +45,7 @@ usage(void)
 	    "       pbxmodel macroevaluation\n"
 	    "       pbxmodel objectgraphpath\n"
 	    "       pbxmodel compatfeatures\n"
+	    "       pbxmodel supportedversionranges\n"
 	    "       pbxmodel plistwrappers\n"
 	    "       pbxmodel stringlist\n"
 	    "       pbxmodel tsstringbom\n"
@@ -1436,6 +1439,137 @@ cmdCompatibilityFeatures(void)
 }
 #pragma clang diagnostic pop
 
+static DVTVersion *
+SupportedVersionRangeVersion(NSString *stringValue)
+{
+	if ([stringValue isEqualToString:@"(nil)"])
+		return (nil);
+	return ([DVTVersion versionWithStringValue:stringValue]);
+}
+
+static void
+PrintSupportedVersionValue(const char *label, id value)
+{
+	printf("%s = <%s>\n", label,
+	    (value != nil) ? [[value description] UTF8String] : "nil");
+}
+
+static void
+ProbeSupportedVersionRange(NSArray *pair, NSArray *versions)
+{
+	DVTVersion *start = SupportedVersionRangeVersion([pair objectAtIndex:0]);
+	DVTVersion *end = SupportedVersionRangeVersion([pair objectAtIndex:1]);
+	XCPropertyDefinition_SupportedVersionRange *range;
+
+	range = [[XCPropertyDefinition_SupportedVersionRange alloc]
+	    initWithStartOfRange:start endOfRange:end];
+	printf("== range %s..%s ==\n",
+	    [[pair objectAtIndex:0] UTF8String],
+	    [[pair objectAtIndex:1] UTF8String]);
+	PrintSupportedVersionValue("class", NSStringFromClass([range class]));
+	PrintSupportedVersionValue("description", [range description]);
+	printf("hash.same = <%d>\n", [range hash] == [range hash]);
+	printf("equal.same = <%d>\n", [range isEqual:range]);
+	XCPropertyDefinition_SupportedVersionRange *same =
+	    [[XCPropertyDefinition_SupportedVersionRange alloc]
+		initWithStartOfRange:start endOfRange:end];
+	printf("equal.fresh = <%d>\n", [range isEqual:same]);
+	printf("hash.fresh = <%d>\n", [range hash] == [same hash]);
+	printf("equal.string = <%d>\n", [range isEqual:@"x"]);
+	for (NSString *versionString in versions) {
+		DVTVersion *version = [DVTVersion versionWithStringValue:versionString];
+
+		printf("supports[%s] = <%d>\n", [versionString UTF8String],
+		    (int)[range supportsVersion:version]);
+	}
+}
+
+static void
+ProbeSupportedVersionDefinition(NSString *label, NSArray *ranges,
+    NSArray *versions)
+{
+	NSDictionary *dictionary = @{
+		@"Name": @"TEST_SETTING",
+		@"Type": @"String",
+		@"SupportedVersionRanges": ranges,
+	};
+	TSPropertyListDictionary *plist =
+	    [TSPropertyListDictionary propertyListDictionaryWithDictionary:dictionary];
+	XCPropertyDefinition *definition =
+	    [XCPropertyDefinition propertyDefinitionFromPListDictionary:plist];
+
+	printf("== %s ==\n", [label UTF8String]);
+	printf("has = <%d>\n", [definition hasSupportedVersionRanges]);
+	for (NSString *versionString in versions) {
+		DVTVersion *version = [DVTVersion versionWithStringValue:versionString];
+
+		printf("supports[%s] = <%d>\n", [versionString UTF8String],
+		    (int)[definition supportsVersion:version]);
+	}
+}
+
+static int
+cmdSupportedVersionRanges(void)
+{
+	NSArray *cases = @[
+		@[@"1.0", @"2.0"],
+		@[@"1.0", @"1.0"],
+		@[@"2.0", @"1.0"],
+		@[@"", @"2.0"],
+		@[@"1.0", @""],
+		@[@"", @""],
+		@[@"1.0", @"(nil)"]
+	];
+	NSArray *versions = @[@"0.9", @"1", @"1.0", @"1.0.0", @"01.0",
+	    @"1.5", @"1.9.9", @"2", @"2.0", @"2.0.1", @"2.1", @"10.0",
+	    @"abc", @""];
+	NSArray *definitionVersions = @[@"0", @"1", @"100", @"119", @"120",
+	    @"602", @"602.0.0", @"603", @"800", @"900", @"1000",
+	    @"107.60.1", @"107.60.2", @"107.60.999", @"107.61.0",
+	    @"107.100.2", @"107.100.3", @"107.100.999", @"107.101.0"];
+
+	PrintSupportedVersionValue("class",
+	    NSStringFromClass([XCPropertyDefinition_SupportedVersionRange class]));
+	for (NSArray *pair in cases)
+		ProbeSupportedVersionRange(pair, versions);
+
+	XCPropertyDefinition_SupportedVersionRange *r1 =
+	    [[XCPropertyDefinition_SupportedVersionRange alloc]
+		initWithStartOfRange:[DVTVersion versionWithStringValue:@"1.0"]
+		endOfRange:[DVTVersion versionWithStringValue:@"2.0"]];
+	XCPropertyDefinition_SupportedVersionRange *r2 =
+	    [[XCPropertyDefinition_SupportedVersionRange alloc]
+		initWithStartOfRange:[DVTVersion versionWithStringValue:@"1.0"]
+		endOfRange:[DVTVersion versionWithStringValue:@"2.0"]];
+	XCPropertyDefinition_SupportedVersionRange *r3 =
+	    [[XCPropertyDefinition_SupportedVersionRange alloc]
+		initWithStartOfRange:[DVTVersion versionWithStringValue:@"1.0"]
+		endOfRange:[DVTVersion versionWithStringValue:@"3.0"]];
+	printf("== equality ==\n");
+	printf("r1.r2 = <%d>\n", [r1 isEqual:r2]);
+	printf("r1.r3 = <%d>\n", [r1 isEqual:r3]);
+	printf("hash.r1.r2 = <%d>\n", [r1 hash] == [r2 hash]);
+
+	printf("== supported range definitions ==\n");
+	ProbeSupportedVersionDefinition(@"string-only", @[@"800.0.0"],
+	    definitionVersions);
+	ProbeSupportedVersionDefinition(@"array-pair",
+	    @[@[@"107.60.2", @"107.60.999"]], definitionVersions);
+	ProbeSupportedVersionDefinition(@"mixed",
+	    @[@[@"107.60.2", @"107.60.999"],
+	      @[@"107.100.3", @"107.100.999"], @"119"], definitionVersions);
+	ProbeSupportedVersionDefinition(@"one-element-pair", @[@[@"1.0"]],
+	    definitionVersions);
+	ProbeSupportedVersionDefinition(@"three-element-pair",
+	    @[@[@"1.0", @"2.0", @"3.0"]], definitionVersions);
+	ProbeSupportedVersionDefinition(@"reversed-pair",
+	    @[@[@"2.0", @"1.0"]], definitionVersions);
+	ProbeSupportedVersionDefinition(@"bad-string", @[@"abc"],
+	    definitionVersions);
+	ProbeSupportedVersionDefinition(@"empty", @[], definitionVersions);
+	return (0);
+}
+
 static void
 PrintWrapperValue(const char *label, id value)
 {
@@ -1865,6 +1999,8 @@ main(int argc, char **argv)
 			return (cmdObjectGraphPath());
 		if (argc >= 2 && strcmp(argv[1], "compatfeatures") == 0)
 			return (cmdCompatibilityFeatures());
+		if (argc >= 2 && strcmp(argv[1], "supportedversionranges") == 0)
+			return (cmdSupportedVersionRanges());
 		if (argc >= 2 && strcmp(argv[1], "plistwrappers") == 0)
 			return (cmdPlistWrappers());
 		if (argc >= 2 && strcmp(argv[1], "stringlist") == 0)

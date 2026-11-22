@@ -106,6 +106,9 @@ only unless a real dependency appears.
 - [x] XCCompatibilityFeature/Use factory objects (Apple `pbxmodel compatfeatures`
       oracle fixture; 49 feature factories, name/hash/equality/copy semantics,
       singleton caching except package traits, and feature-use descriptions)
+- [x] XCPropertyDefinition supported version ranges (Apple
+      `pbxmodel supportedversionranges` oracle fixture; inclusive bounded and
+      open-ended ranges, pointer identity, xcspec string/pair parsing)
 
 ### 6) DevToolsSupport / XcodePlugIns
 - [ ] Reverse-engineer and implement needed APIs
