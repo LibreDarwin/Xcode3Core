@@ -45,6 +45,13 @@
 	return (key);
 }
 
+- (SEL)selectorForArchiveMask:(NSInteger)mask
+{
+	if ((mask & 4) != 0)
+		return (@selector(decodeObjectForKey:));
+	return (@selector(encodeObject:forKey:));
+}
+
 + (NSSet *)relationshipKeySet
 {
 	NSMutableSet *set = [NSMutableSet set];

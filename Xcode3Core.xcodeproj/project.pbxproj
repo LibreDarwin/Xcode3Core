@@ -47,6 +47,8 @@
 		1A2B3C4D000000000000000EC /* PBXPackageTypeSpecification.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000ED /* PBXPackageTypeSpecification.m */; };
 		1A2B3C4D000000000000000EF /* XCProductTypeSpecification.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000F0 /* XCProductTypeSpecification.m */; };
 		1A2B3C4D000000000000000F2 /* PBXRuntimeValues.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000F3 /* PBXRuntimeValues.m */; };
+		1A2B3C4D0000000000000116 /* PBXArchiveBinding.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000111 /* PBXArchiveBinding.m */; };
+		1A2B3C4D0000000000000117 /* PBXPListArchiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000115 /* PBXPListArchiver.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -137,6 +139,12 @@
 		1A2B3C4D000000000000000F3 /* PBXRuntimeValues.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PBXRuntimeValues.m; sourceTree = "<group>"; };
 		1A2B3C4D000000000000000F4 /* PBXExtendedWrapperPart.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PBXExtendedWrapperPart.h; sourceTree = "<group>"; };
 		1A2B3C4D000000000000000F5 /* PBXFileSystemSynchronizedGroupRelativeReferenceID.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PBXFileSystemSynchronizedGroupRelativeReferenceID.h; sourceTree = "<group>"; };
+		1A2B3C4D0000000000000110 /* PBXArchiveBinding.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PBXArchiveBinding.h; sourceTree = "<group>"; };
+		1A2B3C4D0000000000000111 /* PBXArchiveBinding.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PBXArchiveBinding.m; sourceTree = "<group>"; };
+		1A2B3C4D0000000000000112 /* PBXArchivingBinding.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PBXArchivingBinding.h; sourceTree = "<group>"; };
+		1A2B3C4D0000000000000113 /* PBXUnarchivingBinding.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PBXUnarchivingBinding.h; sourceTree = "<group>"; };
+		1A2B3C4D0000000000000114 /* PBXPListArchiver.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PBXPListArchiver.h; sourceTree = "<group>"; };
+		1A2B3C4D0000000000000115 /* PBXPListArchiver.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PBXPListArchiver.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -229,6 +237,8 @@
 				1A2B3C4D00000000000000095 /* PBXSupport.m */,
 				1A2B3C4D000000000000000F3 /* PBXRuntimeValues.m */,
 				1A2B3C4D0000000000000104 /* PBXPlistArchiverAdditions.m */,
+				1A2B3C4D0000000000000111 /* PBXArchiveBinding.m */,
+				1A2B3C4D0000000000000115 /* PBXPListArchiver.m */,
 			);
 			path = ProjectModel;
 			sourceTree = "<group>";
@@ -278,6 +288,7 @@
 				1A2B3C4D0000000000000108 /* XCCompatibilityFeature.h */,
 				1A2B3C4D000000000000000F4 /* PBXExtendedWrapperPart.h */,
 				1A2B3C4D000000000000000F5 /* PBXFileSystemSynchronizedGroupRelativeReferenceID.h */,
+				1A2B3C4D0000000000000118 /* ProjectModel */,
 				1A2B3C4D000000000000000AF /* BuildSystem */,
 			);
 			path = DevToolsCore;
@@ -324,6 +335,17 @@
 			children = (
 			);
 			path = DVTFoundation;
+			sourceTree = "<group>";
+		};
+		1A2B3C4D0000000000000118 /* ProjectModel */ = {
+			isa = PBXGroup;
+			children = (
+				1A2B3C4D0000000000000110 /* PBXArchiveBinding.h */,
+				1A2B3C4D0000000000000112 /* PBXArchivingBinding.h */,
+				1A2B3C4D0000000000000113 /* PBXUnarchivingBinding.h */,
+				1A2B3C4D0000000000000114 /* PBXPListArchiver.h */,
+			);
+			path = ProjectModel;
 			sourceTree = "<group>";
 		};
 		1A2B3C4D000000000000000AF /* BuildSystem */ = {
@@ -497,6 +519,8 @@
 				1A2B3C4D000000000000000EC /* PBXPackageTypeSpecification.m in Sources */,
 				1A2B3C4D000000000000000EF /* XCProductTypeSpecification.m in Sources */,
 				1A2B3C4D000000000000000F2 /* PBXRuntimeValues.m in Sources */,
+				1A2B3C4D0000000000000116 /* PBXArchiveBinding.m in Sources */,
+				1A2B3C4D0000000000000117 /* PBXPListArchiver.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

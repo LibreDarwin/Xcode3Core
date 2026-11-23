@@ -6,8 +6,12 @@
 
 #include <string.h>
 
+#import <objc/message.h>
+#import <objc/runtime.h>
+
 #import "DevToolsCore/PBXProjectModel.h"
 #import "DevToolsCore/PBXObject.h"
+#import "DevToolsCore/ProjectModel/PBXArchiveBinding.h"
 #import "DevToolsCore/PBXTarget.h"
 #import "DevToolsCore/XCBuildConfiguration.h"
 #import <DVTFoundation/DVTVersion.h>
@@ -56,7 +60,8 @@ usage(void)
 	    "       pbxmodel xcproducttypes\n"
 	    "       pbxmodel runtimevalues\n"
 	    "       pbxmodel buildconfigurations\n"
-	    "       pbxmodel targetdependencies\n");
+	    "       pbxmodel targetdependencies\n"
+	    "       pbxmodel archivebindings\n");
 	exit(2);
 }
 
@@ -2308,6 +2313,290 @@ cmdTSStringBOM(void)
 	return (0);
 }
 
+@interface LBSArchiveValue : NSObject
+@property (nonatomic, copy) NSString *text;
+- (SEL)selectorForArchiveMask:(NSInteger)mask;
+@end
+
+@implementation LBSArchiveValue
+- (SEL)selectorForArchiveMask:(NSInteger)mask
+{
+	return ((mask & 4) != 0) ? @selector(decodeObjectForKey:) :
+	    @selector(encodeObject:forKey:);
+}
+@end
+
+@interface LBSBindingTarget : NSObject
+@property (nonatomic, strong) id path;
+@end
+
+@implementation LBSBindingTarget
++ (NSString *)archiveNameForKey:(NSString *)key
+{
+	return ([@"archive_" stringByAppendingString:key]);
+}
+
++ (BOOL)canArchiveAnyClassForKey:(NSString *)key
+{
+	return ([key isEqualToString:@"path"]);
+}
+
++ (BOOL)relationshipIsWeak:(id)object forPListArchiver:(id)archiver
+{
+	(void)object;
+	(void)archiver;
+	return (NO);
+}
+
++ (NSArray *)archivableKeysToBeSkippedByPListArchiver:(id)archiver
+{
+	(void)archiver;
+	return (@[]);
+}
+
++ (NSArray *)archivableWeakRelationshipsForPListArchiver:(id)archiver
+{
+	(void)archiver;
+	return (@[]);
+}
+@end
+
+@interface LBSSelectorTarget : NSObject
+@end
+
+@implementation LBSSelectorTarget
++ (NSString *)archiveNameForKey:(NSString *)key
+{
+	return ([@"archive_" stringByAppendingString:key]);
+}
+
++ (BOOL)canArchiveAnyClassForKey:(NSString *)key
+{
+	(void)key;
+	return (NO);
+}
+
++ (BOOL)relationshipIsWeak:(id)object forPListArchiver:(id)archiver
+{
+	(void)object;
+	(void)archiver;
+	return (NO);
+}
+
++ (NSArray *)archivableKeysToBeSkippedByPListArchiver:(id)archiver
+{
+	(void)archiver;
+	return (@[]);
+}
+
++ (NSArray *)archivableWeakRelationshipsForPListArchiver:(id)archiver
+{
+	(void)archiver;
+	return (@[]);
+}
+
+- (id)path
+{
+	return (nil);
+}
+
+- (void)setPath:(id)path
+{
+	(void)path;
+}
+@end
+
+@interface LBSBindingArchiver : NSObject
+@property (nonatomic, strong) NSMutableDictionary *values;
+@end
+
+@implementation LBSBindingArchiver
+- (instancetype)init
+{
+	if ((self = [super init]) != nil)
+		_values = [[NSMutableDictionary alloc] init];
+	return (self);
+}
+
+- (void)encodeObject:(id)value forKey:(NSString *)key
+{
+	if (value != nil && key != nil)
+		[_values setObject:value forKey:key];
+}
+
+- (void)encodeString:(id)value forKey:(NSString *)key
+{
+	[self encodeObject:value forKey:key];
+}
+@end
+
+@interface LBSBindingUnarchiver : NSObject
+@property (nonatomic, strong) id archivedValue;
+@property (nonatomic, strong) id decodedValue;
+@end
+
+@implementation LBSBindingUnarchiver
+- (id)valueForKey:(NSString *)key
+{
+	(void)key;
+	return (_archivedValue);
+}
+
+- (id)decodeObjectForKey:(NSString *)key
+{
+	(void)key;
+	return (_decodedValue);
+}
+@end
+
+@protocol LBSBindingArchiveProtocol <NSObject>
++ (id)bindingWithClass:(Class)cls
+    key:(NSString *)key
+    archiveMask:(NSInteger)mask;
+- (int)archiveMask;
+- (NSString *)key;
+- (Class)targetClass;
+- (BOOL)allowsAnyClass;
+- (void)writeValueForObject:(id)object toPListArchiver:(id)archiver;
+- (void)readValueForObject:(id)object fromPListUnarchiver:(id)unarchiver;
+@end
+
+static id
+LBSBindingObjectIvar(id object, const char *name)
+{
+	Ivar ivar = class_getInstanceVariable([object class], name);
+
+	if (ivar == NULL)
+		return (nil);
+	return (object_getIvar(object, ivar));
+}
+
+static const char *
+LBSBindingSelectorIvar(id object, const char *name)
+{
+	Ivar ivar = class_getInstanceVariable([object class], name);
+	SEL value;
+
+	if (ivar == NULL)
+		return ("-");
+	value = *(SEL *)((char *)(__bridge void *)object + ivar_getOffset(ivar));
+	return ((value != NULL) ? sel_getName(value) : "-");
+}
+
+static const char *
+LBSBindingSafeUTF8(id object)
+{
+	return ((object != nil) ? [object UTF8String] : "-");
+}
+
+static void
+LBSBindingDumpFactory(Class bindingClass, Class targetClass, NSArray *masks)
+{
+	@try {
+		for (NSNumber *number in masks) {
+			id binding = [(id<LBSBindingArchiveProtocol>)bindingClass
+			    bindingWithClass:targetClass key:@"path"
+			    archiveMask:[number integerValue]];
+			id keyBinding = LBSBindingObjectIvar(binding,
+			    "_keyBindingInternal");
+			id<LBSBindingArchiveProtocol> typed = binding;
+
+			printf("mask=%ld class=%s archiveMask=%d key=%s "
+			    "allows=%d target=%s keyBindingClass=%s\n",
+			    (long)[number integerValue],
+			    class_getName([binding class]), [typed archiveMask],
+			    LBSBindingSafeUTF8([typed key]),
+			    (int)[typed allowsAnyClass],
+			    class_getName([typed targetClass]),
+			    ((keyBinding != nil) ? class_getName([keyBinding class]) :
+			    "-"));
+		}
+	} @catch (NSException *exception) {
+		printf("factory exception=%s: %s\n", [[exception name] UTF8String],
+		    [[exception reason] UTF8String]);
+	}
+}
+
+static int
+cmdArchiveBindings(void)
+{
+	@autoreleasepool {
+		Class bindingClass = NSClassFromString(@"PBXArchiveBinding");
+
+		if (bindingClass == Nil) {
+			printf("class=missing\n");
+			return (1);
+		}
+		printf("== factory ==\n");
+		LBSBindingDumpFactory(bindingClass, [LBSBindingTarget class],
+		    @[ @(-8), @(-4), @0, @1, @2, @3, @4, @5, @6, @7, @8, @16 ]);
+		printf("== factory selector ==\n");
+		LBSBindingDumpFactory(bindingClass, [LBSSelectorTarget class],
+		    @[ @1, @5 ]);
+
+		printf("== archiving ==\n");
+		@try {
+			LBSBindingTarget *target = [LBSBindingTarget new];
+			LBSBindingArchiver *archiver = [LBSBindingArchiver new];
+			LBSArchiveValue *value = [LBSArchiveValue new];
+			id binding = [(id<LBSBindingArchiveProtocol>)bindingClass
+			    bindingWithClass:[LBSBindingTarget class]
+			    key:@"path" archiveMask:1];
+			id stored;
+
+			[value setText:@"hello"];
+			[target setPath:value];
+			[(id<LBSBindingArchiveProtocol>)binding
+			    writeValueForObject:target toPListArchiver:archiver];
+			stored = [[archiver values] objectForKey:@"archive_path"];
+			printf("bindingClass=%s\n", class_getName([binding class]));
+			printf("valueClass=%s\n", class_getName([value class]));
+			printf("archiveSelector=%s\n",
+			    LBSBindingSelectorIvar(binding, "_archiveSelector"));
+			printf("archiveKey=%s\n",
+			    LBSBindingSafeUTF8(LBSBindingObjectIvar(binding,
+			    "_archiveKey")));
+			printf("archiveValue=%s\n",
+			    LBSBindingSafeUTF8([(LBSArchiveValue *)stored
+			    text]));
+		} @catch (NSException *exception) {
+			printf("archiving exception=%s: %s\n",
+			    [[exception name] UTF8String],
+			    [[exception reason] UTF8String]);
+		}
+
+		printf("== unarchiving ==\n");
+		@try {
+			LBSBindingTarget *target = [LBSBindingTarget new];
+			LBSBindingUnarchiver *unarchiver = [LBSBindingUnarchiver new];
+			LBSArchiveValue *archived = [LBSArchiveValue new];
+			id binding = [(id<LBSBindingArchiveProtocol>)bindingClass
+			    bindingWithClass:[LBSBindingTarget class]
+			    key:@"path" archiveMask:5];
+
+			[archived setText:@"archived"];
+			[unarchiver setArchivedValue:archived];
+			[unarchiver setDecodedValue:@"decoded"];
+			[(id<LBSBindingArchiveProtocol>)binding
+			    readValueForObject:target
+			    fromPListUnarchiver:unarchiver];
+			printf("bindingClass=%s\n", class_getName([binding class]));
+			printf("archivedClass=%s\n", class_getName([archived class]));
+			printf("unarchiveSelector=%s\n",
+			    LBSBindingSelectorIvar(binding, "_unarchiveSelector"));
+			printf("archiveKey=%s\n",
+			    LBSBindingSafeUTF8(LBSBindingObjectIvar(binding,
+			    "_archiveKey")));
+			printf("targetPath=%s\n", LBSBindingSafeUTF8([target path]));
+		} @catch (NSException *exception) {
+			printf("unarchiving exception=%s: %s\n",
+			    [[exception name] UTF8String],
+			    [[exception reason] UTF8String]);
+		}
+	}
+	return (0);
+}
+
 int
 main(int argc, char **argv)
 {
@@ -2348,6 +2637,8 @@ main(int argc, char **argv)
 			return (cmdBuildConfigurations());
 		if (argc >= 2 && strcmp(argv[1], "targetdependencies") == 0)
 			return (cmdTargetDependencies());
+		if (argc >= 2 && strcmp(argv[1], "archivebindings") == 0)
+			return (cmdArchiveBindings());
 		if (argc < 3)
 			usage();
 		cmd = argv[1];

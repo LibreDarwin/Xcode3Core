@@ -26,10 +26,13 @@ PROJECTMODEL := Sources/DevToolsCore/ProjectModel
 # this repository root and is baked into the binary's run path.
 DVTFRAMEWORKS       ?= ../DVTFrameworks
 DVTFRAMEWORKS_BUILD := $(DVTFRAMEWORKS)/build
+APPKIT              ?= ../../../Library/Staging/AppKit
+APPKIT_BUILD        := $(APPKIT)/build/release
 
 CFLAGS   := $(OPT) -std=c11 -D_DARWIN_C_SOURCE -isysroot "$(SDK)" -ISources -Wall -Wextra
 OBJCFLAGS := $(OPT) -fobjc-arc -D_DARWIN_C_SOURCE -isysroot "$(SDK)" \
-	-IHeaders -ISources -I$(PROJECTMODEL) -F$(DVTFRAMEWORKS_BUILD) -Wall -Wextra
+	-IHeaders -ISources -I$(PROJECTMODEL) -F$(DVTFRAMEWORKS_BUILD) \
+	-F$(APPKIT_BUILD) -Wall -Wextra
 
 AGVTOOL      := $(BUILD_DIR)/agvtool
 AGVTOOL_OBJS := $(OBJDIR)/agvtool.o
@@ -39,7 +42,9 @@ PBXTOOL_OBJS := $(OBJDIR)/pbxproj.o $(OBJDIR)/pbxtool.o
 
 PBXMODEL      := $(BUILD_DIR)/pbxmodel
 PBXMODEL_OBJS := $(OBJDIR)/pbxmodel.o $(OBJDIR)/pbxproj.o \
-	$(OBJDIR)/PBXBuild.o $(OBJDIR)/PBXObject.o $(OBJDIR)/PBXPListCoding.o \
+	$(OBJDIR)/PBXBuild.o $(OBJDIR)/PBXObject.o \
+	$(OBJDIR)/PBXArchiveBinding.o $(OBJDIR)/PBXPListArchiver.o \
+	$(OBJDIR)/PBXPListCoding.o \
 	$(OBJDIR)/PBXProject.o $(OBJDIR)/PBXProjectModel.o $(OBJDIR)/PBXReference.o \
 	$(OBJDIR)/PBXTarget.o $(OBJDIR)/XCBuildConfiguration.o \
 	$(OBJDIR)/PBXSupport.o $(OBJDIR)/PBXNamePath.o \
@@ -91,8 +96,9 @@ $(PBXMODEL): $(PBXMODEL_OBJS)
 	@mkdir -p $(BUILD_DIR)
 	$(CC) $(OBJCFLAGS) -o $@ $(PBXMODEL_OBJS) -framework Foundation \
 		-F$(DVTFRAMEWORKS_BUILD) -framework DVTMacroFoundation \
-		-framework DVTFoundation \
-		-Wl,-rpath,@loader_path/../../$(DVTFRAMEWORKS)/build
+		-framework DVTFoundation -framework AppKit \
+		-Wl,-rpath,@loader_path/../../$(DVTFRAMEWORKS)/build \
+		-Wl,-rpath,@loader_path/../../$(APPKIT)/build/release
 
 $(OBJDIR)/pbxmodel.o: Sources/DevToolsCore/pbxmodel/pbxmodel.m
 	@mkdir -p $(OBJDIR)
@@ -105,6 +111,14 @@ $(OBJDIR)/PBXBuild.o: $(PROJECTMODEL)/PBXBuild.m
 $(OBJDIR)/PBXObject.o: $(PROJECTMODEL)/PBXObject.m
 	@mkdir -p $(OBJDIR)
 	$(CC) $(OBJCFLAGS) -c -o $@ $(PROJECTMODEL)/PBXObject.m
+
+$(OBJDIR)/PBXArchiveBinding.o: $(PROJECTMODEL)/PBXArchiveBinding.m
+	@mkdir -p $(OBJDIR)
+	$(CC) $(OBJCFLAGS) -c -o $@ $(PROJECTMODEL)/PBXArchiveBinding.m
+
+$(OBJDIR)/PBXPListArchiver.o: $(PROJECTMODEL)/PBXPListArchiver.m
+	@mkdir -p $(OBJDIR)
+	$(CC) $(OBJCFLAGS) -c -o $@ $(PROJECTMODEL)/PBXPListArchiver.m
 
 $(OBJDIR)/PBXPListCoding.o: $(PROJECTMODEL)/PBXPListCoding.m
 	@mkdir -p $(OBJDIR)
@@ -259,6 +273,7 @@ test: all
 	PBXMODEL=$(PBXMODEL) bash tools/runtimevalues.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/buildconfigurations.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/targetdependencies.sh || ok=1; \
+	PBXMODEL=$(PBXMODEL) bash tools/archivebindings.sh || ok=1; \
 	exit $$ok
 
 install: all

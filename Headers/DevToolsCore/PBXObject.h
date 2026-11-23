@@ -43,6 +43,9 @@
 /* Archive key written for a binding key (identity unless overridden). */
 + (NSString *)archiveNameForKey:(NSString *)key;
 
+/* Archiver selector used for values of this class under an archive mask. */
+- (SEL)selectorForArchiveMask:(NSInteger)mask;
+
 /* Object identity (the key in the "objects" dictionary). */
 - (NSString *)objectID;
 - (void)setObjectID:(NSString *)objectID;

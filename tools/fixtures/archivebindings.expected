@@ -1,0 +1,28 @@
+== factory ==
+mask=-8 class=PBXArchivingBinding archiveMask=-8 key=path allows=1 target=LBSBindingTarget keyBindingClass=_NSKVCPIvarGetBinding
+mask=-4 class=PBXUnarchivingBinding archiveMask=-4 key=path allows=1 target=LBSBindingTarget keyBindingClass=_NSKVCPIvarSetBinding
+mask=0 class=PBXArchivingBinding archiveMask=0 key=path allows=1 target=LBSBindingTarget keyBindingClass=_NSKVCPIvarGetBinding
+mask=1 class=PBXArchivingBinding archiveMask=1 key=path allows=1 target=LBSBindingTarget keyBindingClass=_NSKVCPIvarGetBinding
+mask=2 class=PBXArchivingBinding archiveMask=2 key=path allows=1 target=LBSBindingTarget keyBindingClass=_NSKVCPIvarGetBinding
+mask=3 class=PBXArchivingBinding archiveMask=3 key=path allows=1 target=LBSBindingTarget keyBindingClass=_NSKVCPIvarGetBinding
+mask=4 class=PBXUnarchivingBinding archiveMask=4 key=path allows=1 target=LBSBindingTarget keyBindingClass=_NSKVCPIvarSetBinding
+mask=5 class=PBXUnarchivingBinding archiveMask=5 key=path allows=1 target=LBSBindingTarget keyBindingClass=_NSKVCPIvarSetBinding
+mask=6 class=PBXUnarchivingBinding archiveMask=6 key=path allows=1 target=LBSBindingTarget keyBindingClass=_NSKVCPIvarSetBinding
+mask=7 class=PBXUnarchivingBinding archiveMask=7 key=path allows=1 target=LBSBindingTarget keyBindingClass=_NSKVCPIvarSetBinding
+mask=8 class=PBXArchivingBinding archiveMask=8 key=path allows=1 target=LBSBindingTarget keyBindingClass=_NSKVCPIvarGetBinding
+mask=16 class=PBXArchivingBinding archiveMask=16 key=path allows=1 target=LBSBindingTarget keyBindingClass=_NSKVCPIvarGetBinding
+== factory selector ==
+mask=1 class=PBXArchivingBinding archiveMask=1 key=path allows=0 target=LBSSelectorTarget keyBindingClass=_NSSelectorGetBinding
+mask=5 class=PBXUnarchivingBinding archiveMask=5 key=path allows=0 target=LBSSelectorTarget keyBindingClass=_NSSelectorSetBinding
+== archiving ==
+bindingClass=PBXArchivingBinding
+valueClass=LBSArchiveValue
+archiveSelector=encodeObject:forKey:
+archiveKey=archive_path
+archiveValue=hello
+== unarchiving ==
+bindingClass=PBXUnarchivingBinding
+archivedClass=LBSArchiveValue
+unarchiveSelector=decodeObjectForKey:
+archiveKey=archive_path
+targetPath=decoded

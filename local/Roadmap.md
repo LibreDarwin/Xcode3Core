@@ -123,6 +123,9 @@ only unless a real dependency appears.
       `pbxmodel propertysupported` oracle fixture; `Architectures`/`FileTypes`
       keys, legacy key rejection, raw macro strings, absent-key architecture
       acceptance)
+- [x] PBXArchiveBinding factory and PBXObject archive-mask selectors (Apple
+      `pbxmodel archivebindings` oracle fixture; Foundation private KVC ivar and
+      selector key bindings, archive/unarchive mask routing, descriptions)
 
 ### 6) DevToolsSupport / XcodePlugIns
 - [ ] Reverse-engineer and implement needed APIs
