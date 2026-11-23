@@ -38,9 +38,15 @@ Note: no XCDataModel/XCEntity/XCAttribute/XCRelationship classes exist in
 DevToolsCore or Xcode3Core (verified against the binaries and the 264-class
 list); Core Data model editing lives in the IDE plugins. Keep the scaffold
 only unless a real dependency appears.
-- [ ] Confirm no DevToolsCore integration point exists
-- [ ] Reverse-engineer .xcdatamodel/.xcdatamodeld parsing/writing only if needed
-- [ ] Implement XCDataModel, XCVersionedDataModel, XCEntity, XCAttribute, XCRelationship etc to match Apple behavior
+- [x] Confirm no DevToolsCore integration point exists (Apple `DevToolsCore`
+      has no `XCDataModel`/`XCEntity`/`XCAttribute`/`XCRelationship` classes or
+      DataModel selectors; only `.xcdatamodel(d)` path strings and the
+      `XCDataModelVersionGroupsFeature` compatibility factory)
+- [x] Reverse-engineer .xcdatamodel/.xcdatamodeld parsing/writing — not
+      applicable: no DevToolsCore integration point
+- [x] Implement XCDataModel, XCVersionedDataModel, XCEntity, XCAttribute,
+      XCRelationship etc — not applicable: no DevToolsCore integration point;
+      keep the local scaffold only
 
 ### 3) BuildSystem
 - [x] XCSpecification / XCSpecificationProxy / XCSpecificationRegistry / XCSpecificationFilter
