@@ -11,7 +11,9 @@
 
 #import "DevToolsCore/PBXProjectModel.h"
 #import "DevToolsCore/PBXObject.h"
+#import "DevToolsCore/PBXObjectID.h"
 #import "DevToolsCore/ProjectModel/PBXArchiveBinding.h"
+#import "DevToolsCore/ProjectModel/PBXPListArchiver.h"
 #import "DevToolsCore/PBXTarget.h"
 #import "DevToolsCore/XCBuildConfiguration.h"
 #import <DVTFoundation/DVTVersion.h>
@@ -61,7 +63,8 @@ usage(void)
 	    "       pbxmodel runtimevalues\n"
 	    "       pbxmodel buildconfigurations\n"
 	    "       pbxmodel targetdependencies\n"
-	    "       pbxmodel archivebindings\n");
+	    "       pbxmodel archivebindings\n"
+	    "       pbxmodel plistarchive\n");
 	exit(2);
 }
 
@@ -2517,6 +2520,219 @@ LBSBindingDumpFactory(Class bindingClass, Class targetClass, NSArray *masks)
 	}
 }
 
+@interface PLATestObject : NSObject
++ (BOOL)hasUserKeys;
+- (PBXObjectID *)objectID;
+- (NSString *)classNameForPListArchive;
+- (NSString *)fallbackClassNameForPListArchive;
+- (void)writeToPListArchiver:(PBXPListArchiver *)archiver;
+- (void)writeUserSettingsToPListArchiver:(PBXPListArchiver *)archiver;
+@end
+
+@implementation PLATestObject
++ (BOOL)hasUserKeys
+{
+	return (YES);
+}
+- (PBXObjectID *)objectID
+{
+	return ([[PBXObjectID alloc] initFromStringRepresentation:
+	    @"000000000000000000000001"]);
+}
+- (NSString *)classNameForPListArchive
+{
+	return (@"PLAArchiveObject");
+}
+- (NSString *)fallbackClassNameForPListArchive
+{
+	return (@"PBXObject");
+}
+- (void)writeToPListArchiver:(PBXPListArchiver *)archiver
+{
+	[archiver encodeString:@"probe" forKey:@"name"];
+	[archiver encodeInteger:7 forKey:@"count"];
+}
+- (void)writeUserSettingsToPListArchiver:(PBXPListArchiver *)archiver
+{
+	[archiver encodeString:@"setting" forKey:@"userKey"];
+}
+@end
+
+static const char *
+PLASafeUTF8(id object)
+{
+	return ((object != nil) ? [object UTF8String] : "(nil)");
+}
+
+static void
+PLAPrintValue(id value)
+{
+	if (value == nil) {
+		printf("(nil)");
+		return;
+	}
+	if ([value isKindOfClass:[NSString class]]) {
+		printf("\"%s\"", [value UTF8String]);
+		return;
+	}
+	if ([value isKindOfClass:[NSArray class]]) {
+		printf("[");
+		for (NSUInteger i = 0; i < [value count]; i++) {
+			if (i != 0)
+				printf(", ");
+			PLAPrintValue([value objectAtIndex:i]);
+		}
+		printf("]");
+		return;
+	}
+	if ([value isKindOfClass:[NSDictionary class]]) {
+		NSArray *keys = [[value allKeys]
+		    sortedArrayUsingSelector:@selector(compare:)];
+
+		printf("{");
+		for (NSUInteger i = 0; i < [keys count]; i++) {
+			id key = [keys objectAtIndex:i];
+
+			if (i != 0)
+				printf(", ");
+			printf("%s: ", PLASafeUTF8(key));
+			PLAPrintValue([value objectForKey:key]);
+		}
+		printf("}");
+		return;
+	}
+	printf("%s", [[value description] UTF8String]);
+}
+
+static void
+PLALine(NSString *label, id value)
+{
+	printf("%s = ", [label UTF8String]);
+	PLAPrintValue(value);
+	printf("\n");
+}
+
+static PBXPListArchiver *
+PLAMakeArchiver(void)
+{
+	PBXPListArchiver *archiver = [[PBXPListArchiver alloc]
+	    initWithRootObject:nil delegate:nil role:0];
+
+	[archiver setValue:[NSMutableDictionary dictionary]
+	    forKey:@"_currentArchiveDict"];
+	return (archiver);
+}
+
+static PBXPListUnarchiver *
+PLAMakeUnarchiver(NSDictionary *current)
+{
+	PBXPListUnarchiver *unarchiver = [[PBXPListUnarchiver alloc]
+	    initWithPListArchive:@{@"archiveVersion": @"1", @"classes": @{},
+	        @"objects": @{}, @"rootObject": @"nil"}];
+
+	[unarchiver setValue:current forKey:@"_currentArchiveDict"];
+	return (unarchiver);
+}
+
+static int
+cmdPlistArchive(void)
+{
+	@autoreleasepool {
+		printf("== factory ==\n");
+		PLALine(@"archive", [PBXPListArchiver plistArchiveWithRootObject:nil
+		    delegate:nil role:0]);
+
+		printf("== scalars ==\n");
+		@try {
+			PBXPListArchiver *archiver = PLAMakeArchiver();
+
+			[archiver encodeBoolean:YES forKey:@"yes"];
+			[archiver encodeBoolean:NO forKey:@"no"];
+			[archiver encodeCharacter:'A' forKey:@"char"];
+			[archiver encodeInteger:-42 forKey:@"int"];
+			[archiver encodeFloat:1.5f forKey:@"float"];
+			[archiver encodeDouble:2.25 forKey:@"double"];
+			[archiver encodeRange:NSMakeRange(3, 7) forKey:@"range"];
+			[archiver encodeValue:@"text" forKey:@"value"];
+			[archiver encodeString:@"text" forKey:@"string"];
+			[archiver encodePListArray:@[@"a", @2] forKey:@"array"];
+			[archiver encodePListDictionary:@{@"one": @2} forKey:@"dict"];
+			PLALine(@"current", [archiver valueForKey:@"_currentArchiveDict"]);
+		} @catch (NSException *exception) {
+			printf("scalars exception=%s: %s\n",
+			    [[exception name] UTF8String],
+			    [[exception reason] UTF8String]);
+		}
+
+		printf("== objects ==\n");
+		@try {
+			PBXPListArchiver *archiver = PLAMakeArchiver();
+			PLATestObject *object = [[PLATestObject alloc] init];
+
+			[archiver encodeObject:object forKey:@"strong"];
+			[archiver encodeObjectWeakly:object forKey:@"weak"];
+			[archiver encodeObjectArray:@[object, object] forKey:@"array"];
+			[archiver encodeObjectDictionary:@{@"one": object}
+			    forKey:@"dict"];
+			PLALine(@"current", [archiver valueForKey:@"_currentArchiveDict"]);
+			PLALine(@"settings", [archiver userSettings]);
+		} @catch (NSException *exception) {
+			printf("objects exception=%s: %s\n",
+			    [[exception name] UTF8String],
+			    [[exception reason] UTF8String]);
+		}
+
+		printf("== root ==\n");
+		@try {
+			PBXPListArchiver *archiver = [[PBXPListArchiver alloc]
+			    initWithRootObject:[[PLATestObject alloc] init]
+			    delegate:nil role:0];
+
+			PLALine(@"archive", [archiver plistArchive]);
+			PLALine(@"settings", [archiver userSettings]);
+		} @catch (NSException *exception) {
+			printf("root exception=%s: %s\n",
+			    [[exception name] UTF8String],
+			    [[exception reason] UTF8String]);
+		}
+
+		printf("== decode ==\n");
+		@try {
+			NSDictionary *current = @{@"key": @"text", @"number": @"42",
+			    @"numberValue": @42, @"bool": @"YES",
+			    @"boolValue": @YES, @"char": @"65",
+			    @"float": @"1.500000", @"double": @"2.250000",
+			    @"range": @"3 7", @"array": @[@"a", @2],
+			    @"dict": @{@"one": @2}};
+			PBXPListUnarchiver *unarchiver = PLAMakeUnarchiver(current);
+
+			PLALine(@"value", [unarchiver valueForKey:@"key"]);
+			PLALine(@"missing", [unarchiver valueForKey:@"missing"]);
+			PLALine(@"has", @([unarchiver hasValueForKey:@"key"]));
+			PLALine(@"hasMissing", @([unarchiver hasValueForKey:@"missing"]));
+			PLALine(@"object", [unarchiver decodeObjectForKey:@"key"]);
+			PLALine(@"string", [unarchiver decodeStringForKey:@"key"]);
+			PLALine(@"number", [unarchiver decodeNumberForKey:@"number"]);
+			PLALine(@"numberValue", [unarchiver decodeNumberForKey:@"numberValue"]);
+			PLALine(@"bool", @([unarchiver decodeBooleanForKey:@"bool"]));
+			PLALine(@"boolValue", @([unarchiver decodeBooleanForKey:@"boolValue"]));
+			PLALine(@"char", @([unarchiver decodeCharacterForKey:@"char"]));
+			PLALine(@"int", @([unarchiver decodeIntegerForKey:@"number"]));
+			PLALine(@"intValue", @([unarchiver decodeIntegerForKey:@"numberValue"]));
+			PLALine(@"float", @([unarchiver decodeFloatForKey:@"float"]));
+			PLALine(@"double", @([unarchiver decodeDoubleForKey:@"double"]));
+			PLALine(@"range", NSStringFromRange([unarchiver decodeRangeForKey:@"range"]));
+			PLALine(@"array", [unarchiver decodeMutablePListArrayForKey:@"array"]);
+			PLALine(@"dict", [unarchiver decodeMutablePListDictionaryForKey:@"dict"]);
+		} @catch (NSException *exception) {
+			printf("decode exception=%s: %s\n",
+			    [[exception name] UTF8String],
+			    [[exception reason] UTF8String]);
+		}
+	}
+	return (0);
+}
+
 static int
 cmdArchiveBindings(void)
 {
@@ -2639,6 +2855,8 @@ main(int argc, char **argv)
 			return (cmdTargetDependencies());
 		if (argc >= 2 && strcmp(argv[1], "archivebindings") == 0)
 			return (cmdArchiveBindings());
+		if (argc >= 2 && strcmp(argv[1], "plistarchive") == 0)
+			return (cmdPlistArchive());
 		if (argc < 3)
 			usage();
 		cmd = argv[1];

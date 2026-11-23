@@ -1,0 +1,29 @@
+== factory ==
+archive = {archiveVersion: "1", classes: {}, objects: {}, rootObject: "nil"}
+== scalars ==
+current = {array: ["a", 2], char: "65", dict: {one: 2}, double: "2.250000", float: "1.500000", int: "-42", no: "NO", range: "3 7", string: "text", value: "text", yes: "YES"}
+== objects ==
+current = {array: ["000000000000000000000001", "000000000000000000000001"], dict: {one: "000000000000000000000001"}, strong: "000000000000000000000001", weak: "000000000000000000000001"}
+settings = (nil)
+== root ==
+archive = {archiveVersion: "1", classes: {}, objects: {000000000000000000000001: {count: "7", fallbackIsa: "PBXObject", isa: "PLAArchiveObject", name: "probe"}}, rootObject: "000000000000000000000001"}
+settings = {000000000000000000000001: {userKey: "setting"}}
+== decode ==
+value = "text"
+missing = (nil)
+has = 1
+hasMissing = 0
+object = (nil)
+string = "text"
+number = 42
+numberValue = 42
+bool = 1
+boolValue = 0
+char = 65
+int = 42
+intValue = 0
+float = 1.5
+double = 2.25
+range = "{3, 7}"
+array = ["a", 2]
+dict = {one: 2}

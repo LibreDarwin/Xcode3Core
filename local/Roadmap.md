@@ -26,11 +26,9 @@ We must achieve behavioral parity and, where specified, byte-identical output wi
 - [x] Complete PBXGroup/PBXFileReference/PBXVariantGroup/XCVersionGroup full APIs
 - [x] Ensure archiving canonical order matches Apple for all cases; verify on broader corpus (1081/1081 byte-exact)
 - [x] PBX*ProductType classes: runtime-only XCSpecification subclasses, never archived
-- [ ] PBXArchivingBinding/PBXUnarchivingBinding family: depends on AppKit
-      NSKeyBinding and on a PListArchiver API (writeValueForObject:toPListArchiver:,
-      pbxPlistArchiver:overrideValue:forArchivingKey:) that we do not expose.
-      They are not used by the archive path we implement; defer until an
-      AppKit-dependent consumer appears.
+- [x] PBXArchivingBinding/PBXUnarchivingBinding family (Apple `pbxmodel
+      archivebindings` oracle fixture; Foundation key bindings and archive-mask
+      routing, with a minimal PListArchiver API)
 - [x] PBXExtendedWrapperPart / PBXFileSystemSynchronizedGroupRelativeReferenceID:
       small runtime-only value objects, not used by the archive path
 - [x] PBXFileType family: depends on XCSpecification; defer to item 3
