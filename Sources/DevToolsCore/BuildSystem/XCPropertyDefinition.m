@@ -1274,7 +1274,7 @@ XCPropertyConditionFlavors(NSArray *names)
 - (NSSet *)supportedArchitectures
 {
 	return ([NSSet setWithArray:
-	    ([_properties arrayOrNilForKey:@"SupportedArchs"] ?: @[])]);
+	    ([_properties arrayOrNilForKey:@"Architectures"] ?: @[])]);
 }
 
 - (NSSet *)supportedArchitecturesInDomain:(id)domain
@@ -1289,6 +1289,8 @@ XCPropertyConditionFlavors(NSArray *names)
 		    inDomain:(id)domain
 	 withMacroExpansionScope:(id)scope
 {
+	if ([_properties objectOrNilForKey:@"Architectures"] == nil)
+		return (YES);
 	return ([[self supportedArchitecturesInDomain:domain
 				 withMacroExpansionScope:scope]
 	    containsObject:architecture]);
@@ -1297,7 +1299,7 @@ XCPropertyConditionFlavors(NSArray *names)
 - (NSSet *)supportedFileTypes
 {
 	return ([NSSet setWithArray:
-	    ([_properties arrayOrNilForKey:@"SupportedFileTypes"] ?: @[])]);
+	    ([_properties arrayOrNilForKey:@"FileTypes"] ?: @[])]);
 }
 
 - (BOOL)supportsFileType:(NSString *)type

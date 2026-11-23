@@ -52,7 +52,10 @@ only unless a real dependency appears.
 - [x] Reverse-engineer XCBuildConfiguration/XCConfigurationList runtime behavior (build settings,
       hidden/couldBeActive state, effective configuration lookup, list mutations, archivable
       key tables and archive-name mapping; `pbxmodel buildconfigurations` oracle fixture)
-- [ ] XCDependencyGraph, build settings expansion, macro evaluation
+- [ ] Build settings expansion and macro evaluation with real IDEBuildParameters/workspace scope
+- [x] XCDependencyGraph reconnaissance: no public DevToolsCore class exists; only log-aspect
+      symbols are present, and target dependency ordering is already covered by the
+      `pbxmodel targetdependencies` oracle fixture
 - [x] Target dependencies/phase ordering (PBXTargetDependency/PBXContainerItemProxy,
       dependency registration/lookup/missing APIs, recursive ordering with cycle
       detection, PBXProject allTargetsInDependencyOrder; `pbxmodel targetdependencies`
@@ -116,6 +119,10 @@ only unless a real dependency appears.
       `pbxmodel propertyconditions` oracle fixture; macro expression classes,
       parser/descriptions/precedence/errors, ConditionFlavors parameters,
       nil-scope enablement)
+- [x] XCPropertyDefinition supported architectures/file types (Apple
+      `pbxmodel propertysupported` oracle fixture; `Architectures`/`FileTypes`
+      keys, legacy key rejection, raw macro strings, absent-key architecture
+      acceptance)
 
 ### 6) DevToolsSupport / XcodePlugIns
 - [ ] Reverse-engineer and implement needed APIs

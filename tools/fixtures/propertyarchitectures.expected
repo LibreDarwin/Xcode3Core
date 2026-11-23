@@ -1,0 +1,45 @@
+== def none ==
+archs = -
+filetypes = -
+supports-absent-arm64 = YES
+flavors = -
+== def legacy-supportedarchs ==
+archs = -
+filetypes = -
+supports-absent-arm64 = YES
+flavors = -
+== def architectures ==
+archs = arm64,x86_64
+filetypes = -
+supports-absent-arm64 = SKIP
+flavors = -
+== def architectures-macro ==
+archs = $(ARCHS),arm64
+filetypes = -
+supports-absent-arm64 = SKIP
+flavors = -
+== def architectures-empty ==
+archs = -
+filetypes = -
+supports-absent-arm64 = SKIP
+flavors = -
+== def filetypes ==
+archs = -
+filetypes = sourcecode.c.objc,wrapper.framework
+supports-absent-arm64 = YES
+flavors = -
+== def legacy-supportedfiletypes ==
+archs = -
+filetypes = -
+supports-absent-arm64 = YES
+flavors = -
+== def filetypes-macro ==
+archs = -
+filetypes = $(FILETYPE),sourcecode.c.objc
+supports-absent-arm64 = YES
+flavors = -
+== def flavors-arch ==
+archs = arm64,x86_64
+filetypes = -
+supports-absent-arm64 = SKIP
+flavors = arch,sdk

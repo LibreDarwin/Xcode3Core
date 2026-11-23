@@ -49,6 +49,7 @@ usage(void)
 	    "       pbxmodel supportedversionranges\n"
 	    "       pbxmodel propertyvalues\n"
 	    "       pbxmodel propertyconditions\n"
+	    "       pbxmodel propertysupported\n"
 	    "       pbxmodel plistwrappers\n"
 	    "       pbxmodel stringlist\n"
 	    "       pbxmodel tsstringbom\n"
@@ -1811,6 +1812,91 @@ cmdPropertyConditions(void)
 	return (0);
 }
 
+static NSString *
+PropertySupportedSetText(NSSet *set)
+{
+	NSMutableArray *items = [NSMutableArray array];
+
+	for (id item in set)
+		[items addObject:PropertyConditionText(item)];
+	[items sortUsingSelector:@selector(compare:)];
+	if ([items count] == 0)
+		return (@"-");
+	return ([items componentsJoinedByString:@","]);
+}
+
+static void
+ProbePropertySupported(NSString *name, NSDictionary *dictionary)
+{
+	NSMutableDictionary *full = [dictionary mutableCopy];
+	TSPropertyListDictionary *plist;
+	XCPropertyDefinition *definition;
+	NSMutableArray *flavorNames = [NSMutableArray array];
+	NSSet *architectures;
+
+	[full setObject:@"TEST_SETTING" forKey:@"Name"];
+	[full setObject:@"String" forKey:@"Type"];
+	plist = [TSPropertyListDictionary
+	    propertyListDictionaryWithDictionary:full];
+	definition = [XCPropertyDefinition
+	    propertyDefinitionFromPListDictionary:plist];
+	architectures = [definition supportedArchitectures];
+	for (id parameter in [definition conditionFlavors]) {
+		NSString *flavor = [parameter valueForKey:@"name"];
+
+		if (flavor != nil)
+			[flavorNames addObject:flavor];
+	}
+	[flavorNames sortUsingSelector:@selector(compare:)];
+
+	printf("== def %s ==\n", [name UTF8String]);
+	printf("archs = %s\n", [PropertySupportedSetText(architectures)
+	    UTF8String]);
+	printf("filetypes = %s\n", [PropertySupportedSetText(
+	    [definition supportedFileTypes]) UTF8String]);
+	if ([dictionary objectForKey:@"Architectures"] == nil) {
+		printf("supports-absent-arm64 = %s\n", [definition
+		    supportsArchitecture:@"arm64" inDomain:nil
+		    withMacroExpansionScope:nil] ? "YES" : "NO");
+	} else {
+		printf("supports-absent-arm64 = SKIP\n");
+	}
+	printf("flavors = %s\n", ([flavorNames count] == 0)
+	    ? "-" : [[flavorNames componentsJoinedByString:@","]
+		UTF8String]);
+}
+
+static int
+cmdPropertySupported(void)
+{
+	ProbePropertySupported(@"none", @{});
+	ProbePropertySupported(@"legacy-supportedarchs", @{
+		@"SupportedArchs": @[@"arm64", @"x86_64"],
+	});
+	ProbePropertySupported(@"architectures", @{
+		@"Architectures": @[@"x86_64", @"arm64"],
+	});
+	ProbePropertySupported(@"architectures-macro", @{
+		@"Architectures": @[@"$(ARCHS)", @"arm64"],
+	});
+	ProbePropertySupported(@"architectures-empty",
+	    @{@"Architectures": @[]});
+	ProbePropertySupported(@"filetypes", @{
+		@"FileTypes": @[@"wrapper.framework", @"sourcecode.c.objc"],
+	});
+	ProbePropertySupported(@"legacy-supportedfiletypes", @{
+		@"SupportedFileTypes": @[@"sourcecode.c.objc"],
+	});
+	ProbePropertySupported(@"filetypes-macro", @{
+		@"FileTypes": @[@"$(FILETYPE)", @"sourcecode.c.objc"],
+	});
+	ProbePropertySupported(@"flavors-arch", @{
+		@"Architectures": @[@"arm64", @"x86_64"],
+		@"ConditionFlavors": @[@"arch", @"sdk"],
+	});
+	return (0);
+}
+
 static void
 PrintWrapperValue(const char *label, id value)
 {
@@ -2246,6 +2332,8 @@ main(int argc, char **argv)
 			return (cmdPropertyValues());
 		if (argc >= 2 && strcmp(argv[1], "propertyconditions") == 0)
 			return (cmdPropertyConditions());
+		if (argc >= 2 && strcmp(argv[1], "propertysupported") == 0)
+			return (cmdPropertySupported());
 		if (argc >= 2 && strcmp(argv[1], "plistwrappers") == 0)
 			return (cmdPlistWrappers());
 		if (argc >= 2 && strcmp(argv[1], "stringlist") == 0)

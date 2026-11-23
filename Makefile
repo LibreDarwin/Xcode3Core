@@ -251,6 +251,7 @@ test: all
 	PBXMODEL=$(PBXMODEL) bash tools/supportedversionranges.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/propertyvalues.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/propertyconditions.sh || ok=1; \
+	PBXMODEL=$(PBXMODEL) bash tools/propertysupported.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/plistwrappers.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/stringlist.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/tsstringbom.sh || ok=1; \
