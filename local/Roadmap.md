@@ -100,7 +100,9 @@ only unless a real dependency appears.
         [x] XCPropertyDomainSpecification
         [x] XCMacroExpansionExtensions category (DVTMacroDefinitionTable+XCMacroExpansionExtensions.h;
             pbxmodel xcmacroexpansion harness matches Apple)
-- [ ] Environment/paths behavior
+- [x] Environment/paths behavior (DevToolsCore `PBXReference` source-tree path
+      resolution matches Apple `pbxmodel paths` fixture; IDEFoundation-owned
+      build-parameter/workspace resolution is out of scope)
 
 ### 5) pbxtool/pbxmodel parity hardening
 - [ ] Eliminate any remaining byte differences on Apple-written projects

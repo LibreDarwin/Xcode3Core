@@ -62,9 +62,12 @@
 - (BOOL)canSetName;
 
 /* Path resolution.  <group> paths are resolved through the parent group;
- * SOURCE_ROOT/SRCROOT through the project directory.  Unresolved build
- * locations (BUILT_PRODUCTS_DIR, SDKROOT, ...) are returned unexpanded. */
+ * other source trees keep an unexpanded /$(NAME) root. */
 - (NSString *)absolutePath;
+- (NSString *)absolutePathForBuildParameters:(id)parameters;
+- (NSString *)resolvedAbsolutePath;
+- (NSString *)absoluteExpandedPathForString:(NSString *)string
+    forBuildParameters:(id)parameters;
 - (NSString *)absolutePathForDisplay;
 - (NSString *)absoluteDirectory;
 - (NSString *)projectRelativePath;

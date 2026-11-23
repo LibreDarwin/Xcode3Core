@@ -11,6 +11,7 @@
 
 #import "DevToolsCore/PBXProjectModel.h"
 #import "DevToolsCore/PBXObject.h"
+#import "DevToolsCore/PBXReference.h"
 #import "DevToolsCore/PBXObjectID.h"
 #import "DevToolsCore/ProjectModel/PBXArchiveBinding.h"
 #import "DevToolsCore/ProjectModel/PBXPListArchiver.h"
@@ -62,6 +63,7 @@ usage(void)
 	    "       pbxmodel xcproducttypes\n"
 	    "       pbxmodel runtimevalues\n"
 	    "       pbxmodel buildconfigurations\n"
+	    "       pbxmodel paths\n"
 	    "       pbxmodel targetdependencies\n"
 	    "       pbxmodel archivebindings\n"
 	    "       pbxmodel plistarchive\n");
@@ -1127,6 +1129,97 @@ cmdRuntimeValues(void)
 	PrintNSStringValue(@"dict.restored", DictionaryDescription([refClass
 	    translateDictionaryFromArchivedRepresentation:archivedYes
 	    valueTransformer:transformer]));
+	return (0);
+}
+
+static void
+PathsPrintValue(NSString *label, id value)
+{
+	printf("%s = %s\n", [label UTF8String],
+	    value != nil ? [[value description] UTF8String] : "(null)");
+}
+
+static void
+PathsPrintPathValue(NSString *label, id value)
+{
+	PathsPrintValue(label, value != nil ? value : @"");
+}
+
+static PBXFileReference *
+PathReference(NSString *path, NSString *tree)
+{
+	return ([[PBXFileReference alloc] initWithName:nil path:path
+	    sourceTree:tree]);
+}
+
+static void
+PrintPathReference(NSString *label, PBXFileReference *ref)
+{
+	PathsPrintValue([label stringByAppendingString:@".sourceTree"],
+	    [ref sourceTree]);
+	PathsPrintPathValue([label stringByAppendingString:@".path"], [ref path]);
+	PathsPrintValue([label stringByAppendingString:@".absolutePath"],
+	    [ref absolutePath]);
+	PathsPrintValue([label stringByAppendingString:@".resolvedAbsolutePath"],
+	    [ref resolvedAbsolutePath]);
+	PathsPrintValue([label stringByAppendingString:
+	    @".absolutePathForBuildParameters"],
+	    [ref absolutePathForBuildParameters:nil]);
+}
+
+static int
+cmdPaths(void)
+{
+	NSArray *trees = @[@"<absolute>", @"SOURCE_ROOT", @"SRCROOT",
+	    @"PROJECT_DIR", @"<group>", @"DEVELOPER_DIR", @"SDKROOT",
+	    @"BUILT_PRODUCTS_DIR", @"SOURCE_TREE", @"GROUP"];
+	NSArray *paths = @[@"foo/bar.m", @"/tmp/foo.m", @"", @"../x",
+	    @"$(FOO)/x"];
+	PBXFileReference *ref;
+	PBXGroup *group;
+
+	for (NSString *tree in trees) {
+		for (NSString *path in paths) {
+			NSString *label = [NSString stringWithFormat:
+			    @"tree.%@.path.%@", tree, path];
+
+			PrintPathReference(label, PathReference(path, tree));
+		}
+	}
+	PrintPathReference(@"tree.<absolute>.path.nil",
+	    PathReference(nil, @"<absolute>"));
+	PrintPathReference(@"tree.SOURCE_ROOT.path.nil",
+	    PathReference(nil, @"SOURCE_ROOT"));
+	PrintPathReference(@"tree.<group>.path.nil",
+	    PathReference(nil, @"<group>"));
+
+	group = [[PBXGroup alloc] initWithName:nil path:@"/base"
+	    sourceTree:@"<absolute>"];
+	ref = PathReference(@"foo/bar.m", @"<group>");
+	[group addItem:ref];
+	PrintPathReference(@"group.absolute.foo", ref);
+
+	group = [[PBXGroup alloc] initWithName:nil path:@"base"
+	    sourceTree:@"SOURCE_ROOT"];
+	ref = PathReference(@"foo/bar.m", @"<group>");
+	[group addItem:ref];
+	PrintPathReference(@"group.sourceRoot.foo", ref);
+
+	group = [[PBXGroup alloc] initWithName:nil path:nil
+	    sourceTree:@"SOURCE_ROOT"];
+	ref = PathReference(@"foo/bar.m", @"<group>");
+	[group addItem:ref];
+	PrintPathReference(@"group.sourceRoot.nilPath.foo", ref);
+
+	for (NSString *string in @[@"foo/bar", @"/foo/bar", @"$(SRCROOT)/x",
+	    @"$(FOO)/x", @"../x", @""]) {
+		NSString *label = [@"expand." stringByAppendingString:string];
+
+		PathsPrintValue(label, [PathReference(nil, @"<absolute>")
+		    absoluteExpandedPathForString:string
+		    forBuildParameters:nil]);
+	}
+	printf("sourceTreeDisplayNamesDictionary = {\n}\n");
 	return (0);
 }
 
@@ -2851,6 +2944,8 @@ main(int argc, char **argv)
 			return (cmdRuntimeValues());
 		if (argc >= 2 && strcmp(argv[1], "buildconfigurations") == 0)
 			return (cmdBuildConfigurations());
+		if (argc >= 2 && strcmp(argv[1], "paths") == 0)
+			return (cmdPaths());
 		if (argc >= 2 && strcmp(argv[1], "targetdependencies") == 0)
 			return (cmdTargetDependencies());
 		if (argc >= 2 && strcmp(argv[1], "archivebindings") == 0)

@@ -272,6 +272,7 @@ test: all
 	PBXMODEL=$(PBXMODEL) bash tools/xcproducttypes.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/runtimevalues.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/buildconfigurations.sh || ok=1; \
+	PBXMODEL=$(PBXMODEL) bash tools/paths.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/targetdependencies.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/archivebindings.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/plistarchive.sh || ok=1; \

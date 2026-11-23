@@ -208,34 +208,75 @@
 	return ([_path length] > 0);
 }
 
+static NSString *
+XCJoinedAbsolutePath(NSString *base, NSString *path)
+{
+	if ([path isAbsolutePath])
+		return (path);
+	if ([base length] == 0)
+		return ([@"/" stringByAppendingString:path]);
+	if ([path length] == 0)
+		return ([base stringByAppendingString:@"/"]);
+	return ([[base stringByAppendingPathComponent:path]
+	    stringByStandardizingPath]);
+}
+
+static NSString *
+XCSourceTreeBase(NSString *tree)
+{
+	if ([tree isEqualToString:@"<absolute>"] ||
+	    [tree isEqualToString:@"<group>"])
+		return (nil);
+	return ([@"/$(" stringByAppendingFormat:@"%@)", tree]);
+}
+
 - (NSString *)absolutePath
 {
 	NSString *tree = (_sourceTree != nil) ? _sourceTree : @"<group>";
-	PBXProject *project = [[self projectModel] rootObject];
 
-	if ([tree isEqualToString:@"<absolute>"])
-		return (_path);
-	if ([tree isEqualToString:@"SOURCE_ROOT"] ||
-	    [tree isEqualToString:@"SRCROOT"] ||
-	    [tree isEqualToString:@"PROJECT_DIR"]) {
-		NSString *dir = [project projectDirectory];
-
-		if (dir == nil)
+	if ([tree isEqualToString:@"<absolute>"]) {
+		if (_path == nil || [_path length] == 0)
+			return (@"/(null)");
+		if ([_path rangeOfString:@"$("].location != NSNotFound)
+			return (nil);
+		if ([_path isAbsolutePath])
 			return (_path);
-		return (_path != nil ?
-		    [dir stringByAppendingPathComponent:_path] : dir);
+		return ([@"/" stringByAppendingString:_path]);
 	}
 	if ([tree isEqualToString:@"<group>"]) {
-		PBXGroup *group = [self group];
-		NSString *base = (group != nil) ? [group absolutePath] :
-		    [project projectDirectory];
+		NSString *base = [[self group] absolutePath];
 
-		if (base == nil)
+		if ([_path isAbsolutePath])
 			return (_path);
-		return (_path != nil ?
-		    [base stringByAppendingPathComponent:_path] : base);
+		if (base == nil)
+			return (nil);
+		return (XCJoinedAbsolutePath(base, _path));
 	}
-	return (_path);
+	if ([_path isAbsolutePath])
+		return (_path);
+	return (XCJoinedAbsolutePath(XCSourceTreeBase(tree), _path));
+}
+
+- (NSString *)absolutePathForBuildParameters:(id)parameters
+{
+	(void)parameters;
+	return ([self absolutePath]);
+}
+
+- (NSString *)resolvedAbsolutePath
+{
+	NSString *absolute = [self absolutePath];
+
+	return ((absolute != nil) ?
+	    [absolute stringByResolvingSymlinksInPath] : nil);
+}
+
+- (NSString *)absoluteExpandedPathForString:(NSString *)string
+    forBuildParameters:(id)parameters
+{
+	(void)string;
+	(void)parameters;
+	return (nil);
 }
 
 - (NSString *)absolutePathForDisplay
