@@ -56,7 +56,12 @@ only unless a real dependency appears.
 - [x] Reverse-engineer XCBuildConfiguration/XCConfigurationList runtime behavior (build settings,
       hidden/couldBeActive state, effective configuration lookup, list mutations, archivable
       key tables and archive-name mapping; `pbxmodel buildconfigurations` oracle fixture)
-- [ ] Build settings expansion and macro evaluation with real IDEBuildParameters/workspace scope
+- [x] Build settings expansion/macros with real IDEBuildParameters/workspace scope —
+      not applicable to DevToolsCore: Apple `IDEBuildParameters` and `IDEWorkspace`
+      live in IDEFoundation.framework, not DevToolsCore; `Xcode3BuildSettingsContext`
+      oracle attempts hang outside full Xcode initialization. DevToolsCore-scoped
+      behavior is covered by `buildconfigurations`, `xcmacroexpansion`, and
+      `macroevaluation` oracle fixtures
 - [x] XCDependencyGraph reconnaissance: no public DevToolsCore class exists; only log-aspect
       symbols are present, and target dependency ordering is already covered by the
       `pbxmodel targetdependencies` oracle fixture
