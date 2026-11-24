@@ -111,7 +111,10 @@ only unless a real dependency appears.
 - [x] Strengthen roundtrip harness against larger corpora
       (list/directory recursion plus macOS AppleDouble sidecar skipping;
       verified over the 814-path union corpus)
-- [ ] Handle all edge cases in OPP parser/writer
+- [x] Handle all edge cases in OPP parser/writer
+      (inline array lead/trail spacing and trailing-comma forms, own-line
+      leading comments on array elements and dict keys; regression fixture
+      `tools/fixtures/opp-edge-cases.pbxproj`)
 - [x] NSString (TSStringAdditions) BOM sniffing parity (Apple `pbxmodel tsstringbom`
       oracle fixture; nil path and nil fileData return NO)
 - [x] XCObjectGraphPath value semantics (Apple `pbxmodel objectgraphpath`

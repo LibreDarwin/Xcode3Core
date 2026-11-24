@@ -142,6 +142,7 @@ opp_free(OPPValue *v)
 		for (i = 0; i < v->nelem; i++) {
 			opp_free(v->elems[i].value);
 			free(v->elems[i].comment);
+			free(v->elems[i].lead_comment);
 			free(v->elems[i].indent);
 			free(v->elems[i].lead);
 		}
@@ -154,6 +155,7 @@ opp_free(OPPValue *v)
 			free(v->entries[i].key);
 			free(v->entries[i].key_raw);
 			free(v->entries[i].key_comment);
+			free(v->entries[i].lead_comment);
 			free(v->entries[i].indent);
 			free(v->entries[i].lead);
 			opp_free(v->entries[i].value);
@@ -510,7 +512,7 @@ at_end(const Cursor *c)
  * "Begin ... section" markers) are discarded.
  */
 static void
-skip_ws_keep(Cursor *c, char **cap, char **blanks)
+skip_ws_keep_ex(Cursor *c, char **cap, char **blanks, char **lead_comment)
 {
 	int saw_newline = 0;
 
@@ -553,17 +555,36 @@ skip_ws_keep(Cursor *c, char **cap, char **blanks)
 				fail(c, "unterminated comment");
 				return;
 			}
-			if (cap != NULL && !saw_newline &&
-			    (*cap == NULL)) {
+			{
+				char **dst = NULL;
 				const char *cs = start, *ce = q;
 
-				/* Xcode pads comments with one space on
-				 * each side; drop exactly that padding. */
-				if (cs < ce && *cs == ' ')
-					cs++;
-				if (ce > cs && ce[-1] == ' ')
-					ce--;
-				*cap = xstrndup(cs, (size_t)(ce - cs));
+				if (!saw_newline && cap != NULL &&
+				    *cap == NULL)
+					dst = cap;
+				else if (saw_newline && lead_comment != NULL &&
+				    *lead_comment == NULL)
+					dst = lead_comment;
+				if (dst != NULL) {
+					/* Xcode pads comments with one space on
+					 * each side; drop exactly that padding. */
+					if (cs < ce && *cs == ' ')
+						cs++;
+					if (ce > cs && ce[-1] == ' ')
+						ce--;
+					*dst = xstrndup(cs,
+					    (size_t)(ce - cs));
+					if (dst == lead_comment) {
+						const char *r = q + 2;
+
+						while (r < c->end &&
+						    (*r == ' ' || *r == '\t' ||
+						    *r == '\r'))
+							r++;
+						if (r < c->end && *r == '\n')
+							str_append(dst, "\n", 1);
+					}
+				}
 			}
 			c->p = q + 2;
 			saw_newline = 1;
@@ -580,6 +601,12 @@ skip_ws_keep(Cursor *c, char **cap, char **blanks)
 }
 
 static void
+skip_ws_keep(Cursor *c, char **cap, char **blanks)
+{
+	skip_ws_keep_ex(c, cap, blanks, NULL);
+}
+
+static void
 skip_ws(Cursor *c, char **cap)
 {
 	skip_ws_keep(c, cap, NULL);
@@ -589,6 +616,12 @@ static void
 skip_ws_blanks(Cursor *c, char **cap, char **blanks)
 {
 	skip_ws_keep(c, cap, blanks);
+}
+
+static void
+skip_ws_lead(Cursor *c, char **cap, char **lead_comment, char **blanks)
+{
+	skip_ws_keep_ex(c, cap, blanks, lead_comment);
 }
 
 /* Skip whitespace/comments without capturing. */
@@ -825,14 +858,16 @@ parse_array(Cursor *c)
 	c->p++;				/* '(' */
 	for (;;) {
 		char *cap = NULL;
+		char *lead_comment = NULL;
 		char *ind = NULL;
 		char *blanks = NULL;
 		OPPValue *v;
 
-		skip_ws_blanks(c, &cap, &blanks);
+		skip_ws_lead(c, &cap, &lead_comment, &blanks);
 		if (at_end(c)) {
 			fail(c, "unterminated array");
 			free(cap);
+			free(lead_comment);
 			free(blanks);
 			opp_free(a);
 			return (NULL);
@@ -842,12 +877,14 @@ parse_array(Cursor *c)
 			a->close_lead = blanks;
 			c->p++;
 			free(cap);
+			free(lead_comment);
 			break;
 		}
 		ind = capture_indent(c);
 		v = parse_value(c);
 		if (v == NULL) {
 			free(cap);
+			free(lead_comment);
 			free(ind);
 			free(blanks);
 			opp_free(a);
@@ -856,7 +893,9 @@ parse_array(Cursor *c)
 		opp_array_add_raw(a, v);
 		a->elems[a->nelem - 1].indent = ind;
 		a->elems[a->nelem - 1].lead = blanks;
+		a->elems[a->nelem - 1].lead_comment = lead_comment;
 		blanks = NULL;
+		lead_comment = NULL;
 		if (cap != NULL) {
 			a->elems[a->nelem - 1].comment = cap;
 			cap = NULL;
@@ -894,13 +933,19 @@ parse_array(Cursor *c)
 	}
 	/* inline form: no newline between '(' and ')' */
 	if (memchr(open, '\n', (size_t)(c->p - open)) == NULL) {
+		const char *first = open + 1;
+
 		a->inline_form = 1;
+		while (first < c->p && (*first == ' ' || *first == '\t'))
+			first++;
+		a->inline_array_lead_space = (first != open + 1);
 		if (a->nelem > 0) {
 			const char *r = c->p - 1;	/* the ')' */
 
 			while (r > open && (r[-1] == ' ' || r[-1] == '\t'))
 				r--;
 			a->inline_join = (r[-1] != ',');
+			a->inline_array_trail_space = (r != c->p - 1);
 		}
 	}
 	return (a);
@@ -917,15 +962,17 @@ parse_dict(Cursor *c)
 		d->inline_lead_space = 1;
 	for (;;) {
 		char *kcap = NULL;
+		char *lead_comment = NULL;
 		char *vcap = NULL;
 		char *blanks = NULL;
 		char *ind = NULL;
 		OPPValue *k, *v;
 
-		skip_ws_blanks(c, &kcap, &blanks);
+		skip_ws_lead(c, &kcap, &lead_comment, &blanks);
 		if (at_end(c)) {
 			fail(c, "unterminated dictionary");
 			free(kcap);
+			free(lead_comment);
 			free(blanks);
 			opp_free(d);
 			return (NULL);
@@ -936,11 +983,13 @@ parse_dict(Cursor *c)
 			d->close_lead = blanks;
 			c->p++;
 			free(kcap);
+			free(lead_comment);
 			break;
 		}
 		k = parse_string(c);
 		if (k == NULL) {
 			free(kcap);
+			free(lead_comment);
 			free(blanks);
 			free(ind);
 			opp_free(d);
@@ -956,6 +1005,7 @@ parse_dict(Cursor *c)
 			fail(c, "expected '=' in dictionary");
 			opp_free(k);
 			free(kcap);
+			free(lead_comment);
 			free(blanks);
 			free(ind);
 			opp_free(d);
@@ -971,6 +1021,7 @@ parse_dict(Cursor *c)
 		if (v == NULL) {
 			opp_free(k);
 			free(kcap);
+			free(lead_comment);
 			free(blanks);
 			free(ind);
 			opp_free(d);
@@ -983,6 +1034,7 @@ parse_dict(Cursor *c)
 			opp_free(k);
 			opp_free(v);
 			free(kcap);
+			free(lead_comment);
 			free(vcap);
 			free(blanks);
 			free(ind);
@@ -994,6 +1046,7 @@ parse_dict(Cursor *c)
 		d->entries[d->nentry - 1].key_raw = k->raw;
 		free(k);		/* k->str, k->raw now owned by the entry */
 		d->entries[d->nentry - 1].key_comment = kcap;
+		d->entries[d->nentry - 1].lead_comment = lead_comment;
 		d->entries[d->nentry - 1].value_comment = vcap;
 		d->entries[d->nentry - 1].indent = ind;
 		d->entries[d->nentry - 1].lead = blanks;
@@ -1279,6 +1332,25 @@ emit_comment(SB *sb, const char *comment)
 	sb_puts(sb, " */");
 }
 
+static void
+emit_lead_comment(SB *sb, const char *comment)
+{
+	size_t n;
+	int line;
+
+	if (comment == NULL)
+		return;
+	n = strlen(comment);
+	line = (n > 0 && comment[n - 1] == '\n');
+	sb_puts(sb, "/* ");
+	sb_putn(sb, comment, line ? n - 1 : n);
+	sb_puts(sb, " */");
+	if (line)
+		sb_putc(sb, '\n');
+	else
+		sb_putc(sb, ' ');
+}
+
 /* Emit leading whitespace: the source form if captured, else "depth" tabs. */
 static void
 emit_indent(SB *sb, int depth, const char *cap)
@@ -1295,11 +1367,20 @@ emit_inline_array(SB *sb, const OPPValue *a)
 	size_t i;
 
 	sb_putc(sb, '(');
+	if (a->inline_array_lead_space)
+		sb_putc(sb, ' ');
 	for (i = 0; i < a->nelem; i++) {
+		emit_lead_comment(sb, a->elems[i].lead_comment);
 		emit_value(sb, a->elems[i].value, 0, 1);
 		emit_comment(sb, a->elems[i].comment);
-		if (!a->inline_join || i + 1 < a->nelem)
+		if (i + 1 < a->nelem)
 			sb_puts(sb, ", ");
+		else if (!a->inline_join) {
+			sb_putc(sb, ',');
+			if (a->inline_array_trail_space)
+				sb_putc(sb, ' ');
+		} else if (a->inline_array_trail_space)
+			sb_putc(sb, ' ');
 	}
 	sb_putc(sb, ')');
 }
@@ -1319,6 +1400,7 @@ emit_inline_dict(SB *sb, const OPPValue *d)
 	for (i = 0; i < d->nentry; i++) {
 		if (i != 0)
 			sb_putc(sb, ' ');
+		emit_lead_comment(sb, d->entries[i].lead_comment);
 		sb_puts(sb, (d->entries[i].key_raw != NULL) ?
 		    d->entries[i].key_raw : d->entries[i].key);
 		emit_comment(sb, d->entries[i].key_comment);
@@ -1342,6 +1424,7 @@ emit_array(SB *sb, const OPPValue *a, int depth)
 		if (a->elems[i].lead != NULL)
 			sb_puts(sb, a->elems[i].lead);
 		emit_indent(sb, depth + 1, a->elems[i].indent);
+		emit_lead_comment(sb, a->elems[i].lead_comment);
 		emit_value(sb, a->elems[i].value, depth + 1, 0);
 		emit_comment(sb, a->elems[i].comment);
 		if (a->no_trailing_comma && i + 1 == a->nelem)
@@ -1390,6 +1473,10 @@ emit_object_entry(SB *sb, const OPPValue *d, size_t idx, int depth, int nl)
 	OPPValue *val = e->value;
 
 	emit_indent(sb, depth + 1, e->indent);
+	if (e->lead_comment != NULL) {
+		emit_lead_comment(sb, e->lead_comment);
+		emit_indent(sb, depth + 1, e->indent);
+	}
 	sb_puts(sb, (e->key_raw != NULL) ? e->key_raw : e->key);
 	emit_comment(sb, e->key_comment);
 	sb_puts(sb, " = ");
@@ -1489,6 +1576,10 @@ emit_dict(SB *sb, const OPPValue *d, int depth)
 		if (e->lead != NULL)
 			sb_puts(sb, e->lead);
 		emit_indent(sb, depth + 1, e->indent);
+		if (e->lead_comment != NULL) {
+			emit_lead_comment(sb, e->lead_comment);
+			emit_indent(sb, depth + 1, e->indent);
+		}
 		sb_puts(sb, (e->key_raw != NULL) ? e->key_raw : e->key);
 		emit_comment(sb, e->key_comment);
 		sb_puts(sb, " = ");

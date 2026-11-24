@@ -1,0 +1,85 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXGroup section */
+		3C0000000000000000000002 = {
+			isa = PBXGroup;
+			children = (
+				3C0000000000000000000003 /* Main.c */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXFileReference section */
+		3C0000000000000000000003 /* Main.c */ = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			path = Main.c;
+			sourceTree = "<group>";
+		};
+/* End PBXFileReference section */
+
+/* Begin PBXProject section */
+		3C0000000000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				English,
+			);
+			mainGroup = 3C0000000000000000000002;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+			);
+		};
+/* End PBXProject section */
+	};
+	rootObject = 3C0000000000000000000001 /* Project object */;
+	edgeStrings = {
+		empty = "";
+		escapes = "a\"b\\c\n\t\r";
+		unicode = "é漢字\U0001F600";
+		unknownEscape = "\q\041";
+		slashStar = "*/";
+		hyphen = "a-b";
+		bareHyphen = a-b;
+		colon = a:b;
+	};
+	edgeInline = {a = 1; b = (x, y,); c = {}; d = ();};
+	edgeNested = (
+		(
+			{ k = "v;"; },
+		),
+		{ inner = { deepest = ( one, two ); }; },
+	);
+	edgeComments = (
+		first /* one */,
+		/* leading */ second,
+		third /* three
+		four */,
+	);
+	edgeInlineDicts = { spaced = { k = v; }; tight = {k = v;}; };
+	edgeArraySpacing = (
+		( ),
+		(x, y, ),
+		( a, b ),
+	);
+	edgeDictLeadComment = {
+		/* leading key */
+		key = value;
+	};
+	edgeArrayLeadComments = (
+
+		/* lead one */ one,
+
+		/* lead two */ two,
+	);
+}
