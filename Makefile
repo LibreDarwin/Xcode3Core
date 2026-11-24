@@ -54,6 +54,7 @@ PBXMODEL_OBJS := $(OBJDIR)/pbxmodel.o $(OBJDIR)/pbxproj.o \
 	$(OBJDIR)/TSPropertyListDictionary.o \
 	$(OBJDIR)/TSRegularExpression.o \
 	$(OBJDIR)/TSFileManager.o \
+	$(OBJDIR)/TSTimedTrace.o \
 	$(OBJDIR)/NSString+TSStringAdditions.o \
 	$(OBJDIR)/XCSpecification.o $(OBJDIR)/XCSpecificationProxy.o \
 	$(OBJDIR)/XCSpecificationRegistry.o $(OBJDIR)/XCSpecificationFilter.o \
@@ -178,6 +179,10 @@ $(OBJDIR)/TSFileManager.o: Sources/DevToolsSupport/TSFileManager.m
 	@mkdir -p $(OBJDIR)
 	$(CC) $(OBJCFLAGS) -c -o $@ Sources/DevToolsSupport/TSFileManager.m
 
+$(OBJDIR)/TSTimedTrace.o: Sources/DevToolsSupport/TSTimedTrace.m
+	@mkdir -p $(OBJDIR)
+	$(CC) $(OBJCFLAGS) -c -o $@ Sources/DevToolsSupport/TSTimedTrace.m
+
 $(OBJDIR)/PBXFileTypePart.o: $(PROJECTMODEL)/PBXFileTypePart.m
 	@mkdir -p $(OBJDIR)
 	$(CC) $(OBJCFLAGS) -c -o $@ $(PROJECTMODEL)/PBXFileTypePart.m
@@ -281,6 +286,7 @@ test: all
 	PBXMODEL=$(PBXMODEL) bash tools/tsstringbom.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/tsregularexpression.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/tsfilemanager.sh || ok=1; \
+	PBXMODEL=$(PBXMODEL) bash tools/tstimedtrace.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/xcproducttypes.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/runtimevalues.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/buildconfigurations.sh || ok=1; \

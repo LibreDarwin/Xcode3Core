@@ -29,6 +29,7 @@
 		1A2B3C4D000000000000000A7 /* TSPropertyListDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000A6 /* TSPropertyListDictionary.m */; };
 		1A2B3C4D000000000000000D2 /* TSRegularExpression.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000D1 /* TSRegularExpression.m */; };
 		1A2B3C4D000000000000000D5 /* TSFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000D4 /* TSFileManager.m */; };
+		1A2B3C4D000000000000000D8 /* TSTimedTrace.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000D7 /* TSTimedTrace.m */; };
 		1A2B3C4D000000000000000BA /* XCSpecification.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000B1 /* XCSpecification.m */; };
 		1A2B3C4D000000000000000BB /* XCSpecificationProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000B2 /* XCSpecificationProxy.m */; };
 		1A2B3C4D000000000000000BC /* XCSpecificationRegistry.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000B3 /* XCSpecificationRegistry.m */; };
@@ -102,6 +103,8 @@
 		1A2B3C4D000000000000000D1 /* TSRegularExpression.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TSRegularExpression.m; sourceTree = "<group>"; };
 		1A2B3C4D000000000000000D3 /* TSFileManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TSFileManager.h; sourceTree = "<group>"; };
 		1A2B3C4D000000000000000D4 /* TSFileManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TSFileManager.m; sourceTree = "<group>"; };
+		1A2B3C4D000000000000000D6 /* TSTimedTrace.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TSTimedTrace.h; sourceTree = "<group>"; };
+		1A2B3C4D000000000000000D7 /* TSTimedTrace.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TSTimedTrace.m; sourceTree = "<group>"; };
 		1A2B3C4D000000000000000A8 /* DevToolsSupport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DevToolsSupport.h; sourceTree = "<group>"; };
 		1A2B3C4D000000000000000A9 /* DevToolsSupport.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DevToolsSupport.m; sourceTree = "<group>"; };
 		1A2B3C4D000000000000000B1 /* XCSpecification.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XCSpecification.m; sourceTree = "<group>"; };
@@ -209,6 +212,7 @@
 				1A2B3C4D000000000000000A6 /* TSPropertyListDictionary.m */,
 				1A2B3C4D000000000000000D1 /* TSRegularExpression.m */,
 				1A2B3C4D000000000000000D4 /* TSFileManager.m */,
+				1A2B3C4D000000000000000D7 /* TSTimedTrace.m */,
 				1A2B3C4D000000000000000BF /* NSString+TSStringAdditions.m */,
 			);
 			path = DevToolsSupport;
@@ -309,6 +313,7 @@
 				1A2B3C4D0000000000000009F /* TSPropertyListDictionary.h */,
 				1A2B3C4D000000000000000D0 /* TSRegularExpression.h */,
 				1A2B3C4D000000000000000D3 /* TSFileManager.h */,
+				1A2B3C4D000000000000000D6 /* TSTimedTrace.h */,
 				1A2B3C4D000000000000000C0 /* NSString+TSStringAdditions.h */,
 			);
 			path = DevToolsSupport;
@@ -512,6 +517,7 @@
 				1A2B3C4D000000000000000A7 /* TSPropertyListDictionary.m in Sources */,
 				1A2B3C4D000000000000000D2 /* TSRegularExpression.m in Sources */,
 				1A2B3C4D000000000000000D5 /* TSFileManager.m in Sources */,
+				1A2B3C4D000000000000000D8 /* TSTimedTrace.m in Sources */,
 				1A2B3C4D000000000000000C2 /* NSString+TSStringAdditions.m in Sources */,
 				1A2B3C4D000000000000000BA /* XCSpecification.m in Sources */,
 				1A2B3C4D000000000000000BB /* XCSpecificationProxy.m in Sources */,

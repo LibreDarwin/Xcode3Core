@@ -4,7 +4,9 @@
 
 #import <Foundation/Foundation.h>
 
+#include <fcntl.h>
 #include <string.h>
+#include <unistd.h>
 
 #import <objc/message.h>
 #import <objc/runtime.h>
@@ -40,6 +42,7 @@
 #import "DevToolsSupport/TSPropertyListDictionary.h"
 #import "DevToolsSupport/TSRegularExpression.h"
 #import "DevToolsSupport/TSFileManager.h"
+#import "DevToolsSupport/TSTimedTrace.h"
 #import "PBXPListCoding.h"
 
 static void
@@ -64,6 +67,7 @@ usage(void)
 	    "       pbxmodel tsstringbom\n"
 	    "       pbxmodel tsregularexpression\n"
 	    "       pbxmodel tsfilemanager\n"
+	    "       pbxmodel tstimedtrace\n"
 	    "       pbxmodel xcproducttypes\n"
 	    "       pbxmodel runtimevalues\n"
 	    "       pbxmodel buildconfigurations\n"
@@ -2683,6 +2687,160 @@ cmdTSFileManager(void)
 	return (0);
 }
 
+static void
+TSTTPrintString(const char *label, NSString *value)
+{
+	printf("%s = <%s>\n", label,
+	    (value != nil) ? [value UTF8String] : "nil");
+}
+
+static void
+TSTTPrintBool(const char *label, BOOL value)
+{
+	printf("%s = <%s>\n", label, value ? "YES" : "NO");
+}
+
+static void
+TSTTPrintInt(const char *label, int value)
+{
+	printf("%s = <%d>\n", label, value);
+}
+
+static void
+TSTTPrintCount(const char *label, NSUInteger value)
+{
+	printf("%s = <%lu>\n", label, (unsigned long)value);
+}
+
+static void
+TSTTPrintDouble(const char *label, double value)
+{
+	printf("%s = <%.2f>\n", label, value);
+}
+
+static int
+TSTTTraceFileDescriptor(NSString *path)
+{
+	return (open([path fileSystemRepresentation],
+	    O_WRONLY | O_CREAT | O_TRUNC, 0600));
+}
+
+static void
+TSTTPrintTraceFile(NSString *path)
+{
+	NSData *data = [NSData dataWithContentsOfFile:path];
+
+	if (data != nil)
+		fwrite([data bytes], 1, [data length], stdout);
+}
+
+static int
+cmdTSTimedTrace(void)
+{
+	@autoreleasepool {
+		NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+		NSString *temp = [NSTemporaryDirectory()
+		    stringByAppendingPathComponent:[[NSProcessInfo processInfo]
+		    globallyUniqueString]];
+		NSSet *enabled;
+		NSDictionary *objects;
+		TSTimedTrace *trace;
+		TSTimedTrace *gamma;
+		TSTimedTraceSubtrace *subtrace;
+		int fd;
+
+		[defaults registerDefaults:[NSDictionary
+		    dictionaryWithObject:[NSArray arrayWithObjects:
+		    @"alpha", @"beta", nil]
+		    forKey:@"TSEnabledTimedTraces"]];
+		enabled = [TSTimedTrace _enabledTraceNames];
+		objects = [TSTimedTrace _namesToTraceObjectsDictionary];
+		TSTTPrintCount("enabled.count", [enabled count]);
+		TSTTPrintBool("enabled.alpha", [enabled containsObject:@"alpha"]);
+		TSTTPrintBool("enabled.beta", [enabled containsObject:@"beta"]);
+		TSTTPrintBool("enabled.gamma", [enabled containsObject:@"gamma"]);
+		TSTTPrintCount("objects.count.before", [objects count]);
+		TSTTPrintBool("should.alpha",
+		    [TSTimedTrace shouldCreateTimedTraceWithName:@"alpha"]);
+		TSTTPrintBool("should.gamma",
+		    [TSTimedTrace shouldCreateTimedTraceWithName:@"gamma"]);
+		gamma = [TSTimedTrace timedTraceWithName:@"gamma"];
+		TSTTPrintString("gamma.class", NSStringFromClass([gamma class]));
+		trace = [TSTimedTrace timedTraceWithName:@"alpha"];
+		TSTTPrintString("alpha.class", NSStringFromClass([trace class]));
+		TSTTPrintBool("alpha.cached",
+		    trace == [TSTimedTrace timedTraceWithName:@"alpha"]);
+		TSTTPrintCount("objects.count.after", [objects count]);
+		TSTTPrintInt("alpha.fd", [trace outputFileDescriptor]);
+		TSTTPrintCount("alpha.level", [trace currentSubtraceLevel]);
+		TSTTPrintString("alpha.top.class",
+		    NSStringFromClass([[trace toplevelSubtrace] class]));
+		TSTTPrintString("alpha.current.class",
+		    NSStringFromClass([[trace currentSubtrace] class]));
+
+		subtrace = [[TSTimedTraceSubtrace alloc]
+		    initWithStartTime:10.0 userDescription:@"root"];
+		TSTTPrintDouble("sub.start", [subtrace startTime]);
+		TSTTPrintDouble("sub.last", [subtrace lastMarkTime]);
+		TSTTPrintDouble("sub.average", [subtrace averageTimeBetweenMarks]);
+		TSTTPrintString("sub.description", [subtrace userDescription]);
+		[subtrace setLastMarkTime:14.0];
+		TSTTPrintDouble("sub.last.mark", [subtrace lastMarkTime]);
+		TSTTPrintDouble("sub.average.mark",
+		    [subtrace averageTimeBetweenMarks]);
+		[subtrace setStartTime:20.0];
+		TSTTPrintDouble("sub.start.reset", [subtrace startTime]);
+		TSTTPrintDouble("sub.average.reset",
+		    [subtrace averageTimeBetweenMarks]);
+
+		fd = TSTTTraceFileDescriptor(temp);
+		[trace setOutputFileDescriptor:fd closeWhenDone:NO];
+		[trace _emitLineWithCurrentTime:1.0
+		    timeIntoTrace:2.0 timeIntoSubtrace:3.0
+		    timeSinceLastMark:-1.0 averageTimeBetweenMarks:-1.0
+		    typeTokenString:@"<< " userDescription:@"three"];
+		[trace _emitLineWithCurrentTime:1.0
+		    timeIntoTrace:2.0 timeIntoSubtrace:3.0
+		    timeSinceLastMark:4.0 averageTimeBetweenMarks:-1.0
+		    typeTokenString:@" | " userDescription:@"four"];
+		[trace _emitLineWithCurrentTime:1.0
+		    timeIntoTrace:2.0 timeIntoSubtrace:3.0
+		    timeSinceLastMark:4.0 averageTimeBetweenMarks:5.0
+		    typeTokenString:@">> " userDescription:@"five"];
+		close(fd);
+		TSTTPrintTraceFile(temp);
+
+		fd = TSTTTraceFileDescriptor(temp);
+		[trace setOutputFileDescriptor:fd closeWhenDone:NO];
+		[trace beginSubtraceWithDescription:@"outer"];
+		[trace beginSubtraceWithDescription:@"inner"];
+		TSTTPrintCount("alpha.level.nested", [trace currentSubtraceLevel]);
+		close(fd);
+		fd = TSTTTraceFileDescriptor(temp);
+		[trace setOutputFileDescriptor:fd closeWhenDone:NO];
+		[trace _emitLineWithCurrentTime:1.0
+		    timeIntoTrace:2.0 timeIntoSubtrace:3.0
+		    timeSinceLastMark:4.0 averageTimeBetweenMarks:5.0
+		    typeTokenString:@">> " userDescription:@"nested"];
+		close(fd);
+		TSTTPrintTraceFile(temp);
+
+		fd = TSTTTraceFileDescriptor(temp);
+		[trace setOutputFileDescriptor:fd closeWhenDone:NO];
+		[trace endSubtraceWithDescription:@"inner"];
+		[trace endSubtraceWithDescription:@"outer"];
+		TSTTPrintCount("alpha.level.after", [trace currentSubtraceLevel]);
+		close(fd);
+		fd = TSTTTraceFileDescriptor(temp);
+		[trace setOutputFileDescriptor:fd closeWhenDone:NO];
+		[trace endSubtraceWithDescription:@"overflow"];
+		close(fd);
+		TSTTPrintTraceFile(temp);
+		[[NSFileManager defaultManager] removeItemAtPath:temp error:NULL];
+	}
+	return (0);
+}
+
 @interface LBSArchiveValue : NSObject
 @property (nonatomic, copy) NSString *text;
 - (SEL)selectorForArchiveMask:(NSInteger)mask;
@@ -3216,6 +3374,8 @@ main(int argc, char **argv)
 			return (cmdTSRegularExpression());
 		if (argc >= 2 && strcmp(argv[1], "tsfilemanager") == 0)
 			return (cmdTSFileManager());
+		if (argc >= 2 && strcmp(argv[1], "tstimedtrace") == 0)
+			return (cmdTSTimedTrace());
 		if (argc >= 2 && strcmp(argv[1], "xcproducttypes") == 0)
 			return (cmdXCProductTypes());
 		if (argc >= 2 && strcmp(argv[1], "runtimevalues") == 0)

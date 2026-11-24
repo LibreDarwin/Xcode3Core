@@ -1,0 +1,30 @@
+enabled.count = <2>
+enabled.alpha = <YES>
+enabled.beta = <YES>
+enabled.gamma = <NO>
+objects.count.before = <0>
+should.alpha = <YES>
+should.gamma = <NO>
+gamma.class = <nil>
+alpha.class = <TSTimedTrace>
+alpha.cached = <YES>
+objects.count.after = <1>
+alpha.fd = <1>
+alpha.level = <0>
+alpha.top.class = <TSTimedTraceSubtrace>
+alpha.current.class = <TSTimedTraceSubtrace>
+sub.start = <10.00>
+sub.last = <10.00>
+sub.average = <0.00>
+sub.description = <root>
+sub.last.mark = <14.00>
+sub.average.mark = <4.00>
+sub.start.reset = <20.00>
+sub.average.reset = <4.00>
+TRACE: alpha  <<       0.00ms 2000.00ms 3000.00ms                      three
+TRACE: alpha   |       0.00ms 2000.00ms 3000.00ms 4000.00ms            four
+TRACE: alpha  >>       0.00ms 2000.00ms 3000.00ms 4000.00ms 5000.00ms  five
+alpha.level.nested = <2>
+TRACE: alpha        >>       0.00ms 2000.00ms 3000.00ms 4000.00ms 5000.00ms  nested
+alpha.level.after = <0>
+TRACE: -endSubtraceWithDescription: stack underflow
