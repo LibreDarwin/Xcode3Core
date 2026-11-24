@@ -38,6 +38,7 @@
 #import "DevToolsCore/ProjectModel/pbxproj.h"
 #import "DevToolsSupport/NSString+TSStringAdditions.h"
 #import "DevToolsSupport/TSPropertyListDictionary.h"
+#import "DevToolsSupport/TSRegularExpression.h"
 #import "PBXPListCoding.h"
 
 static void
@@ -60,6 +61,7 @@ usage(void)
 	    "       pbxmodel plistwrappers\n"
 	    "       pbxmodel stringlist\n"
 	    "       pbxmodel tsstringbom\n"
+	    "       pbxmodel tsregularexpression\n"
 	    "       pbxmodel xcproducttypes\n"
 	    "       pbxmodel runtimevalues\n"
 	    "       pbxmodel buildconfigurations\n"
@@ -2409,6 +2411,110 @@ cmdTSStringBOM(void)
 	return (0);
 }
 
+static void
+TSRegexPrintBool(NSString *label, BOOL value)
+{
+	printf("%s = <%d>\n", [label UTF8String], value ? 1 : 0);
+}
+
+static void
+TSRegexPrintString(NSString *label, id value)
+{
+	printf("%s = <%s>\n", [label UTF8String],
+	    (value != nil) ? [value UTF8String] : "nil");
+}
+
+static void
+TSRegexPrintRange(NSString *label, NSRange range)
+{
+	printf("%s = <%lu,%lu>\n", [label UTF8String],
+	    (unsigned long)range.location, (unsigned long)range.length);
+}
+
+static int
+cmdTSRegularExpression(void)
+{
+	TSRegularExpression *plain;
+	TSRegularExpression *ignoreCase;
+	TSRegularExpression *groups;
+	TSRegularExpression *copied;
+	TSRegularExpression *empty;
+	TSRegularExpression *uninitialized;
+	NSString *text = @"xxabcxx";
+	NSString *upperText = @"xxABCxx";
+	NSString *groupText = @"item-42";
+	NSRange range;
+
+	plain = [[TSRegularExpression alloc] initWithExpressionString:@"abc"];
+	ignoreCase = [[TSRegularExpression alloc]
+	    initWithExpressionString:@"abc" ignoreCase:YES];
+	groups = [[TSRegularExpression alloc]
+	    initWithExpressionString:@"([a-z]+)-([0-9]+)"];
+	copied = [plain copy];
+	empty = [[TSRegularExpression alloc] initWithExpressionString:nil];
+	uninitialized = [[TSRegularExpression alloc] init];
+
+	TSRegexPrintString(@"ctor.plain.class", NSStringFromClass([plain class]));
+	TSRegexPrintString(@"ctor.plain.expr", [plain expressionString]);
+	TSRegexPrintString(@"ctor.groups.class", NSStringFromClass([groups class]));
+	TSRegexPrintString(@"ctor.groups.expr", [groups expressionString]);
+	TSRegexPrintString(@"ctor.nil.class",
+	    (empty != nil) ? NSStringFromClass([empty class]) : nil);
+	TSRegexPrintString(@"ctor.init.class",
+	    (uninitialized != nil) ? NSStringFromClass([uninitialized class]) : nil);
+
+	TSRegexPrintBool(@"match.plain", [plain matchesString:text]);
+	TSRegexPrintBool(@"match.plain.upper", [plain matchesString:upperText]);
+	TSRegexPrintBool(@"match.ignoreCase.upper", [ignoreCase matchesString:upperText]);
+	TSRegexPrintBool(@"match.groups", [groups matchesString:groupText]);
+	TSRegexPrintBool(@"match.nil", [plain matchesString:nil]);
+
+	range = [plain rangeForSubexpressionAtIndex:0 inString:text];
+	TSRegexPrintRange(@"range.plain.full", range);
+	range = [plain rangeForSubexpressionAtIndex:0 inString:upperText];
+	TSRegexPrintRange(@"range.plain.upper", range);
+	range = [groups rangeForSubexpressionAtIndex:0 inString:groupText];
+	TSRegexPrintRange(@"range.groups.full", range);
+	range = [groups rangeForSubexpressionAtIndex:1 inString:groupText];
+	TSRegexPrintRange(@"range.groups.one", range);
+	range = [groups rangeForSubexpressionAtIndex:2 inString:groupText];
+	TSRegexPrintRange(@"range.groups.two", range);
+	range = [groups rangeForSubexpressionAtIndex:3 inString:groupText];
+	TSRegexPrintRange(@"range.groups.out", range);
+	range = [plain rangeForSubexpressionAtIndex:0 inString:nil];
+	TSRegexPrintRange(@"range.nil", range);
+
+	TSRegexPrintString(@"sub.groups.full",
+	    [groups substringForSubexpressionAtIndex:0 inString:groupText]);
+	TSRegexPrintString(@"sub.groups.one",
+	    [groups substringForSubexpressionAtIndex:1 inString:groupText]);
+	TSRegexPrintString(@"sub.groups.two",
+	    [groups substringForSubexpressionAtIndex:2 inString:groupText]);
+	TSRegexPrintString(@"sub.groups.out",
+	    [groups substringForSubexpressionAtIndex:3 inString:groupText]);
+	TSRegexPrintString(@"sub.nil",
+	    [plain substringForSubexpressionAtIndex:0 inString:nil]);
+
+	TSRegexPrintBool(@"equal.same", [plain isEqual:plain]);
+	TSRegexPrintBool(@"equal.copy", [plain isEqual:copied]);
+	TSRegexPrintBool(@"equal.ignoreCase", [plain isEqual:ignoreCase]);
+	TSRegexPrintBool(@"equal.other", [plain isEqual:groups]);
+	TSRegexPrintBool(@"equal.string", [plain isEqual:@"abc"]);
+	TSRegexPrintBool(@"equal.nil", [plain isEqual:nil]);
+	TSRegexPrintBool(@"hash.copy", [plain hash] == [copied hash]);
+	TSRegexPrintBool(@"hash.ignoreCase", [plain hash] == [ignoreCase hash]);
+	TSRegexPrintBool(@"hash.other", [plain hash] != [groups hash]);
+
+	TSRegexPrintString(@"copy.class", NSStringFromClass([copied class]));
+	TSRegexPrintBool(@"copy.identity", copied == plain);
+	TSRegexPrintString(@"copy.expr", [copied expressionString]);
+	TSRegexPrintBool(@"responds.encode",
+	    [plain respondsToSelector:@selector(encodeWithCoder:)]);
+	TSRegexPrintBool(@"responds.decode",
+	    [plain respondsToSelector:@selector(initWithCoder:)]);
+	return (0);
+}
+
 @interface LBSArchiveValue : NSObject
 @property (nonatomic, copy) NSString *text;
 - (SEL)selectorForArchiveMask:(NSInteger)mask;
@@ -2938,6 +3044,8 @@ main(int argc, char **argv)
 			return (cmdStringList());
 		if (argc >= 2 && strcmp(argv[1], "tsstringbom") == 0)
 			return (cmdTSStringBOM());
+		if (argc >= 2 && strcmp(argv[1], "tsregularexpression") == 0)
+			return (cmdTSRegularExpression());
 		if (argc >= 2 && strcmp(argv[1], "xcproducttypes") == 0)
 			return (cmdXCProductTypes());
 		if (argc >= 2 && strcmp(argv[1], "runtimevalues") == 0)

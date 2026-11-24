@@ -27,6 +27,7 @@
 		1A2B3C4D000000000000000A4 /* PBXPlatformFilterableItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D00000000000000094 /* PBXPlatformFilterableItem.m */; };
 		1A2B3C4D000000000000000A5 /* PBXSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D00000000000000095 /* PBXSupport.m */; };
 		1A2B3C4D000000000000000A7 /* TSPropertyListDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000A6 /* TSPropertyListDictionary.m */; };
+		1A2B3C4D000000000000000D2 /* TSRegularExpression.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000D1 /* TSRegularExpression.m */; };
 		1A2B3C4D000000000000000BA /* XCSpecification.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000B1 /* XCSpecification.m */; };
 		1A2B3C4D000000000000000BB /* XCSpecificationProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000B2 /* XCSpecificationProxy.m */; };
 		1A2B3C4D000000000000000BC /* XCSpecificationRegistry.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000B3 /* XCSpecificationRegistry.m */; };
@@ -96,6 +97,8 @@
 		1A2B3C4D0000000000000009E /* PBXPlatformFilterableItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PBXPlatformFilterableItem.h; sourceTree = "<group>"; };
 		1A2B3C4D000000000000000A6 /* TSPropertyListDictionary.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TSPropertyListDictionary.m; sourceTree = "<group>"; };
 		1A2B3C4D0000000000000009F /* TSPropertyListDictionary.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TSPropertyListDictionary.h; sourceTree = "<group>"; };
+		1A2B3C4D000000000000000D0 /* TSRegularExpression.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TSRegularExpression.h; sourceTree = "<group>"; };
+		1A2B3C4D000000000000000D1 /* TSRegularExpression.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TSRegularExpression.m; sourceTree = "<group>"; };
 		1A2B3C4D000000000000000A8 /* DevToolsSupport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DevToolsSupport.h; sourceTree = "<group>"; };
 		1A2B3C4D000000000000000A9 /* DevToolsSupport.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DevToolsSupport.m; sourceTree = "<group>"; };
 		1A2B3C4D000000000000000B1 /* XCSpecification.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XCSpecification.m; sourceTree = "<group>"; };
@@ -201,6 +204,7 @@
 			children = (
 				1A2B3C4D000000000000000A9 /* DevToolsSupport.m */,
 				1A2B3C4D000000000000000A6 /* TSPropertyListDictionary.m */,
+				1A2B3C4D000000000000000D1 /* TSRegularExpression.m */,
 				1A2B3C4D000000000000000BF /* NSString+TSStringAdditions.m */,
 			);
 			path = DevToolsSupport;
@@ -299,6 +303,7 @@
 			children = (
 				1A2B3C4D000000000000000A8 /* DevToolsSupport.h */,
 				1A2B3C4D0000000000000009F /* TSPropertyListDictionary.h */,
+				1A2B3C4D000000000000000D0 /* TSRegularExpression.h */,
 				1A2B3C4D000000000000000C0 /* NSString+TSStringAdditions.h */,
 			);
 			path = DevToolsSupport;
@@ -500,6 +505,7 @@
 				1A2B3C4D000000000000000A4 /* PBXPlatformFilterableItem.m in Sources */,
 				1A2B3C4D000000000000000A5 /* PBXSupport.m in Sources */,
 				1A2B3C4D000000000000000A7 /* TSPropertyListDictionary.m in Sources */,
+				1A2B3C4D000000000000000D2 /* TSRegularExpression.m in Sources */,
 				1A2B3C4D000000000000000C2 /* NSString+TSStringAdditions.m in Sources */,
 				1A2B3C4D000000000000000BA /* XCSpecification.m in Sources */,
 				1A2B3C4D000000000000000BB /* XCSpecificationProxy.m in Sources */,
