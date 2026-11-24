@@ -39,6 +39,7 @@
 #import "DevToolsSupport/NSString+TSStringAdditions.h"
 #import "DevToolsSupport/TSPropertyListDictionary.h"
 #import "DevToolsSupport/TSRegularExpression.h"
+#import "DevToolsSupport/TSFileManager.h"
 #import "PBXPListCoding.h"
 
 static void
@@ -62,6 +63,7 @@ usage(void)
 	    "       pbxmodel stringlist\n"
 	    "       pbxmodel tsstringbom\n"
 	    "       pbxmodel tsregularexpression\n"
+	    "       pbxmodel tsfilemanager\n"
 	    "       pbxmodel xcproducttypes\n"
 	    "       pbxmodel runtimevalues\n"
 	    "       pbxmodel buildconfigurations\n"
@@ -2515,6 +2517,172 @@ cmdTSRegularExpression(void)
 	return (0);
 }
 
+static void
+TSFMPrintBool(NSString *label, BOOL value)
+{
+	printf("%s = <%d>\n", [label UTF8String], value ? 1 : 0);
+}
+
+static void
+TSFMPrintString(NSString *label, id value)
+{
+	printf("%s = <%s>\n", [label UTF8String],
+	    (value != nil) ? [value UTF8String] : "nil");
+}
+
+static void
+TSFMPrintMode(NSString *label, NSUInteger value)
+{
+	printf("%s = <%lu>\n", [label UTF8String], (unsigned long)value);
+}
+
+static NSUInteger
+TSFMModeAtPath(NSString *path)
+{
+	NSDictionary *attributes = [[NSFileManager defaultManager]
+	    attributesOfItemAtPath:path error:NULL];
+	return ([[attributes objectForKey:NSFilePosixPermissions] unsignedIntegerValue]);
+}
+
+static int
+cmdTSFileManager(void)
+{
+	@autoreleasepool {
+		NSFileManager *fm = [NSFileManager defaultManager];
+		TSFileManager *mgr = [TSFileManager defaultManager];
+		NSString *unique = [[NSProcessInfo processInfo] globallyUniqueString];
+		NSString *root = [[NSTemporaryDirectory()
+		    stringByAppendingPathComponent:@"tsfm-oracle"]
+		    stringByAppendingPathComponent:unique];
+		NSString *dir = [root stringByAppendingPathComponent:@"dir"];
+		NSString *file = [root stringByAppendingPathComponent:@"file.txt"];
+		NSString *copy1 = [root stringByAppendingPathComponent:@"copy1.txt"];
+		NSString *copy2 = [root stringByAppendingPathComponent:@"copy2.txt"];
+		NSString *moved = [root stringByAppendingPathComponent:@"moved.txt"];
+		NSString *moved2 = [root stringByAppendingPathComponent:@"moved2.txt"];
+		NSString *link = [root stringByAppendingPathComponent:@"link.txt"];
+		NSString *symlink = [root stringByAppendingPathComponent:@"symlink"];
+		NSString *permSrc = [root stringByAppendingPathComponent:@"permsrc"];
+		NSString *permDst = [root stringByAppendingPathComponent:@"permdst"];
+		NSString *missing = [root stringByAppendingPathComponent:@"missing"];
+		NSError *error = nil;
+		BOOL ok;
+
+		[fm createDirectoryAtPath:root withIntermediateDirectories:YES
+		    attributes:nil error:NULL];
+
+		TSFMPrintString(@"default.class", NSStringFromClass([mgr class]));
+		TSFMPrintBool(@"default.singleton", mgr == [TSFileManager defaultManager]);
+		TSFMPrintBool(@"default.nsfm", [mgr isEqual:fm]);
+
+		TSFMPrintBool(@"dir.create", [mgr createDirectoryAtPath:dir
+		    withIntermediateDirectories:YES attributes:nil error:&error]);
+		TSFMPrintBool(@"dir.create.error", error == nil);
+		TSFMPrintBool(@"dir.is.traverse", [mgr isDirectoryAtPath:dir traverseLink:YES]);
+		TSFMPrintBool(@"dir.is.notraverse", [mgr isDirectoryAtPath:dir traverseLink:NO]);
+		TSFMPrintBool(@"dir.is.missing", [mgr isDirectoryAtPath:missing traverseLink:YES]);
+		TSFMPrintBool(@"dir.is.nil", [mgr isDirectoryAtPath:nil traverseLink:YES]);
+		TSFMPrintBool(@"dir.legacy.create", [mgr createDirectoryAtPath:
+		    [root stringByAppendingPathComponent:@"legacy"] attributes:nil]);
+		TSFMPrintBool(@"dir.recurse.create", [mgr createDirectoryAtPath:
+		    [root stringByAppendingPathComponent:@"recurse/a/b"]
+		    attributes:nil recurse:YES]);
+
+		TSFMPrintBool(@"file.create", [mgr createFileAtPath:file
+		    contents:[@"hello" dataUsingEncoding:NSUTF8StringEncoding]
+		    attributes:nil]);
+		TSFMPrintBool(@"file.exists", [fm fileExistsAtPath:file]);
+		TSFMPrintBool(@"file.isdir", [mgr isDirectoryAtPath:file traverseLink:YES]);
+		TSFMPrintString(@"file.contents", [NSString stringWithContentsOfFile:file
+		    encoding:NSUTF8StringEncoding error:NULL]);
+
+		TSFMPrintMode(@"chmod.755", [mgr posixPermissionsByApplyingChmodString:@"755" to:0644]);
+		TSFMPrintMode(@"chmod.addx", [mgr posixPermissionsByApplyingChmodString:@"+x" to:0644]);
+		TSFMPrintMode(@"chmod.addx.user", [mgr posixPermissionsByApplyingChmodString:@"+x" to:0600]);
+		TSFMPrintMode(@"chmod.uw", [mgr posixPermissionsByApplyingChmodString:@"u+w" to:0444]);
+		TSFMPrintMode(@"chmod.ar", [mgr posixPermissionsByApplyingChmodString:@"a+r" to:0600]);
+		TSFMPrintMode(@"chmod.ow", [mgr posixPermissionsByApplyingChmodString:@"o+w" to:0444]);
+		TSFMPrintMode(@"chmod.gow", [mgr posixPermissionsByApplyingChmodString:@"go-w" to:0777]);
+		TSFMPrintMode(@"chmod.multi", [mgr posixPermissionsByApplyingChmodString:@"u+x,g-w" to:0644]);
+		TSFMPrintMode(@"chmod.equal", [mgr posixPermissionsByApplyingChmodString:@"=r" to:0777]);
+		TSFMPrintMode(@"chmod.bare.w", [mgr posixPermissionsByApplyingChmodString:@"+w" to:0]);
+		TSFMPrintMode(@"chmod.bare.rw", [mgr posixPermissionsByApplyingChmodString:@"+rw" to:0]);
+		TSFMPrintMode(@"chmod.bare.minusw", [mgr posixPermissionsByApplyingChmodString:@"-w" to:0666]);
+		TSFMPrintMode(@"chmod.bare.equalw", [mgr posixPermissionsByApplyingChmodString:@"=w" to:0777]);
+		TSFMPrintMode(@"chmod.explicit.aw", [mgr posixPermissionsByApplyingChmodString:@"a+w" to:0]);
+		TSFMPrintMode(@"chmod.X.noexec", [mgr posixPermissionsByApplyingChmodString:@"+X" to:0600]);
+		TSFMPrintMode(@"chmod.X.exec", [mgr posixPermissionsByApplyingChmodString:@"+X" to:0700]);
+		TSFMPrintMode(@"chmod.X.equal", [mgr posixPermissionsByApplyingChmodString:@"=X" to:0777]);
+
+		TSFMPrintBool(@"setattrs", [mgr setAttributes:
+		    [NSDictionary dictionaryWithObject:
+		    [NSNumber numberWithUnsignedInteger:0755]
+		    forKey:NSFilePosixPermissions] ofItemAtPath:file error:&error]);
+		TSFMPrintBool(@"setattrs.error", error == nil);
+		TSFMPrintMode(@"setattrs.mode", TSFMModeAtPath(file));
+		TSFMPrintBool(@"changeattrs", [mgr changeFileAttributes:
+		    [NSDictionary dictionaryWithObject:
+		    [NSNumber numberWithUnsignedInteger:0640]
+		    forKey:NSFilePosixPermissions] atPath:file]);
+		TSFMPrintMode(@"changeattrs.mode", TSFMModeAtPath(file));
+
+		TSFMPrintBool(@"copy.item", [mgr copyItemAtPath:file toPath:copy1 error:&error]);
+		TSFMPrintBool(@"copy.item.error", error == nil);
+		TSFMPrintBool(@"copy.item.exists", [fm fileExistsAtPath:copy1]);
+		TSFMPrintBool(@"copy.path", [mgr copyPath:file toPath:copy2 handler:nil]);
+		TSFMPrintBool(@"copy.path.exists", [fm fileExistsAtPath:copy2]);
+
+		TSFMPrintBool(@"move.item", [mgr moveItemAtPath:copy1 toPath:moved error:&error]);
+		TSFMPrintBool(@"move.item.error", error == nil);
+		TSFMPrintBool(@"move.item.source", [fm fileExistsAtPath:copy1]);
+		TSFMPrintBool(@"move.item.dest", [fm fileExistsAtPath:moved]);
+		TSFMPrintBool(@"move.path", [mgr movePath:copy2 toPath:moved2 handler:nil]);
+		TSFMPrintBool(@"move.path.source", [fm fileExistsAtPath:copy2]);
+		TSFMPrintBool(@"move.path.dest", [fm fileExistsAtPath:moved2]);
+
+		TSFMPrintBool(@"link.item", [mgr linkItemAtPath:file toPath:link error:&error]);
+		TSFMPrintBool(@"link.item.error", error == nil);
+		TSFMPrintBool(@"link.exists", [fm fileExistsAtPath:link]);
+		TSFMPrintBool(@"symlink.create", [mgr createSymbolicLinkAtPath:symlink
+		    withDestinationPath:dir error:&error]);
+		TSFMPrintBool(@"symlink.is.traverse", [mgr isDirectoryAtPath:symlink traverseLink:YES]);
+		TSFMPrintBool(@"symlink.is.notraverse", [mgr isDirectoryAtPath:symlink traverseLink:NO]);
+
+		TSFMPrintBool(@"permsrc.create", [mgr createFileAtPath:permSrc contents:nil attributes:nil]);
+		TSFMPrintBool(@"permdst.create", [mgr createFileAtPath:permDst contents:nil attributes:nil]);
+		TSFMPrintBool(@"permsrc.set", [mgr setAttributes:
+		    [NSDictionary dictionaryWithObject:
+		    [NSNumber numberWithUnsignedInteger:0701]
+		    forKey:NSFilePosixPermissions] ofItemAtPath:permSrc error:NULL]);
+		TSFMPrintBool(@"permdst.set", [mgr setAttributes:
+		    [NSDictionary dictionaryWithObject:
+		    [NSNumber numberWithUnsignedInteger:0644]
+		    forKey:NSFilePosixPermissions] ofItemAtPath:permDst error:NULL]);
+		TSFMPrintBool(@"copy.permissions", [mgr copyPermissionsFromPath:permSrc toPath:permDst]);
+		TSFMPrintMode(@"copy.permissions.mode", TSFMModeAtPath(permDst));
+		TSFMPrintBool(@"permdst.reset", [mgr setAttributes:
+		    [NSDictionary dictionaryWithObject:
+		    [NSNumber numberWithUnsignedInteger:0644]
+		    forKey:NSFilePosixPermissions] ofItemAtPath:permDst error:NULL]);
+		TSFMPrintBool(@"copy.ownerpermissions", [mgr copyOwnerGroupAndPermissionsFromPath:permSrc
+		    toPath:permDst]);
+		TSFMPrintMode(@"copy.ownerpermissions.mode", TSFMModeAtPath(permDst));
+		TSFMPrintBool(@"copy.findinfo", [mgr copyFinderInfoFromPath:file toPath:permDst]);
+		TSFMPrintBool(@"copy.resourcefork", [mgr copyResourceForkFromPath:file toPath:permDst]);
+
+		TSFMPrintBool(@"remove.item", [mgr removeItemAtPath:moved error:&error]);
+		TSFMPrintBool(@"remove.item.error", error == nil);
+		TSFMPrintBool(@"remove.item.exists", [fm fileExistsAtPath:moved]);
+		TSFMPrintBool(@"remove.file", [mgr removeFileAtPath:moved2 handler:nil]);
+		TSFMPrintBool(@"remove.file.exists", [fm fileExistsAtPath:moved2]);
+		TSFMPrintBool(@"remove.nil", [mgr removeItemAtPath:nil error:&error]);
+
+		ok = [fm removeItemAtPath:root error:NULL];
+		TSFMPrintBool(@"cleanup", ok);
+	}
+	return (0);
+}
+
 @interface LBSArchiveValue : NSObject
 @property (nonatomic, copy) NSString *text;
 - (SEL)selectorForArchiveMask:(NSInteger)mask;
@@ -3046,6 +3214,8 @@ main(int argc, char **argv)
 			return (cmdTSStringBOM());
 		if (argc >= 2 && strcmp(argv[1], "tsregularexpression") == 0)
 			return (cmdTSRegularExpression());
+		if (argc >= 2 && strcmp(argv[1], "tsfilemanager") == 0)
+			return (cmdTSFileManager());
 		if (argc >= 2 && strcmp(argv[1], "xcproducttypes") == 0)
 			return (cmdXCProductTypes());
 		if (argc >= 2 && strcmp(argv[1], "runtimevalues") == 0)
