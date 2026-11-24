@@ -105,8 +105,12 @@ only unless a real dependency appears.
       build-parameter/workspace resolution is out of scope)
 
 ### 5) pbxtool/pbxmodel parity hardening
-- [ ] Eliminate any remaining byte differences on Apple-written projects
-- [ ] Strengthen roundtrip harness against larger corpora
+- [x] Eliminate any remaining byte differences on Apple-written projects
+      (0 failures over the 814-path current/union corpus; 280 paths in the old
+      1087-path list no longer exist)
+- [x] Strengthen roundtrip harness against larger corpora
+      (list/directory recursion plus macOS AppleDouble sidecar skipping;
+      verified over the 814-path union corpus)
 - [ ] Handle all edge cases in OPP parser/writer
 - [x] NSString (TSStringAdditions) BOM sniffing parity (Apple `pbxmodel tsstringbom`
       oracle fixture; nil path and nil fileData return NO)

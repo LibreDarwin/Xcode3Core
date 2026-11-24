@@ -91,6 +91,9 @@ else
 fi
 
 for f in "${files[@]}"; do
+	case "${f##*/}" in
+	._*) continue ;;
+	esac
 	if [ ! -e "$f" ]; then
 		FAIL=$((FAIL+1))
 		printf 'FAIL  %s -- not found\n' "$f"
