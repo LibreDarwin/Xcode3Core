@@ -146,7 +146,12 @@ only unless a real dependency appears.
       selector key bindings, archive/unarchive mask routing, descriptions)
 
 ### 6) DevToolsSupport / XcodePlugIns
-- [ ] Reverse-engineer and implement needed APIs
+- [x] Reverse-engineer and implement needed APIs (DevToolsSupport
+      `TSRegularExpression`, `TSFileManager`, `TSTimedTrace`,
+      `TSPropertyListDictionary`, and `NSString` BOM sniffing, each with an
+      Apple oracle fixture; DevToolsCore undefined-symbol audit confirms all
+      referenced DevToolsSupport classes are covered; XcodePlugIns scaffolds
+      retained)
 
 ## Methodology
 1. Extract class/method lists from Apple's DevToolsCore/Xcode3Core

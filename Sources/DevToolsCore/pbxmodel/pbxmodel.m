@@ -68,6 +68,7 @@ usage(void)
 	    "       pbxmodel tsregularexpression\n"
 	    "       pbxmodel tsfilemanager\n"
 	    "       pbxmodel tstimedtrace\n"
+	    "       pbxmodel tspropertylistdictionary\n"
 	    "       pbxmodel xcproducttypes\n"
 	    "       pbxmodel runtimevalues\n"
 	    "       pbxmodel buildconfigurations\n"
@@ -2841,6 +2842,143 @@ cmdTSTimedTrace(void)
 	return (0);
 }
 
+static const char *
+TSPLHKind(id object)
+{
+	if (object == nil)
+		return ("nil");
+	if ([object isKindOfClass:[NSString class]])
+		return ("NSString");
+	if ([object isKindOfClass:[NSNumber class]])
+		return ("NSNumber");
+	if ([object isKindOfClass:[NSData class]])
+		return ("NSData");
+	if ([object isKindOfClass:[NSArray class]])
+		return ("NSArray");
+	if ([object isKindOfClass:[NSDictionary class]])
+		return ("NSDictionary");
+	return ("other");
+}
+
+static void
+TSPLHPrintValue(const char *label, id object)
+{
+	if ([object isKindOfClass:[NSString class]]) {
+		printf("%s = <string:%s>\n", label, [object UTF8String]);
+	} else if ([object isKindOfClass:[NSNumber class]]) {
+		printf("%s = <number:%s>\n", label,
+		    [[object stringValue] UTF8String]);
+	} else if ([object isKindOfClass:[NSData class]]) {
+		printf("%s = <data:%lu>\n", label,
+		    (unsigned long)[(NSData *)object length]);
+	} else if ([object isKindOfClass:[NSArray class]]) {
+		printf("%s = <array:%lu>\n", label,
+		    (unsigned long)[(NSArray *)object count]);
+	} else if ([object isKindOfClass:[NSDictionary class]]) {
+		printf("%s = <dictionary:%lu>\n", label,
+		    (unsigned long)[(NSDictionary *)object count]);
+	} else {
+		printf("%s = <%s>\n", label, TSPLHKind(object));
+	}
+}
+
+static void
+TSPLHTry(const char *label, void (^block)(void))
+{
+	@try {
+		block();
+		printf("%s = <ok>\n", label);
+	} @catch (NSException *exception) {
+		printf("%s.exception = <%s: %s>\n", label,
+		    [[exception name] UTF8String],
+		    [[exception reason] UTF8String]);
+	}
+}
+
+static int
+cmdTSPropertyListDictionary(void)
+{
+	@autoreleasepool {
+		NSDictionary *base = [NSDictionary dictionaryWithObjectsAndKeys:
+		    @"value", @"str",
+		    [NSData dataWithBytes:"abc" length:3], @"data",
+		    [NSDictionary dictionaryWithObject:@"yes" forKey:@"inner"], @"dict",
+		    [NSArray arrayWithObjects:@"one", @"two", nil], @"array",
+		    [NSNumber numberWithInt:42], @"number", nil];
+		TSPropertyListDictionary *d = [TSPropertyListDictionary
+		    propertyListDictionaryWithDictionary:base];
+		NSMutableArray *keys = [NSMutableArray array];
+		for (id key in d)
+			[keys addObject:key];
+		[keys sortUsingSelector:@selector(compare:)];
+
+		TSTTPrintCount("count", [d count]);
+		TSTTPrintString("keys", [keys componentsJoinedByString:@","]);
+		TSPLHPrintValue("object.str", [d objectForKey:@"str"]);
+		TSPLHPrintValue("object.missing", [d objectOrNilForKey:@"missing"]);
+		TSPLHTry("object.required.missing", ^{
+		    (void)[d objectForKey:@"missing"];
+		});
+		TSPLHPrintValue("string.str", [d stringForKey:@"str"]);
+		TSPLHPrintValue("string.optional.missing",
+		    [d stringOrNilForKey:@"missing"]);
+		TSPLHTry("string.required.missing", ^{
+		    (void)[d stringForKey:@"missing"];
+		});
+		TSPLHTry("string.required.wrong", ^{
+		    (void)[d stringForKey:@"number"];
+		});
+		TSPLHTry("string.optional.wrong", ^{
+		    (void)[d stringOrNilForKey:@"number"];
+		});
+		TSPLHPrintValue("data.data", [d dataForKey:@"data"]);
+		TSPLHPrintValue("dictionary.dict", [d dictionaryForKey:@"dict"]);
+		TSPLHPrintValue("array.array", [d arrayForKey:@"array"]);
+		TSPLHPrintValue("array.or.object.number",
+		    [d arrayOrObjectOrNilForKey:@"number"]);
+		TSPLHPrintValue("array.or.object.array",
+		    [d arrayOrObjectOrNilForKey:@"array"]);
+		TSPLHPrintValue("array.or.object.missing",
+		    [d arrayOrObjectOrNilForKey:@"missing"]);
+
+		[d setBundle:[NSBundle mainBundle]];
+		TSTTPrintString("bundle.class",
+		    NSStringFromClass([[d bundle] class]));
+		[d setLocalizationDictionary:[NSDictionary
+		    dictionaryWithObject:@"v" forKey:@"k"]];
+		TSTTPrintCount("localization.count",
+		    [[d localizationDictionary] count]);
+
+		TSTTPrintString("type.string",
+		    [d _localizedTypeNameForClass:[NSString class]]);
+		TSTTPrintString("type.data",
+		    [d _localizedTypeNameForClass:[NSData class]]);
+		TSTTPrintString("type.dictionary",
+		    [d _localizedTypeNameForClass:[NSDictionary class]]);
+		TSTTPrintString("type.array",
+		    [d _localizedTypeNameForClass:[NSArray class]]);
+		TSTTPrintString("type.number",
+		    [d _localizedTypeNameForClass:[NSNumber class]]);
+		TSTTPrintString("type.nil",
+		    [d _localizedTypeNameForClass:Nil]);
+
+		TSPropertyListDictionary *parsed = [TSPropertyListDictionary
+		    propertyListDictionaryWithContentsOfString:
+		    @"{ str = value; array = ( one, two ); }"];
+		TSTTPrintCount("parsed.count", [parsed count]);
+		TSPLHPrintValue("parsed.str", [parsed stringForKey:@"str"]);
+		TSPLHPrintValue("parsed.array", [parsed arrayForKey:@"array"]);
+		TSPLHTry("parsed.top.wrong", ^{
+		    (void)[TSPropertyListDictionary
+		        propertyListDictionaryWithContentsOfString:@"( one, two )"];
+		});
+		TSPropertyListDictionary *empty = [[TSPropertyListDictionary alloc]
+		    initWithDictionary:nil];
+		TSTTPrintCount("empty.count", [empty count]);
+	}
+	return (0);
+}
+
 @interface LBSArchiveValue : NSObject
 @property (nonatomic, copy) NSString *text;
 - (SEL)selectorForArchiveMask:(NSInteger)mask;
@@ -3376,6 +3514,8 @@ main(int argc, char **argv)
 			return (cmdTSFileManager());
 		if (argc >= 2 && strcmp(argv[1], "tstimedtrace") == 0)
 			return (cmdTSTimedTrace());
+		if (argc >= 2 && strcmp(argv[1], "tspropertylistdictionary") == 0)
+			return (cmdTSPropertyListDictionary());
 		if (argc >= 2 && strcmp(argv[1], "xcproducttypes") == 0)
 			return (cmdXCProductTypes());
 		if (argc >= 2 && strcmp(argv[1], "runtimevalues") == 0)

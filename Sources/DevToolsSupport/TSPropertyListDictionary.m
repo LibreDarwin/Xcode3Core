@@ -125,7 +125,8 @@ TSRequireKindOfClass(id object, Class expectedClass)
         return [NSString stringWithFormat:TSLocalizedString(@"an %@", @"an %@"),
                                           NSStringFromClass(aClass)];
     }
-    return TSLocalizedString(@"an %@", @"an %@");
+    return [NSString stringWithFormat:TSLocalizedString(@"an %@", @"an %@"),
+                                      NSStringFromClass(aClass)];
 }
 
 - (id)bundle

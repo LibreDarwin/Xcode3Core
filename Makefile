@@ -287,6 +287,7 @@ test: all
 	PBXMODEL=$(PBXMODEL) bash tools/tsregularexpression.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/tsfilemanager.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/tstimedtrace.sh || ok=1; \
+	PBXMODEL=$(PBXMODEL) bash tools/tspropertylistdictionary.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/xcproducttypes.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/runtimevalues.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/buildconfigurations.sh || ok=1; \
