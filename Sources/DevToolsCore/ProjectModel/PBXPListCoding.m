@@ -59,13 +59,16 @@ PBXOPPValueFromObject(id object)
 	}
 	if ([object isKindOfClass:[NSDictionary class]]) {
 		OPPValue *d = opp_dict_new();
-		NSString *key;
+		NSDictionary *dictionary = (NSDictionary *)object;
+		NSArray *keys = [[dictionary allKeys]
+		    sortedArrayUsingSelector:@selector(compare:)];
+		id key;
 
-		for (key in [(NSDictionary *)object allKeys]) {
+		for (key in keys) {
 			NSString *k = [key isKindOfClass:[NSString class]] ?
 			    key : [key description];
 			opp_dict_set(d, [k UTF8String],
-			    PBXOPPValueFromObject([(NSDictionary *)object objectForKey:key]));
+			    PBXOPPValueFromObject([dictionary objectForKey:key]));
 		}
 		return (d);
 	}

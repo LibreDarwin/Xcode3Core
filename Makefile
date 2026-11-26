@@ -281,6 +281,7 @@ test: all
 	@ok=0; \
 	bash tools/difftest.sh $(AGVTOOL) || ok=1; \
 	PBXMODEL=$(PBXMODEL) PBXTOOL=$(PBXTOOL) bash tools/pbxroundtrip.sh || ok=1; \
+	FUZZ_ITERATIONS=120 PBXMODEL=$(PBXMODEL) PBXTOOL=$(PBXTOOL) bash tools/pbfuzz.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/propertydefs.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/propertydomains.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/xcmacroexpansion.sh || ok=1; \
