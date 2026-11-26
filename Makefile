@@ -3,8 +3,8 @@
 # Open source reimplementation of Apple's Xcode3Core.
 #
 # This Makefile builds the tools that live under Sources/DevToolsCore
-# (agvtool, pbxtool and pbxmodel); the framework targets are added as their
-# sources are reconstructed.
+# (agvtool, pbxtool and pbxmodel), DevToolsCore.framework,
+# DevToolsSupport.framework and Xcode3Core.ideplugin.
 #
 # Portable to both GNU make and BSD make (bmake): no pattern rules, no
 # ifeq/ifdef/.if conditionals and no $(if)/$(shell) functions.  Per-config
@@ -72,10 +72,45 @@ PBXMODEL_OBJS := $(OBJDIR)/pbxmodel.o $(OBJDIR)/pbxproj.o \
 	$(OBJDIR)/XCProductTypeSpecification.o \
 	$(OBJDIR)/PBXRuntimeValues.o
 
+DEVTOOLSSUPPORT      := $(BUILD_DIR)/DevToolsSupport.framework
+DEVTOOLSSUPPORT_OBJS := $(OBJDIR)/DevToolsSupport.o \
+	$(OBJDIR)/TSPropertyListDictionary.o $(OBJDIR)/TSRegularExpression.o \
+	$(OBJDIR)/TSFileManager.o $(OBJDIR)/TSTimedTrace.o \
+	$(OBJDIR)/NSString+TSStringAdditions.o
+
+DEVTOOLSCORE      := $(BUILD_DIR)/DevToolsCore.framework
+DEVTOOLSCORE_OBJS := $(OBJDIR)/pbxproj.o \
+	$(OBJDIR)/PBXBuild.o $(OBJDIR)/PBXObject.o \
+	$(OBJDIR)/PBXArchiveBinding.o $(OBJDIR)/PBXPListArchiver.o \
+	$(OBJDIR)/PBXPListCoding.o \
+	$(OBJDIR)/PBXProject.o $(OBJDIR)/PBXProjectModel.o $(OBJDIR)/PBXReference.o \
+	$(OBJDIR)/PBXTarget.o $(OBJDIR)/XCBuildConfiguration.o \
+	$(OBJDIR)/PBXSupport.o $(OBJDIR)/PBXNamePath.o \
+	$(OBJDIR)/PBXPlatformFilterableItem.o $(OBJDIR)/PBXFolder.o \
+	$(OBJDIR)/PBXFramework.o $(OBJDIR)/PBXFileTypePart.o \
+	$(OBJDIR)/PBXFileType.o \
+	$(OBJDIR)/XCSpecification.o $(OBJDIR)/XCSpecificationProxy.o \
+	$(OBJDIR)/XCSpecificationRegistry.o $(OBJDIR)/XCSpecificationFilter.o \
+	$(OBJDIR)/XCPropertyDefinition.o $(OBJDIR)/XCPropertyTypes.o \
+	$(OBJDIR)/XCPropertyCategory.o $(OBJDIR)/XCPropertyDomainSpecification.o \
+	$(OBJDIR)/DVTMacroDefinitionTable+XCMacroExpansionExtensions.o \
+	$(OBJDIR)/XCMacroExpansionScope.o $(OBJDIR)/XCObjectGraphPath.o \
+	$(OBJDIR)/XCStringList.o $(OBJDIR)/XCSimpleFilePreprocessor.o \
+	$(OBJDIR)/XCProjectRenameItem.o \
+	$(OBJDIR)/XCPropertyDefinition_SupportedVersionRange.o \
+	$(OBJDIR)/XCCompatibilityFeature.o \
+	$(OBJDIR)/PBXPlistArchiverAdditions.o \
+	$(OBJDIR)/PBXPackageTypeSpecification.o \
+	$(OBJDIR)/XCProductTypeSpecification.o $(OBJDIR)/PBXRuntimeValues.o \
+	$(OBJDIR)/XCDataModel.o $(OBJDIR)/XCRuntimeSupport.o
+
+XCODEPLUGIN      := $(BUILD_DIR)/Xcode3Core.ideplugin
+XCODEPLUGIN_OBJS := $(OBJDIR)/XcodePlugIn.o
+
 PREFIX  ?= /usr/local
 DESTDIR ?=
 
-all: $(AGVTOOL) $(PBXTOOL) $(PBXMODEL)
+all: $(AGVTOOL) $(PBXTOOL) $(PBXMODEL) $(DEVTOOLSSUPPORT) $(DEVTOOLSCORE) $(XCODEPLUGIN)
 
 $(AGVTOOL): $(AGVTOOL_OBJS)
 	@mkdir -p $(BUILD_DIR)
@@ -277,6 +312,44 @@ $(OBJDIR)/PBXRuntimeValues.o: $(PROJECTMODEL)/PBXRuntimeValues.m
 	@mkdir -p $(OBJDIR)
 	$(CC) $(OBJCFLAGS) -c -o $@ $(PROJECTMODEL)/PBXRuntimeValues.m
 
+$(OBJDIR)/DevToolsSupport.o: Sources/DevToolsSupport/DevToolsSupport.m
+	@mkdir -p $(OBJDIR)
+	$(CC) $(OBJCFLAGS) -c -o $@ Sources/DevToolsSupport/DevToolsSupport.m
+
+$(OBJDIR)/XCDataModel.o: Sources/DevToolsCore/DataModel/XCDataModel.m
+	@mkdir -p $(OBJDIR)
+	$(CC) $(OBJCFLAGS) -c -o $@ Sources/DevToolsCore/DataModel/XCDataModel.m
+
+$(OBJDIR)/XCRuntimeSupport.o: Sources/DevToolsCore/RuntimeSupport/XCRuntimeSupport.m
+	@mkdir -p $(OBJDIR)
+	$(CC) $(OBJCFLAGS) -c -o $@ Sources/DevToolsCore/RuntimeSupport/XCRuntimeSupport.m
+
+$(OBJDIR)/XcodePlugIn.o: Sources/XcodePlugIns/XcodePlugIn.m
+	@mkdir -p $(OBJDIR)
+	$(CC) $(OBJCFLAGS) -c -o $@ Sources/XcodePlugIns/XcodePlugIn.m
+
+$(DEVTOOLSSUPPORT): $(DEVTOOLSSUPPORT_OBJS)
+	@mkdir -p $(DEVTOOLSSUPPORT)/Versions/A $(DEVTOOLSSUPPORT)/Headers
+	$(CC) $(OBJCFLAGS) -dynamiclib -o $(DEVTOOLSSUPPORT)/Versions/A/DevToolsSupport $(DEVTOOLSSUPPORT_OBJS) -framework Foundation -Wl,-install_name,@rpath/DevToolsSupport.framework/Versions/A/DevToolsSupport
+	ln -sf A $(DEVTOOLSSUPPORT)/Versions/Current
+	ln -sf Versions/A/DevToolsSupport $(DEVTOOLSSUPPORT)/DevToolsSupport
+	ln -sf Versions/A/Headers $(DEVTOOLSSUPPORT)/Headers
+	cp -R Headers/DevToolsSupport/. $(DEVTOOLSSUPPORT)/Versions/A/Headers/
+
+$(DEVTOOLSCORE): $(DEVTOOLSCORE_OBJS) $(DEVTOOLSSUPPORT)
+	@mkdir -p $(DEVTOOLSCORE)/Versions/A $(DEVTOOLSCORE)/Headers
+	$(CC) $(OBJCFLAGS) -dynamiclib -o $(DEVTOOLSCORE)/Versions/A/DevToolsCore $(DEVTOOLSCORE_OBJS) -F$(BUILD_DIR) -framework DevToolsSupport -framework Foundation -F$(DVTFRAMEWORKS_BUILD) -framework DVTMacroFoundation -framework DVTFoundation -framework AppKit -Wl,-install_name,@rpath/DevToolsCore.framework/Versions/A/DevToolsCore -Wl,-rpath,@executable_path/../Frameworks
+	ln -sf A $(DEVTOOLSCORE)/Versions/Current
+	ln -sf Versions/A/DevToolsCore $(DEVTOOLSCORE)/DevToolsCore
+	ln -sf Versions/A/Headers $(DEVTOOLSCORE)/Headers
+	cp -R Headers/DevToolsCore/. $(DEVTOOLSCORE)/Versions/A/Headers/
+
+$(XCODEPLUGIN): $(XCODEPLUGIN_OBJS) $(DEVTOOLSCORE) $(DEVTOOLSSUPPORT)
+	@mkdir -p $(XCODEPLUGIN)/Contents/MacOS $(XCODEPLUGIN)/Contents/Frameworks
+	$(CC) $(OBJCFLAGS) -bundle -o $(XCODEPLUGIN)/Contents/MacOS/Xcode3Core $(XCODEPLUGIN_OBJS) -F$(BUILD_DIR) -framework DevToolsCore -framework DevToolsSupport -framework Foundation -Wl,-rpath,@executable_path/../Frameworks -Wl,-rpath,$(DVTFRAMEWORKS_BUILD) -Wl,-rpath,$(APPKIT_BUILD)
+	cp -R $(DEVTOOLSSUPPORT) $(XCODEPLUGIN)/Contents/Frameworks/
+	cp -R $(DEVTOOLSCORE) $(XCODEPLUGIN)/Contents/Frameworks/
+
 test: all
 	@ok=0; \
 	bash tools/difftest.sh $(AGVTOOL) || ok=1; \
@@ -311,11 +384,15 @@ test: all
 	exit $$ok
 
 install: all
-	install -d $(DESTDIR)$(PREFIX)/bin $(DESTDIR)$(PREFIX)/share/man/man1
+	install -d $(DESTDIR)$(PREFIX)/bin $(DESTDIR)$(PREFIX)/lib $(DESTDIR)$(PREFIX)/share/man/man1
+	install -d "$(DESTDIR)$(PREFIX)/Library/Application Support/Developer/Shared/Xcode/Plug-ins"
 	install -m 0755 $(AGVTOOL) $(DESTDIR)$(PREFIX)/bin/agvtool
 	install -m 0755 $(PBXTOOL) $(DESTDIR)$(PREFIX)/bin/pbxtool
 	install -m 0755 $(PBXMODEL) $(DESTDIR)$(PREFIX)/bin/pbxmodel
 	install -m 0444 man/agvtool.1 $(DESTDIR)$(PREFIX)/share/man/man1/agvtool.1
+	cp -R $(DEVTOOLSSUPPORT) $(DESTDIR)$(PREFIX)/lib/
+	cp -R $(DEVTOOLSCORE) $(DESTDIR)$(PREFIX)/lib/
+	cp -R $(XCODEPLUGIN) "$(DESTDIR)$(PREFIX)/Library/Application Support/Developer/Shared/Xcode/Plug-ins/"
 
 clean:
 	rm -rf build

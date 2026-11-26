@@ -54,6 +54,66 @@
 		1A2B3C4D0000000000000117 /* PBXPListArchiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000115 /* PBXPListArchiver.m */; };
 		1A2B3C4D000000000000011C /* XCSimpleFilePreprocessor.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000011D /* XCSimpleFilePreprocessor.m */; };
 		1A2B3C4D000000000000011F /* XCProjectRenameItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000120 /* XCProjectRenameItem.m */; };
+		1A2B3C4D0000000000000220 /* DevToolsSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000A9 /* DevToolsSupport.m */; };
+		1A2B3C4D0000000000000221 /* XcodePlugIn.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000203 /* XcodePlugIn.m */; };
+		1A2B3C4D0000000000000222 /* XCDataModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000205 /* XCDataModel.m */; };
+		1A2B3C4D0000000000000223 /* XCRuntimeSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000206 /* XCRuntimeSupport.m */; };
+		1A2B3C4D0000000000000224 /* DevToolsSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000200 /* DevToolsSupport.framework */; };
+		1A2B3C4D0000000000000225 /* DevToolsSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000200 /* DevToolsSupport.framework */; };
+		1A2B3C4D0000000000000226 /* DevToolsCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000201 /* DevToolsCore.framework */; };
+		1A2B3C4D0000000000000227 /* DevToolsSupport.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000200 /* DevToolsSupport.framework */; };
+		1A2B3C4D0000000000000228 /* DevToolsCore.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000201 /* DevToolsCore.framework */; };
+		1A2B3C4D0000000000000230 /* DVTMacroDefinitionTable+XCMacroExpansionExtensions.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000E8 /* DVTMacroDefinitionTable+XCMacroExpansionExtensions.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D0000000000000231 /* XCBuildSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000207 /* XCBuildSystem.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D0000000000000232 /* XCPropertyCategory.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000E3 /* XCPropertyCategory.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D0000000000000233 /* XCPropertyDefinition.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000DD /* XCPropertyDefinition.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D0000000000000234 /* XCPropertyDefinition_SupportedVersionRange.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000010B /* XCPropertyDefinition_SupportedVersionRange.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D0000000000000235 /* XCPropertyDomainSpecification.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000E5 /* XCPropertyDomainSpecification.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D0000000000000236 /* XCPropertyTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000DF /* XCPropertyTypes.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D0000000000000237 /* XCSimpleFilePreprocessor.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000011E /* XCSimpleFilePreprocessor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D0000000000000238 /* XCSpecification.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000B6 /* XCSpecification.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D0000000000000239 /* XCSpecificationFilter.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000C4 /* XCSpecificationFilter.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D000000000000023A /* XCSpecificationProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000B7 /* XCSpecificationProxy.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D000000000000023B /* XCSpecificationRegistry.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000B8 /* XCSpecificationRegistry.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D000000000000023C /* XCDataModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000208 /* XCDataModel.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D000000000000023D /* PBXAnchoredReference.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D00000000000000096 /* PBXAnchoredReference.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D000000000000023E /* PBXBuild.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000005B /* PBXBuild.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D000000000000023F /* PBXExtendedWrapperPart.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000F4 /* PBXExtendedWrapperPart.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D0000000000000240 /* PBXFileSystemSynchronizedGroupRelativeReferenceID.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000F5 /* PBXFileSystemSynchronizedGroupRelativeReferenceID.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D0000000000000241 /* PBXFileType.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000BE /* PBXFileType.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D0000000000000242 /* PBXFileTypePart.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D00000000000000097 /* PBXFileTypePart.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D0000000000000243 /* PBXFolder.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D00000000000000098 /* PBXFolder.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D0000000000000244 /* PBXFramework.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D00000000000000099 /* PBXFramework.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D0000000000000245 /* PBXGroupEnumerator.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000009A /* PBXGroupEnumerator.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D0000000000000246 /* PBXNamePath.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000009B /* PBXNamePath.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D0000000000000247 /* PBXObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000005C /* PBXObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D0000000000000248 /* PBXObjectID.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000009C /* PBXObjectID.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D0000000000000249 /* PBXPackageTypeSpecification.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000EE /* PBXPackageTypeSpecification.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D000000000000024A /* PBXPlatformFilter.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000009D /* PBXPlatformFilter.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D000000000000024B /* PBXPlatformFilterableItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000009E /* PBXPlatformFilterableItem.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D000000000000024C /* PBXPlistArchiverAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000105 /* PBXPlistArchiverAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D000000000000024D /* PBXProject.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000005D /* PBXProject.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D000000000000024E /* PBXProjectModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000005E /* PBXProjectModel.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D000000000000024F /* PBXReference.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000005F /* PBXReference.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D0000000000000250 /* PBXTarget.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000060 /* PBXTarget.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D0000000000000251 /* PBXArchiveBinding.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000110 /* PBXArchiveBinding.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D0000000000000252 /* PBXArchivingBinding.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000112 /* PBXArchivingBinding.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D0000000000000253 /* PBXPListArchiver.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000114 /* PBXPListArchiver.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D0000000000000254 /* PBXUnarchivingBinding.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000113 /* PBXUnarchivingBinding.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D0000000000000255 /* XCProjectRenameItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000121 /* XCProjectRenameItem.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D0000000000000256 /* XCRuntimeSupport.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000209 /* XCRuntimeSupport.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D0000000000000257 /* XCBuildConfiguration.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000061 /* XCBuildConfiguration.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D0000000000000258 /* XCCompatibilityFeature.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000108 /* XCCompatibilityFeature.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D0000000000000259 /* XCMacroExpansionScope.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000EA /* XCMacroExpansionScope.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D000000000000025A /* XCObjectGraphPath.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000F8 /* XCObjectGraphPath.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D000000000000025B /* XCProductTypeSpecification.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000F1 /* XCProductTypeSpecification.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D000000000000025C /* XCStringList.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000102 /* XCStringList.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D0000000000000260 /* DevToolsSupport.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000A8 /* DevToolsSupport.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D0000000000000261 /* NSString+TSStringAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000C0 /* NSString+TSStringAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D0000000000000262 /* TSFileManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000D3 /* TSFileManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D0000000000000263 /* TSPropertyListDictionary.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000009F /* TSPropertyListDictionary.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D0000000000000264 /* TSRegularExpression.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000D0 /* TSRegularExpression.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A2B3C4D0000000000000265 /* TSTimedTrace.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000000D6 /* TSTimedTrace.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -160,6 +220,16 @@
 		1A2B3C4D000000000000011E /* XCSimpleFilePreprocessor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XCSimpleFilePreprocessor.h; sourceTree = "<group>"; };
 		1A2B3C4D0000000000000120 /* XCProjectRenameItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XCProjectRenameItem.m; sourceTree = "<group>"; };
 		1A2B3C4D0000000000000121 /* XCProjectRenameItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XCProjectRenameItem.h; sourceTree = "<group>"; };
+		1A2B3C4D0000000000000200 /* DevToolsSupport.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = DevToolsSupport.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		1A2B3C4D0000000000000201 /* DevToolsCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = DevToolsCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		1A2B3C4D0000000000000202 /* Xcode3Core.ideplugin */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Xcode3Core.ideplugin; sourceTree = BUILT_PRODUCTS_DIR; };
+		1A2B3C4D0000000000000203 /* XcodePlugIn.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XcodePlugIn.m; sourceTree = "<group>"; };
+		1A2B3C4D0000000000000204 /* XcodePlugIn.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XcodePlugIn.h; sourceTree = "<group>"; };
+		1A2B3C4D0000000000000205 /* XCDataModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XCDataModel.m; sourceTree = "<group>"; };
+		1A2B3C4D0000000000000206 /* XCRuntimeSupport.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XCRuntimeSupport.m; sourceTree = "<group>"; };
+		1A2B3C4D0000000000000207 /* XCBuildSystem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XCBuildSystem.h; sourceTree = "<group>"; };
+		1A2B3C4D0000000000000208 /* XCDataModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XCDataModel.h; sourceTree = "<group>"; };
+		1A2B3C4D0000000000000209 /* XCRuntimeSupport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XCRuntimeSupport.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -181,6 +251,9 @@
 				1A2B3C4D0000000000000018 /* agvtool */,
 				1A2B3C4D0000000000000044 /* pbxtool */,
 				1A2B3C4D000000000000005A /* pbxmodel */,
+				1A2B3C4D0000000000000200 /* DevToolsSupport.framework */,
+				1A2B3C4D0000000000000201 /* DevToolsCore.framework */,
+				1A2B3C4D0000000000000202 /* Xcode3Core.ideplugin */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -191,6 +264,7 @@
 				1A2B3C4D0000000000000005 /* DevToolsCore */,
 				1A2B3C4D000000000000000AA /* DevToolsSupport */,
 				1A2B3C4D000000000000000AC /* DVTFoundation */,
+				1A2B3C4D0000000000000210 /* XcodePlugIns */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -200,6 +274,8 @@
 			children = (
 				1A2B3C4D0000000000000006 /* agvtool */,
 				1A2B3C4D000000000000004A /* ProjectModel */,
+				1A2B3C4D0000000000000212 /* DataModel */,
+				1A2B3C4D0000000000000213 /* RuntimeSupport */,
 				1A2B3C4D0000000000000085 /* pbxmodel */,
 				1A2B3C4D000000000000004B /* pbxtool */,
 				1A2B3C4D000000000000000E9 /* XCMacroExpansionScope.m */,
@@ -276,6 +352,7 @@
 				1A2B3C4D0000000000000087 /* DevToolsCore */,
 				1A2B3C4D000000000000000AB /* DevToolsSupport */,
 				1A2B3C4D000000000000000AE /* DVTFoundation */,
+				1A2B3C4D0000000000000211 /* XcodePlugIns */,
 			);
 			path = Headers;
 			sourceTree = "<group>";
@@ -305,9 +382,13 @@
 				1A2B3C4D0000000000000102 /* XCStringList.h */,
 				1A2B3C4D0000000000000105 /* PBXPlistArchiverAdditions.h */,
 				1A2B3C4D0000000000000108 /* XCCompatibilityFeature.h */,
+				1A2B3C4D000000000000000F1 /* XCProductTypeSpecification.h */,
+				1A2B3C4D000000000000000EE /* PBXPackageTypeSpecification.h */,
 				1A2B3C4D000000000000000F4 /* PBXExtendedWrapperPart.h */,
 				1A2B3C4D000000000000000F5 /* PBXFileSystemSynchronizedGroupRelativeReferenceID.h */,
 				1A2B3C4D0000000000000118 /* ProjectModel */,
+				1A2B3C4D0000000000000214 /* DataModel */,
+				1A2B3C4D0000000000000215 /* RuntimeSupport */,
 				1A2B3C4D000000000000000AF /* BuildSystem */,
 			);
 			path = DevToolsCore;
@@ -385,8 +466,7 @@
 				1A2B3C4D000000000000000E5 /* XCPropertyDomainSpecification.h */,
 				1A2B3C4D000000000000000E8 /* DVTMacroDefinitionTable+XCMacroExpansionExtensions.h */,
 				1A2B3C4D000000000000010B /* XCPropertyDefinition_SupportedVersionRange.h */,
-				1A2B3C4D000000000000000EE /* PBXPackageTypeSpecification.h */,
-				1A2B3C4D000000000000000F1 /* XCProductTypeSpecification.h */,
+				1A2B3C4D0000000000000207 /* XCBuildSystem.h */,
 				1A2B3C4D000000000000011E /* XCSimpleFilePreprocessor.h */,
 			);
 			path = BuildSystem;
@@ -408,7 +488,199 @@
 			path = man;
 			sourceTree = "<group>";
 		};
+		1A2B3C4D0000000000000210 /* XcodePlugIns */ = {
+			isa = PBXGroup;
+			children = (
+				1A2B3C4D0000000000000203 /* XcodePlugIn.m */,
+			);
+			path = XcodePlugIns;
+			sourceTree = "<group>";
+		};
+		1A2B3C4D0000000000000211 /* XcodePlugIns */ = {
+			isa = PBXGroup;
+			children = (
+				1A2B3C4D0000000000000204 /* XcodePlugIn.h */,
+			);
+			path = XcodePlugIns;
+			sourceTree = "<group>";
+		};
+		1A2B3C4D0000000000000212 /* DataModel */ = {
+			isa = PBXGroup;
+			children = (
+				1A2B3C4D0000000000000205 /* XCDataModel.m */,
+			);
+			path = DataModel;
+			sourceTree = "<group>";
+		};
+		1A2B3C4D0000000000000213 /* RuntimeSupport */ = {
+			isa = PBXGroup;
+			children = (
+				1A2B3C4D0000000000000206 /* XCRuntimeSupport.m */,
+			);
+			path = RuntimeSupport;
+			sourceTree = "<group>";
+		};
+		1A2B3C4D0000000000000214 /* DataModel */ = {
+			isa = PBXGroup;
+			children = (
+				1A2B3C4D0000000000000208 /* XCDataModel.h */,
+			);
+			path = DataModel;
+			sourceTree = "<group>";
+		};
+		1A2B3C4D0000000000000215 /* RuntimeSupport */ = {
+			isa = PBXGroup;
+			children = (
+				1A2B3C4D0000000000000209 /* XCRuntimeSupport.h */,
+			);
+			path = RuntimeSupport;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
+
+/* Begin PBXContainerItemProxy section */
+		1A2B3C4D0000000000000430 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1A2B3C4D0000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1A2B3C4D0000000000000400;
+			remoteInfo = DevToolsSupport.framework;
+		};
+		1A2B3C4D0000000000000431 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1A2B3C4D0000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1A2B3C4D0000000000000401;
+			remoteInfo = DevToolsCore.framework;
+		};
+		1A2B3C4D0000000000000432 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1A2B3C4D0000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1A2B3C4D0000000000000400;
+			remoteInfo = DevToolsSupport.framework;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		1A2B3C4D0000000000000307 /* Copy Files */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				1A2B3C4D0000000000000227 /* DevToolsSupport.framework in Copy Files */,
+				1A2B3C4D0000000000000228 /* DevToolsCore.framework in Copy Files */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		1A2B3C4D0000000000000305 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1A2B3C4D0000000000000224 /* DevToolsSupport.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1A2B3C4D0000000000000306 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1A2B3C4D0000000000000225 /* DevToolsSupport.framework in Frameworks */,
+				1A2B3C4D0000000000000226 /* DevToolsCore.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXHeadersBuildPhase section */
+		1A2B3C4D0000000000000303 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1A2B3C4D0000000000000260 /* in Headers */,
+				1A2B3C4D0000000000000261 /* in Headers */,
+				1A2B3C4D0000000000000262 /* in Headers */,
+				1A2B3C4D0000000000000263 /* in Headers */,
+				1A2B3C4D0000000000000264 /* in Headers */,
+				1A2B3C4D0000000000000265 /* in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1A2B3C4D0000000000000304 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1A2B3C4D0000000000000230 /* in Headers */,
+				1A2B3C4D0000000000000231 /* in Headers */,
+				1A2B3C4D0000000000000232 /* in Headers */,
+				1A2B3C4D0000000000000233 /* in Headers */,
+				1A2B3C4D0000000000000234 /* in Headers */,
+				1A2B3C4D0000000000000235 /* in Headers */,
+				1A2B3C4D0000000000000236 /* in Headers */,
+				1A2B3C4D0000000000000237 /* in Headers */,
+				1A2B3C4D0000000000000238 /* in Headers */,
+				1A2B3C4D0000000000000239 /* in Headers */,
+				1A2B3C4D000000000000023A /* in Headers */,
+				1A2B3C4D000000000000023B /* in Headers */,
+				1A2B3C4D000000000000023C /* in Headers */,
+				1A2B3C4D000000000000023D /* in Headers */,
+				1A2B3C4D000000000000023E /* in Headers */,
+				1A2B3C4D000000000000023F /* in Headers */,
+				1A2B3C4D0000000000000240 /* in Headers */,
+				1A2B3C4D0000000000000241 /* in Headers */,
+				1A2B3C4D0000000000000242 /* in Headers */,
+				1A2B3C4D0000000000000243 /* in Headers */,
+				1A2B3C4D0000000000000244 /* in Headers */,
+				1A2B3C4D0000000000000245 /* in Headers */,
+				1A2B3C4D0000000000000246 /* in Headers */,
+				1A2B3C4D0000000000000247 /* in Headers */,
+				1A2B3C4D0000000000000248 /* in Headers */,
+				1A2B3C4D0000000000000249 /* in Headers */,
+				1A2B3C4D000000000000024A /* in Headers */,
+				1A2B3C4D000000000000024B /* in Headers */,
+				1A2B3C4D000000000000024C /* in Headers */,
+				1A2B3C4D000000000000024D /* in Headers */,
+				1A2B3C4D000000000000024E /* in Headers */,
+				1A2B3C4D000000000000024F /* in Headers */,
+				1A2B3C4D0000000000000250 /* in Headers */,
+				1A2B3C4D0000000000000251 /* in Headers */,
+				1A2B3C4D0000000000000252 /* in Headers */,
+				1A2B3C4D0000000000000253 /* in Headers */,
+				1A2B3C4D0000000000000254 /* in Headers */,
+				1A2B3C4D0000000000000255 /* in Headers */,
+				1A2B3C4D0000000000000256 /* in Headers */,
+				1A2B3C4D0000000000000257 /* in Headers */,
+				1A2B3C4D0000000000000258 /* in Headers */,
+				1A2B3C4D0000000000000259 /* in Headers */,
+				1A2B3C4D000000000000025A /* in Headers */,
+				1A2B3C4D000000000000025B /* in Headers */,
+				1A2B3C4D000000000000025C /* in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		1A2B3C4D0000000000000420 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1A2B3C4D0000000000000400 /* DevToolsSupport.framework */;
+			targetProxy = 1A2B3C4D0000000000000430 /* PBXContainerItemProxy */;
+		};
+		1A2B3C4D0000000000000421 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1A2B3C4D0000000000000401 /* DevToolsCore.framework */;
+			targetProxy = 1A2B3C4D0000000000000431 /* PBXContainerItemProxy */;
+		};
+		1A2B3C4D0000000000000422 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1A2B3C4D0000000000000400 /* DevToolsSupport.framework */;
+			targetProxy = 1A2B3C4D0000000000000432 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXNativeTarget section */
 		1A2B3C4D0000000000000031 /* agvtool */ = {
@@ -456,6 +728,59 @@
 			productReference = 1A2B3C4D000000000000005A /* pbxmodel */;
 			productType = "com.apple.product-type.tool";
 		};
+		1A2B3C4D0000000000000400 /* DevToolsSupport.framework */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1A2B3C4D0000000000000410 /* Build configuration list for PBXNativeTarget "DevToolsSupport.framework" */;
+			buildPhases = (
+				1A2B3C4D0000000000000300 /* Sources */,
+				1A2B3C4D0000000000000303 /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = DevToolsSupport.framework;
+			productName = DevToolsSupport;
+			productReference = 1A2B3C4D0000000000000200 /* DevToolsSupport.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		1A2B3C4D0000000000000401 /* DevToolsCore.framework */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1A2B3C4D0000000000000411 /* Build configuration list for PBXNativeTarget "DevToolsCore.framework" */;
+			buildPhases = (
+				1A2B3C4D0000000000000301 /* Sources */,
+				1A2B3C4D0000000000000304 /* Headers */,
+				1A2B3C4D0000000000000305 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				1A2B3C4D0000000000000420 /* PBXTargetDependency */,
+			);
+			name = DevToolsCore.framework;
+			productName = DevToolsCore;
+			productReference = 1A2B3C4D0000000000000201 /* DevToolsCore.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		1A2B3C4D0000000000000402 /* Xcode3Core.ideplugin */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1A2B3C4D0000000000000412 /* Build configuration list for PBXNativeTarget "Xcode3Core.ideplugin" */;
+			buildPhases = (
+				1A2B3C4D0000000000000302 /* Sources */,
+				1A2B3C4D0000000000000306 /* Frameworks */,
+				1A2B3C4D0000000000000307 /* Copy Files */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				1A2B3C4D0000000000000421 /* PBXTargetDependency */,
+				1A2B3C4D0000000000000422 /* PBXTargetDependency */,
+			);
+			name = Xcode3Core.ideplugin;
+			productName = Xcode3Core;
+			productReference = 1A2B3C4D0000000000000202 /* Xcode3Core.ideplugin */;
+			productType = "com.apple.product-type.bundle";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -481,6 +806,9 @@
 				1A2B3C4D0000000000000031 /* agvtool */,
 				1A2B3C4D0000000000000047 /* pbxtool */,
 				1A2B3C4D0000000000000080 /* pbxmodel */,
+				1A2B3C4D0000000000000400 /* DevToolsSupport.framework */,
+				1A2B3C4D0000000000000401 /* DevToolsCore.framework */,
+				1A2B3C4D0000000000000402 /* Xcode3Core.ideplugin */,
 			);
 		};
 /* End PBXProject section */
@@ -551,6 +879,74 @@
 				1A2B3C4D0000000000000117 /* PBXPListArchiver.m in Sources */,
 				1A2B3C4D000000000000011C /* XCSimpleFilePreprocessor.m in Sources */,
 				1A2B3C4D000000000000011F /* XCProjectRenameItem.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1A2B3C4D0000000000000300 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1A2B3C4D0000000000000220 /* DevToolsSupport.m in Sources */,
+				1A2B3C4D000000000000000A7 /* TSPropertyListDictionary.m in Sources */,
+				1A2B3C4D000000000000000D2 /* TSRegularExpression.m in Sources */,
+				1A2B3C4D000000000000000D5 /* TSFileManager.m in Sources */,
+				1A2B3C4D000000000000000D8 /* TSTimedTrace.m in Sources */,
+				1A2B3C4D000000000000000C2 /* NSString+TSStringAdditions.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1A2B3C4D0000000000000301 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1A2B3C4D0000000000000071 /* pbxproj.c in Sources */,
+				1A2B3C4D0000000000000072 /* PBXBuild.m in Sources */,
+				1A2B3C4D0000000000000073 /* PBXObject.m in Sources */,
+				1A2B3C4D0000000000000074 /* PBXPListCoding.m in Sources */,
+				1A2B3C4D0000000000000075 /* PBXProject.m in Sources */,
+				1A2B3C4D0000000000000076 /* PBXProjectModel.m in Sources */,
+				1A2B3C4D0000000000000077 /* PBXReference.m in Sources */,
+				1A2B3C4D0000000000000078 /* PBXTarget.m in Sources */,
+				1A2B3C4D0000000000000079 /* XCBuildConfiguration.m in Sources */,
+				1A2B3C4D000000000000000A0 /* PBXFileTypePart.m in Sources */,
+				1A2B3C4D000000000000000C1 /* PBXFileType.m in Sources */,
+				1A2B3C4D000000000000000A1 /* PBXFolder.m in Sources */,
+				1A2B3C4D000000000000000A2 /* PBXFramework.m in Sources */,
+				1A2B3C4D000000000000000A3 /* PBXNamePath.m in Sources */,
+				1A2B3C4D000000000000000A4 /* PBXPlatformFilterableItem.m in Sources */,
+				1A2B3C4D000000000000000A5 /* PBXSupport.m in Sources */,
+				1A2B3C4D000000000000000BA /* XCSpecification.m in Sources */,
+				1A2B3C4D000000000000000BB /* XCSpecificationProxy.m in Sources */,
+				1A2B3C4D000000000000000BC /* XCSpecificationRegistry.m in Sources */,
+				1A2B3C4D000000000000000C5 /* XCSpecificationFilter.m in Sources */,
+				1A2B3C4D000000000000000DA /* XCPropertyDefinition.m in Sources */,
+				1A2B3C4D000000000000000DB /* XCPropertyTypes.m in Sources */,
+				1A2B3C4D000000000000000E0 /* XCPropertyCategory.m in Sources */,
+				1A2B3C4D000000000000000E1 /* XCPropertyDomainSpecification.m in Sources */,
+				1A2B3C4D000000000000000E6 /* DVTMacroDefinitionTable+XCMacroExpansionExtensions.m in Sources */,
+				1A2B3C4D000000000000000EB /* XCMacroExpansionScope.m in Sources */,
+				1A2B3C4D000000000000000F6 /* XCObjectGraphPath.m in Sources */,
+				1A2B3C4D0000000000000100 /* XCStringList.m in Sources */,
+				1A2B3C4D0000000000000103 /* PBXPlistArchiverAdditions.m in Sources */,
+				1A2B3C4D0000000000000106 /* XCCompatibilityFeature.m in Sources */,
+				1A2B3C4D0000000000000109 /* XCPropertyDefinition_SupportedVersionRange.m in Sources */,
+				1A2B3C4D000000000000000EC /* PBXPackageTypeSpecification.m in Sources */,
+				1A2B3C4D000000000000000EF /* XCProductTypeSpecification.m in Sources */,
+				1A2B3C4D000000000000000F2 /* PBXRuntimeValues.m in Sources */,
+				1A2B3C4D0000000000000116 /* PBXArchiveBinding.m in Sources */,
+				1A2B3C4D0000000000000117 /* PBXPListArchiver.m in Sources */,
+				1A2B3C4D000000000000011C /* XCSimpleFilePreprocessor.m in Sources */,
+				1A2B3C4D000000000000011F /* XCProjectRenameItem.m in Sources */,
+				1A2B3C4D0000000000000222 /* XCDataModel.m in Sources */,
+				1A2B3C4D0000000000000223 /* XCRuntimeSupport.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1A2B3C4D0000000000000302 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1A2B3C4D0000000000000221 /* XcodePlugIn.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -752,6 +1148,241 @@
 			};
 			name = Release;
 		};
+		1A2B3C4D0000000000000500 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				GCC_C_LANGUAGE_STANDARD = c11;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				PRODUCT_NAME = DevToolsSupport;
+				SKIP_INSTALL = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				OTHER_CFLAGS = (
+					"-D_DARWIN_C_SOURCE",
+					"-Wall",
+					"-Wextra",
+				);
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GENERATE_INFOPLIST_FILE = YES;
+				INSTALL_PATH = "$(CONFIGURATION_BUILD_DIR)";
+				MACH_O_TYPE = mh_dylib;
+				PRODUCT_BUNDLE_IDENTIFIER = org.libredarwin.DevToolsSupport;
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+				);
+			};
+			name = Debug;
+		};
+		1A2B3C4D0000000000000501 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				GCC_C_LANGUAGE_STANDARD = c11;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				PRODUCT_NAME = DevToolsCore;
+				SKIP_INSTALL = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				OTHER_CFLAGS = (
+					"-D_DARWIN_C_SOURCE",
+					"-Wall",
+					"-Wextra",
+				);
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(CONFIGURATION_BUILD_DIR)",
+					"$(SRCROOT)/../DVTFrameworks/build",
+				);
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/Headers",
+					"$(SRCROOT)/Sources",
+					"$(SRCROOT)/Sources/DevToolsCore/ProjectModel",
+				);
+				INSTALL_PATH = "$(CONFIGURATION_BUILD_DIR)";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(CONFIGURATION_BUILD_DIR)",
+					"$(SRCROOT)/../DVTFrameworks/build",
+				);
+				MACH_O_TYPE = mh_dylib;
+				PRODUCT_BUNDLE_IDENTIFIER = org.libredarwin.DevToolsCore;
+				OTHER_LDFLAGS = (
+					"-framework",
+					DevToolsSupport,
+					"-framework",
+					Foundation,
+					"-framework",
+					DVTMacroFoundation,
+					"-framework",
+					DVTFoundation,
+					"-framework",
+					AppKit,
+				);
+			};
+			name = Debug;
+		};
+		1A2B3C4D0000000000000502 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				GCC_C_LANGUAGE_STANDARD = c11;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				SKIP_INSTALL = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				OTHER_CFLAGS = (
+					"-D_DARWIN_C_SOURCE",
+					"-Wall",
+					"-Wextra",
+				);
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(CONFIGURATION_BUILD_DIR)",
+				);
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/Headers",
+					"$(SRCROOT)/Sources",
+					"$(SRCROOT)/Sources/DevToolsCore/ProjectModel",
+				);
+				INFOPLIST_KEY_CFBundlePackageType = BNDL;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(CONFIGURATION_BUILD_DIR)",
+					"@executable_path/../Frameworks",
+					"$(SRCROOT)/../DVTFrameworks/build",
+					"$(SRCROOT)/../../../Library/Staging/AppKit/build/release",
+				);
+				OTHER_LDFLAGS = (
+					"-framework",
+					DevToolsCore,
+					"-framework",
+					DevToolsSupport,
+					"-framework",
+					Foundation,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = org.libredarwin.Xcode3Core;
+				PRODUCT_NAME = Xcode3Core;
+				WRAPPER_EXTENSION = ideplugin;
+			};
+			name = Debug;
+		};
+		1A2B3C4D0000000000000503 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = YES;
+				GCC_C_LANGUAGE_STANDARD = c11;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				PRODUCT_NAME = DevToolsSupport;
+				SKIP_INSTALL = YES;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				OTHER_CFLAGS = (
+					"-D_DARWIN_C_SOURCE",
+					"-Wall",
+					"-Wextra",
+				);
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GENERATE_INFOPLIST_FILE = YES;
+				INSTALL_PATH = "$(CONFIGURATION_BUILD_DIR)";
+				MACH_O_TYPE = mh_dylib;
+				PRODUCT_BUNDLE_IDENTIFIER = org.libredarwin.DevToolsSupport;
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+				);
+			};
+			name = Release;
+		};
+		1A2B3C4D0000000000000504 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = YES;
+				GCC_C_LANGUAGE_STANDARD = c11;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				PRODUCT_NAME = DevToolsCore;
+				SKIP_INSTALL = YES;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				OTHER_CFLAGS = (
+					"-D_DARWIN_C_SOURCE",
+					"-Wall",
+					"-Wextra",
+				);
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(CONFIGURATION_BUILD_DIR)",
+					"$(SRCROOT)/../DVTFrameworks/build",
+				);
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/Headers",
+					"$(SRCROOT)/Sources",
+					"$(SRCROOT)/Sources/DevToolsCore/ProjectModel",
+				);
+				INSTALL_PATH = "$(CONFIGURATION_BUILD_DIR)";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(CONFIGURATION_BUILD_DIR)",
+					"$(SRCROOT)/../DVTFrameworks/build",
+				);
+				MACH_O_TYPE = mh_dylib;
+				PRODUCT_BUNDLE_IDENTIFIER = org.libredarwin.DevToolsCore;
+				OTHER_LDFLAGS = (
+					"-framework",
+					DevToolsSupport,
+					"-framework",
+					Foundation,
+					"-framework",
+					DVTMacroFoundation,
+					"-framework",
+					DVTFoundation,
+					"-framework",
+					AppKit,
+				);
+			};
+			name = Release;
+		};
+		1A2B3C4D0000000000000505 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = YES;
+				GCC_C_LANGUAGE_STANDARD = c11;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				SKIP_INSTALL = YES;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				OTHER_CFLAGS = (
+					"-D_DARWIN_C_SOURCE",
+					"-Wall",
+					"-Wextra",
+				);
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(CONFIGURATION_BUILD_DIR)",
+				);
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/Headers",
+					"$(SRCROOT)/Sources",
+					"$(SRCROOT)/Sources/DevToolsCore/ProjectModel",
+				);
+				INFOPLIST_KEY_CFBundlePackageType = BNDL;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(CONFIGURATION_BUILD_DIR)",
+					"@executable_path/../Frameworks",
+					"$(SRCROOT)/../DVTFrameworks/build",
+					"$(SRCROOT)/../../../Library/Staging/AppKit/build/release",
+				);
+				OTHER_LDFLAGS = (
+					"-framework",
+					DevToolsCore,
+					"-framework",
+					DevToolsSupport,
+					"-framework",
+					Foundation,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = org.libredarwin.Xcode3Core;
+				PRODUCT_NAME = Xcode3Core;
+				WRAPPER_EXTENSION = ideplugin;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -787,6 +1418,33 @@
 			buildConfigurations = (
 				1A2B3C4D0000000000000083 /* Debug */,
 				1A2B3C4D0000000000000084 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1A2B3C4D0000000000000410 /* Build configuration list for PBXNativeTarget "DevToolsSupport.framework" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1A2B3C4D0000000000000500 /* Debug */,
+				1A2B3C4D0000000000000503 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1A2B3C4D0000000000000411 /* Build configuration list for PBXNativeTarget "DevToolsCore.framework" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1A2B3C4D0000000000000501 /* Debug */,
+				1A2B3C4D0000000000000504 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1A2B3C4D0000000000000412 /* Build configuration list for PBXNativeTarget "Xcode3Core.ideplugin" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1A2B3C4D0000000000000502 /* Debug */,
+				1A2B3C4D0000000000000505 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
