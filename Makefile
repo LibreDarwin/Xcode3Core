@@ -106,6 +106,7 @@ DEVTOOLSCORE_OBJS := $(OBJDIR)/pbxproj.o \
 
 XCODEPLUGIN      := $(BUILD_DIR)/Xcode3Core.ideplugin
 XCODEPLUGIN_OBJS := $(OBJDIR)/XcodePlugIn.o
+XCODEPLUGIN_INFO := Resources/Xcode3Core-Info.plist
 
 PREFIX  ?= /usr/local
 DESTDIR ?=
@@ -344,9 +345,10 @@ $(DEVTOOLSCORE): $(DEVTOOLSCORE_OBJS) $(DEVTOOLSSUPPORT)
 	ln -sf Versions/A/Headers $(DEVTOOLSCORE)/Headers
 	cp -R Headers/DevToolsCore/. $(DEVTOOLSCORE)/Versions/A/Headers/
 
-$(XCODEPLUGIN): $(XCODEPLUGIN_OBJS) $(DEVTOOLSCORE) $(DEVTOOLSSUPPORT)
+$(XCODEPLUGIN): $(XCODEPLUGIN_OBJS) $(DEVTOOLSCORE) $(DEVTOOLSSUPPORT) $(XCODEPLUGIN_INFO)
 	@mkdir -p $(XCODEPLUGIN)/Contents/MacOS $(XCODEPLUGIN)/Contents/Frameworks
 	$(CC) $(OBJCFLAGS) -bundle -o $(XCODEPLUGIN)/Contents/MacOS/Xcode3Core $(XCODEPLUGIN_OBJS) -F$(BUILD_DIR) -framework DevToolsCore -framework DevToolsSupport -framework Foundation -Wl,-rpath,@executable_path/../Frameworks -Wl,-rpath,$(DVTFRAMEWORKS_BUILD) -Wl,-rpath,$(APPKIT_BUILD)
+	cp $(XCODEPLUGIN_INFO) $(XCODEPLUGIN)/Contents/Info.plist
 	cp -R $(DEVTOOLSSUPPORT) $(XCODEPLUGIN)/Contents/Frameworks/
 	cp -R $(DEVTOOLSCORE) $(XCODEPLUGIN)/Contents/Frameworks/
 
