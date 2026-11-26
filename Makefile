@@ -383,6 +383,8 @@ test: all
 	PBXMODEL=$(PBXMODEL) bash tools/targetdependencies.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/archivebindings.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/plistarchive.sh || ok=1; \
+	PBXMODEL=$(PBXMODEL) bash tools/applearchive.sh || ok=1; \
+	PBXMODEL=$(PBXMODEL) bash tools/applesave.sh || ok=1; \
 	exit $$ok
 
 install: all

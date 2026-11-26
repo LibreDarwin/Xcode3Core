@@ -162,6 +162,15 @@ only unless a real dependency appears.
        proposal replacement semantics, no-op validation/cancel/rename,
        `XCProjectRenameBuildSettingItem.settingName`)
 
+### 8) Apple pbxproj oracle semantic gaps
+- [x] Match Apple `PBXPListArchiver` dictionary shape: omit top-level `objectVersion`
+- [x] Match Apple typed scalar archive values for booleans and integers
+- [x] Emit Apple `___PlistArchiveAtomicDictionary = YES` markers on the same archived objects
+- [x] Match Apple archive handling of unsupported/unknown objects and legacy project attributes
+- [x] Match Apple save migration behavior: objectVersion downgrade, `compatibilityVersion` removal, `preferredProjectObjectVersion` insertion, and FS-synchronized root-group inline rewriting
+- [x] Match Apple canonical section ordering and wrapper-derived build-configuration comments
+- [x] Add oracle-backed fixtures/gates for each implemented gap (`tools/applearchive.sh` and `tools/applesave.sh`) without regressing corpus roundtrip
+
 ## Methodology
 
 1. Extract class/method lists from Apple's DevToolsCore/Xcode3Core

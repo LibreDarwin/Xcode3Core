@@ -1558,7 +1558,7 @@ emit_objects(SB *sb, const OPPValue *d, int depth)
 	if (cur != NULL) {
 		sb_puts(sb, "/* End ");
 		sb_puts(sb, cur);
-		sb_puts(sb, " section */\n\n");
+		sb_puts(sb, " section */\n");
 	}
 	emit_indent(sb, depth, d->close_indent);
 	sb_puts(sb, "}");

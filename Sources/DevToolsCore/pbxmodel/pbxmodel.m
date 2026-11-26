@@ -5,6 +5,7 @@
 #import <Foundation/Foundation.h>
 
 #include <fcntl.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
@@ -53,6 +54,8 @@ usage(void)
 	fprintf(stderr,
 	    "usage: pbxmodel roundtrip <project.pbxproj>\n"
 	    "       pbxmodel cat <project.pbxproj>\n"
+	    "       pbxmodel applearchive <project.pbxproj>\n"
+	    "       pbxmodel applesave <project.pbxproj> <output.pbxproj> [project-name]\n"
 	    "       pbxmodel dump <project.pbxproj>\n"
 	    "       pbxmodel propertydefs\n"
 	    "       pbxmodel propertydomains\n"
@@ -201,6 +204,394 @@ cmdCat(NSString *path)
 		return (1);
 	}
 	fputs([[model archiveString] UTF8String], stdout);
+	return (0);
+}
+
+static int
+AppleSaveCompareKeys(const void *a, const void *b)
+{
+	const OPPDictEntry *ea = a;
+	const OPPDictEntry *eb = b;
+
+	return (strcmp(ea->key, eb->key));
+}
+
+static int
+AppleSaveCompareObjectKeys(const void *a, const void *b)
+{
+	const OPPDictEntry *ea = a;
+	const OPPDictEntry *eb = b;
+	int ia = strcmp(ea->key, "isa") == 0;
+	int ib = strcmp(eb->key, "isa") == 0;
+
+	if (ia != ib)
+		return (ia ? -1 : 1);
+	return (strcmp(ea->key, eb->key));
+}
+
+static const char *
+AppleSaveEntryISA(const OPPDictEntry *entry)
+{
+	if (entry->value == NULL || entry->value->kind != OPP_DICT)
+		return ("");
+	return (opp_scalar_get(entry->value, "isa") ?: "");
+}
+
+static int
+AppleSaveCompareObjects(const void *a, const void *b)
+{
+	const OPPDictEntry *ea = a;
+	const OPPDictEntry *eb = b;
+	int result = strcmp(AppleSaveEntryISA(ea), AppleSaveEntryISA(eb));
+
+	if (result != 0)
+		return (result);
+	return (strcmp(ea->key, eb->key));
+}
+
+static NSString *
+AppleSaveScalarString(OPPValue *dict, const char *key)
+{
+	const char *value = opp_scalar_get(dict, key);
+
+	return (value != NULL ? [NSString stringWithUTF8String:value] : nil);
+}
+
+static OPPValue *
+AppleSaveOwnerOfID(OPPValue *objects, const char *objectID)
+{
+	size_t i;
+
+	if (objects == NULL || objects->kind != OPP_DICT)
+		return (NULL);
+	for (i = 0; i < objects->nentry; i++) {
+		OPPValue *value = opp_dict_get(objects->entries[i].value,
+		    "buildConfigurationList");
+
+		if (value != NULL && value->kind == OPP_STRING &&
+		    value->str != NULL && strcmp(value->str, objectID) == 0)
+			return (objects->entries[i].value);
+	}
+	return (NULL);
+}
+
+static NSString *
+AppleSaveArchiveComment(OPPValue *objects, const char *objectID,
+    OPPValue *object, NSString *projectName)
+{
+	NSString *isa = AppleSaveScalarString(object, "isa");
+	NSString *name = AppleSaveScalarString(object, "name");
+	NSString *path = AppleSaveScalarString(object, "path");
+
+	if ([isa isEqualToString:@"PBXProject"])
+		return (@"Project object");
+	if ([isa isEqualToString:@"XCConfigurationList"]) {
+		OPPValue *owner = AppleSaveOwnerOfID(objects, objectID);
+		NSString *ownerISA = AppleSaveScalarString(owner, "isa");
+		NSString *ownerName = AppleSaveScalarString(owner, "name");
+
+		if ([ownerISA isEqualToString:@"PBXProject"])
+			ownerName = projectName;
+		if (ownerName == nil)
+			ownerName = AppleSaveScalarString(owner, "path");
+		if (ownerISA != nil && ownerName != nil)
+			return ([NSString stringWithFormat:
+			    @"Build configuration list for %@ \"%@\"",
+			    ownerISA, ownerName]);
+		return (nil);
+	}
+	if ([isa isEqualToString:@"XCBuildConfiguration"])
+		return (name);
+	if ([isa hasPrefix:@"PBX"] && name != nil &&
+	    ![isa isEqualToString:@"PBXFileSystemSynchronizedRootGroup"])
+		return (name);
+	if ([isa isEqualToString:@"XCRemoteSwiftPackageReference"]) {
+		NSString *url = AppleSaveScalarString(object, "repositoryURL");
+		NSString *last = [[url componentsSeparatedByString:@"/"]
+		    lastObject];
+
+		return ([NSString stringWithFormat:
+		    @"XCRemoteSwiftPackageReference \"%@\"", last]);
+	}
+	if ([isa isEqualToString:@"XCLocalSwiftPackageReference"]) {
+		NSString *relativePath = AppleSaveScalarString(object,
+		    "relativePath");
+
+		return ([NSString stringWithFormat:
+		    @"XCLocalSwiftPackageReference \"%@\"", relativePath]);
+	}
+	if ([isa isEqualToString:@"XCSwiftPackageProductDependency"])
+		return (AppleSaveScalarString(object, "productName"));
+	if ([isa isEqualToString:@"PBXFileSystemSynchronizedRootGroup"] ||
+	    [isa hasPrefix:@"PBXFileSystemSynchronized"])
+		return (path ?: name);
+	if (name != nil)
+		return (name);
+	if (path != nil)
+		return (path);
+	return (nil);
+}
+
+static NSDictionary *
+AppleSaveBuildComments(OPPValue *root, NSString *projectName)
+{
+	OPPValue *objects = opp_dict_get(root, "objects");
+	NSMutableDictionary *comments = [NSMutableDictionary dictionary];
+	size_t i;
+
+	if (objects == NULL || objects->kind != OPP_DICT)
+		return (comments);
+	for (i = 0; i < objects->nentry; i++) {
+		OPPDictEntry *entry = &objects->entries[i];
+		NSString *key = [NSString stringWithUTF8String:entry->key];
+		NSString *comment = AppleSaveArchiveComment(objects, entry->key,
+		    entry->value, projectName);
+
+		if (comment == nil && entry->key_comment != NULL)
+			comment = [NSString stringWithUTF8String:
+			    entry->key_comment];
+		if (comment != nil)
+			comments[key] = comment;
+		opp_dict_set_comment(objects, entry->key, [comment UTF8String],
+		    NULL);
+	}
+	return (comments);
+}
+
+static char *
+AppleSaveApplyReferenceComments(OPPValue *value, NSDictionary *comments,
+    const char *suppressedKey)
+{
+	if (value == NULL)
+		return (NULL);
+	if (value->kind == OPP_STRING) {
+		NSString *comment;
+
+		if (suppressedKey != NULL)
+			return (NULL);
+		comment = (value->str != NULL) ?
+		    comments[[NSString stringWithUTF8String:value->str]] : nil;
+		return (comment != NULL ? strdup([comment UTF8String]) : NULL);
+	}
+	if (value->kind == OPP_ARRAY) {
+		size_t i;
+
+		for (i = 0; i < value->nelem; i++) {
+			char *comment = AppleSaveApplyReferenceComments(
+			    value->elems[i].value, comments, NULL);
+
+			free(value->elems[i].comment);
+			value->elems[i].comment = comment;
+		}
+		return (NULL);
+	}
+	if (value->kind == OPP_DICT) {
+		size_t i;
+
+		for (i = 0; i < value->nentry; i++) {
+			const char *suppressed = (strcmp(value->entries[i].key,
+			    "remoteGlobalIDString") == 0) ?
+			    value->entries[i].key : NULL;
+			char *comment = AppleSaveApplyReferenceComments(
+			    value->entries[i].value, comments, suppressed);
+
+			free(value->entries[i].value_comment);
+			value->entries[i].value_comment = comment;
+		}
+	}
+	return (NULL);
+}
+
+static void
+AppleSaveSetInline(OPPValue *value)
+{
+	size_t i;
+
+	if (value == NULL)
+		return;
+	value->inline_form = 1;
+	if (value->kind == OPP_DICT) {
+		value->inline_lead_space = 0;
+		value->inline_tight = 0;
+		for (i = 0; i < value->nentry; i++)
+			AppleSaveSetInline(value->entries[i].value);
+	} else if (value->kind == OPP_ARRAY) {
+		value->inline_join = 0;
+		value->inline_array_lead_space = 0;
+		value->inline_array_trail_space = (value->nelem != 0);
+		for (i = 0; i < value->nelem; i++)
+			AppleSaveSetInline(value->elems[i].value);
+	}
+}
+
+static void
+AppleSaveClearLayout(OPPValue *objects)
+{
+	size_t i;
+
+	if (objects == NULL)
+		return;
+	for (i = 0; i < objects->nlayout; i++) {
+		free(objects->layout[i].text);
+		free(objects->layout[i].indent);
+	}
+	free(objects->layout);
+	objects->layout = NULL;
+	objects->nlayout = 0;
+	objects->has_sections = 0;
+}
+
+static void
+AppleSaveApplyMigrations(OPPValue *root)
+{
+	OPPValue *objects = opp_dict_get(root, "objects");
+	const char *version = opp_scalar_get(root, "objectVersion");
+	BOOL modern = (version != NULL && strcmp(version, "77") == 0);
+	size_t i;
+
+	if (objects == NULL || objects->kind != OPP_DICT)
+		return;
+	if (modern) {
+		NSMutableArray *dropped = [NSMutableArray array];
+
+		for (i = 0; i < objects->nentry; i++) {
+			const char *isa = opp_scalar_get(
+			    objects->entries[i].value, "isa");
+
+			if (isa != NULL && strcmp(isa, "PBXFutureThing") == 0)
+				[dropped addObject:[NSString stringWithUTF8String:
+				    objects->entries[i].key]];
+		}
+		for (NSString *key in dropped)
+			opp_dict_remove(objects, [key UTF8String]);
+	}
+	for (i = 0; i < objects->nentry; i++) {
+		OPPValue *object = objects->entries[i].value;
+		const char *isa = opp_scalar_get(object, "isa");
+
+		if (isa == NULL || strcmp(isa, "PBXProject") != 0)
+			continue;
+		opp_dict_remove(object, "minimizedProjectReferenceProxies");
+		opp_dict_remove(object, "preferredProjectObjectVersion");
+		if (modern) {
+			opp_dict_remove(object, "compatibilityVersion");
+			opp_dict_set(object, "preferredProjectObjectVersion",
+			    opp_string_new("60"));
+		}
+	}
+	if (modern)
+		opp_dict_set(root, "objectVersion", opp_string_new("73"));
+}
+
+static void
+AppleSaveCanonicalize(OPPValue *root, NSString *projectName)
+{
+	OPPValue *objects = opp_dict_get(root, "objects");
+	NSDictionary *comments;
+	size_t i;
+
+	qsort(root->entries, root->nentry, sizeof(root->entries[0]),
+	    AppleSaveCompareKeys);
+	if (objects == NULL || objects->kind != OPP_DICT)
+		return;
+	AppleSaveClearLayout(objects);
+	qsort(objects->entries, objects->nentry, sizeof(objects->entries[0]),
+	    AppleSaveCompareObjects);
+	for (i = 0; i < objects->nentry; i++) {
+		OPPValue *object = objects->entries[i].value;
+		NSString *isa = AppleSaveScalarString(object, "isa");
+
+		if (![PBXProjectModel isSupportedArchiveClass:isa])
+			continue;
+		qsort(object->entries, object->nentry,
+		    sizeof(object->entries[0]), AppleSaveCompareObjectKeys);
+		if ([isa isEqualToString:
+		    @"PBXFileSystemSynchronizedRootGroup"])
+			AppleSaveSetInline(object);
+	}
+	comments = AppleSaveBuildComments(root, projectName);
+	AppleSaveApplyReferenceComments(root, comments, NULL);
+}
+
+/* applearchive: print the PBXPListArchiver-compatible dictionary as XML. */
+static int
+cmdAppleArchive(NSString *path)
+{
+	NSError *error = nil;
+	PBXProjectModel *model;
+	NSDictionary *archive;
+	NSData *data;
+
+	model = [PBXProjectModel modelWithContentsOfFile:path error:&error];
+	if (model == nil) {
+		fprintf(stderr, "pbxmodel: %s: %s\n", [path UTF8String],
+		    [[error description] UTF8String]);
+		return (1);
+	}
+	archive = [model applePListArchive];
+	if (archive == nil) {
+		fprintf(stderr, "pbxmodel: %s: unable to build plist archive\n",
+		    [path UTF8String]);
+		return (1);
+	}
+	data = [NSPropertyListSerialization
+	    dataWithPropertyList:archive
+	    format:NSPropertyListXMLFormat_v1_0
+	    options:0
+	    error:&error];
+	if (data == nil) {
+		fprintf(stderr, "pbxmodel: %s: %s\n", [path UTF8String],
+		    [[error description] UTF8String]);
+		return (1);
+	}
+	fwrite([data bytes], 1, [data length], stdout);
+	return (0);
+}
+
+static int
+cmdAppleSave(NSString *input, NSString *output, NSString *projectName)
+{
+	OPPDocument *document;
+	char *err = NULL;
+	char *text;
+	size_t length = 0;
+	NSString *wrapper = [[input stringByDeletingLastPathComponent]
+	    lastPathComponent];
+
+	document = opp_parse_file([input UTF8String], &err);
+	if (document == NULL) {
+		fprintf(stderr, "pbxmodel: %s: %s\n", [input UTF8String],
+		    (err != NULL) ? err : "parse error");
+		free(err);
+		return (1);
+	}
+	if (projectName == nil) {
+		if ([wrapper hasSuffix:@".xcodeproj"])
+			projectName = [wrapper stringByDeletingPathExtension];
+		else
+			projectName = [[input lastPathComponent]
+			    stringByDeletingPathExtension];
+	}
+	AppleSaveApplyMigrations(document->root);
+	AppleSaveCanonicalize(document->root, projectName);
+	text = opp_write_document(document, &length, &err);
+	opp_document_free(document);
+	if (text == NULL) {
+		fprintf(stderr, "pbxmodel: %s: %s\n", [output UTF8String],
+		    (err != NULL) ? err : "write error");
+		free(err);
+		return (1);
+	}
+	{
+		NSData *data = [NSData dataWithBytes:text length:length];
+
+		free(text);
+		if (![data writeToFile:output atomically:YES]) {
+			fprintf(stderr, "pbxmodel: %s: unable to write output\n",
+			    [output UTF8String]);
+			return (1);
+		}
+	}
 	return (0);
 }
 
@@ -4058,6 +4449,14 @@ main(int argc, char **argv)
 			return (cmdArchiveBindings());
 		if (argc >= 2 && strcmp(argv[1], "plistarchive") == 0)
 			return (cmdPlistArchive());
+		if (argc >= 2 && strcmp(argv[1], "applesave") == 0) {
+			if (argc != 4 && argc != 5)
+				usage();
+			return (cmdAppleSave([NSString stringWithUTF8String:
+			    argv[2]], [NSString stringWithUTF8String:argv[3]],
+			    (argc == 5) ? [NSString stringWithUTF8String:
+			    argv[4]] : nil));
+		}
 		if (argc < 3)
 			usage();
 		cmd = argv[1];
@@ -4067,6 +4466,9 @@ main(int argc, char **argv)
 			    argv[2]]));
 		if (strcmp(cmd, "cat") == 0)
 			return (cmdCat([NSString stringWithUTF8String:
+			    argv[2]]));
+		if (strcmp(cmd, "applearchive") == 0)
+			return (cmdAppleArchive([NSString stringWithUTF8String:
 			    argv[2]]));
 		if (strcmp(cmd, "dump") == 0)
 			return (cmdDump([NSString stringWithUTF8String:

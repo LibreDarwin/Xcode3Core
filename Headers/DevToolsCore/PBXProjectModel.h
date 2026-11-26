@@ -40,8 +40,14 @@
 - (NSString *)objectVersion;
 - (void)setObjectVersion:(NSString *)version;
 
++ (BOOL)isSupportedArchiveClass:(NSString *)className;
+
 /* Encode the graph back to OpenStep plist text (canonical Xcode layout). */
 - (NSString *)archiveString;
+
+/* Encode the graph as Apple's PBXPListArchiver dictionary. */
+- (NSDictionary *)applePListArchive;
+
 - (BOOL)writeToFile:(NSString *)path error:(NSError **)error;
 - (BOOL)writeToFile:(NSString *)path atomically:(BOOL)useAuxiliaryFile;
 

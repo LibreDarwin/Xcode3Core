@@ -91,6 +91,74 @@ static NSDictionary *PBXProjectModelClassRegistry(void)
 	return (registry);
 }
 
+static NSSet *
+PBXAppleArchiveBooleanKeys(void)
+{
+	static NSSet *keys = nil;
+
+	if (keys == nil)
+		keys = [NSSet setWithObjects:@"defaultConfigurationIsVisible",
+		    @"hasScannedForEncodings", @"includeInIndex",
+		    @"runOnlyForDeploymentPostprocessing", nil];
+	return (keys);
+}
+
+static NSSet *
+PBXAppleArchiveIntegerKeys(void)
+{
+	static NSSet *keys = nil;
+
+	if (keys == nil)
+		keys = [NSSet setWithObjects:@"buildActionMask", @"fileEncoding",
+		    @"proxyType", nil];
+	return (keys);
+}
+
+static NSSet *
+PBXAppleArchiveAtomicClasses(void)
+{
+	static NSSet *classes = nil;
+
+	if (classes == nil)
+		classes = [NSSet setWithObjects:@"PBXBuildFile",
+		    @"PBXFileReference", @"PBXFileSystemSynchronizedRootGroup",
+		    nil];
+	return (classes);
+}
+
+static NSSet *
+PBXAppleArchiveDroppedProjectKeys(void)
+{
+	static NSSet *keys = nil;
+
+	if (keys == nil)
+		keys = [NSSet setWithObjects:@"minimizedProjectReferenceProxies",
+		    @"preferredProjectObjectVersion", nil];
+	return (keys);
+}
+
+static id
+PBXAppleArchiveScalarValue(NSString *key, id value)
+{
+	if (![value isKindOfClass:[NSString class]])
+		return (value);
+	if ([PBXAppleArchiveBooleanKeys() containsObject:key]) {
+		if ([value isEqualToString:@"1"] || [value isEqualToString:@"YES"])
+			return ([NSNumber numberWithBool:YES]);
+		if ([value isEqualToString:@"0"] || [value isEqualToString:@"NO"])
+			return ([NSNumber numberWithBool:NO]);
+		return (value);
+	}
+	if ([PBXAppleArchiveIntegerKeys() containsObject:key]) {
+		NSScanner *scanner = [NSScanner scannerWithString:value];
+		NSInteger number = 0;
+
+		if ([scanner scanInteger:&number] && [scanner isAtEnd])
+			return ([NSNumber numberWithInteger:number]);
+	}
+	return (value);
+}
+
 @interface PBXProjectModel ()
 - (BOOL)_loadFromRootDictionary:(OPPValue *)root error:(NSError **)error;
 - (id)_resolveReference:(OPPValue *)value;
@@ -100,6 +168,12 @@ static NSDictionary *PBXProjectModelClassRegistry(void)
 @end
 
 @implementation PBXProjectModel
+
++ (BOOL)isSupportedArchiveClass:(NSString *)className
+{
+	return (className != nil &&
+	    PBXProjectModelClassRegistry()[className] != nil);
+}
 
 + (instancetype)modelWithContentsOfFile:(NSString *)path error:(NSError **)error
 {
@@ -481,6 +555,62 @@ static NSDictionary *PBXProjectModelClassRegistry(void)
 	result = [NSString stringWithUTF8String:text];
 	free(text);
 	return (result);
+}
+
+- (NSDictionary *)applePListArchive
+{
+	NSString *string = [self archiveString];
+	NSData *data = [string dataUsingEncoding:NSUTF8StringEncoding];
+	NSPropertyListFormat format = NSPropertyListOpenStepFormat;
+	NSError *error = nil;
+	NSMutableDictionary *root;
+	NSMutableDictionary *objects;
+	NSDictionary *registry = PBXProjectModelClassRegistry();
+	NSDictionary *objectMap = [self objects];
+
+	if (data == nil)
+		return (nil);
+	root = [NSPropertyListSerialization propertyListWithData:data
+	    options:NSPropertyListMutableContainers format:&format error:&error];
+	if (![root isKindOfClass:[NSMutableDictionary class]])
+		return (nil);
+	[root removeObjectForKey:@"objectVersion"];
+	objects = [root objectForKey:@"objects"];
+	if (![objects isKindOfClass:[NSMutableDictionary class]])
+		return (root);
+	for (NSString *objectID in [[objects allKeys] copy]) {
+		NSMutableDictionary *values = [objects objectForKey:objectID];
+		NSString *archiveClass;
+		PBXObject *object;
+		NSArray *keys;
+		NSString *key;
+
+		if (![values isKindOfClass:[NSMutableDictionary class]])
+			continue;
+		archiveClass = [values objectForKey:@"isa"];
+		object = [objectMap objectForKey:objectID];
+		if (![archiveClass isKindOfClass:[NSString class]] ||
+		    [registry objectForKey:archiveClass] == nil ||
+		    object == nil) {
+			[objects removeObjectForKey:objectID];
+			continue;
+		}
+		if ([archiveClass isEqualToString:@"PBXProject"])
+			[values removeObjectsForKeys:
+			    [PBXAppleArchiveDroppedProjectKeys() allObjects]];
+		if ([PBXAppleArchiveAtomicClasses() containsObject:archiveClass])
+			[values setObject:@"YES"
+			    forKey:@"___PlistArchiveAtomicDictionary"];
+		keys = [[values allKeys] copy];
+		for (key in keys) {
+			id converted = PBXAppleArchiveScalarValue(key,
+			    [values objectForKey:key]);
+
+			if (converted != [values objectForKey:key])
+				[values setObject:converted forKey:key];
+		}
+	}
+	return (root);
 }
 
 - (BOOL)writeToFile:(NSString *)path error:(NSError **)error
