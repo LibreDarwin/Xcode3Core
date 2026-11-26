@@ -35,6 +35,7 @@
 #import "DevToolsCore/XCObjectGraphPath.h"
 #import "DevToolsCore/XCProductTypeSpecification.h"
 #import "DevToolsCore/XCStringList.h"
+#import "DevToolsCore/BuildSystem/XCSimpleFilePreprocessor.h"
 #import "DevToolsCore/BuildSystem/XCPropertyDefinition.h"
 #import "DevToolsCore/BuildSystem/XCPropertyDomainSpecification.h"
 #import "DevToolsCore/ProjectModel/pbxproj.h"
@@ -69,6 +70,7 @@ usage(void)
 	    "       pbxmodel tsfilemanager\n"
 	    "       pbxmodel tstimedtrace\n"
 	    "       pbxmodel tspropertylistdictionary\n"
+	    "       pbxmodel xcsfpp\n"
 	    "       pbxmodel xcproducttypes\n"
 	    "       pbxmodel runtimevalues\n"
 	    "       pbxmodel buildconfigurations\n"
@@ -2895,6 +2897,235 @@ TSPLHTry(const char *label, void (^block)(void))
 	}
 }
 
+static NSString *
+XCSFPPClean(NSString *value, NSString *root)
+{
+	if (value == nil)
+		return (nil);
+	return ([value stringByReplacingOccurrencesOfString:root
+	    withString:@"<TMP>"]);
+}
+
+static NSString *
+XCSFPPVisible(NSString *value)
+{
+	NSString *result = value;
+
+	result = [result stringByReplacingOccurrencesOfString:@"\r\n"
+	    withString:@"\\r\\n"];
+	result = [result stringByReplacingOccurrencesOfString:@"\n"
+	    withString:@"\\n"];
+	result = [result stringByReplacingOccurrencesOfString:@"\r"
+	    withString:@"\\r"];
+	result = [result stringByReplacingOccurrencesOfString:@"\t"
+	    withString:@"\\t"];
+	return (result);
+}
+
+static void
+XCSFPPPrintString(const char *label, NSString *value, NSString *root)
+{
+	NSString *normalized = XCSFPPClean(value, root);
+
+	printf("%s = <%s>\n", label,
+	    (normalized != nil) ? [XCSFPPVisible(normalized) UTF8String] : "nil");
+}
+
+static void
+XCSFPPWrite(NSString *root, NSString *name, NSString *contents)
+{
+	NSString *path = [root stringByAppendingPathComponent:name];
+
+	[[NSFileManager defaultManager] createFileAtPath:path
+	    contents:[contents dataUsingEncoding:NSUTF8StringEncoding]
+	    attributes:nil];
+}
+
+static NSString *
+XCSFPPKind(id statement)
+{
+	if ([statement isKindOfClass:[XCSimpleFilePreprocessorText class]])
+		return (@"text");
+	if ([statement isKindOfClass:[XCSimpleFilePreprocessorInclude class]])
+		return (@"include");
+	return (@"other");
+}
+
+static void
+XCSFPPPrintRun(XCSimpleFilePreprocessor *preprocessor, NSString *root,
+    NSString *name)
+{
+	NSString *path = [root stringByAppendingPathComponent:name];
+	NSString *result = [preprocessor preprocessFileAtPath:path
+	    encoding:NSUTF8StringEncoding];
+	NSArray *files = [[[preprocessor filesProcessed] allObjects]
+	    sortedArrayUsingSelector:@selector(compare:)];
+	NSArray *errors = [preprocessor errors];
+	char label[256];
+	NSUInteger index;
+
+	snprintf(label, sizeof(label), "%s.result", [name UTF8String]);
+	XCSFPPPrintString(label, result, root);
+	snprintf(label, sizeof(label), "%s.path", [name UTF8String]);
+	XCSFPPPrintString(label, [preprocessor preprocessedFilePath], root);
+	snprintf(label, sizeof(label), "%s.encoding", [name UTF8String]);
+	printf("%s = <%lu>\n", label,
+	    (unsigned long)[preprocessor fileEncoding]);
+	snprintf(label, sizeof(label), "%s.contents", [name UTF8String]);
+	XCSFPPPrintString(label, [preprocessor preprocessedFileContents], root);
+	for (index = 0; index < [files count]; index++) {
+		snprintf(label, sizeof(label), "%s.file[%lu]", [name UTF8String],
+		    (unsigned long)index);
+		XCSFPPPrintString(label, [files objectAtIndex:index], root);
+	}
+	for (index = 0; index < [errors count]; index++) {
+		snprintf(label, sizeof(label), "%s.error[%lu]", [name UTF8String],
+		    (unsigned long)index);
+		XCSFPPPrintString(label, [errors objectAtIndex:index], root);
+	}
+}
+
+static int
+cmdXCSimpleFilePreprocessor(void)
+{
+	@autoreleasepool {
+		NSFileManager *manager = [NSFileManager defaultManager];
+		NSString *root = [[NSTemporaryDirectory()
+		    stringByAppendingPathComponent:@"pbxmodel_xcsfpp"]
+		    stringByStandardizingPath];
+		XCSimpleFilePreprocessor *preprocessor;
+		XCSimpleFilePreprocessor *other;
+		XCSimpleFilePreprocessorText *text;
+		XCSimpleFilePreprocessorText *crlf;
+		XCSimpleFilePreprocessorInclude *include;
+		XCSimpleFilePreprocessorParsedFile *parsed;
+		NSArray *statements;
+		NSArray *messages;
+		XCSimpleFilePreprocessorInclude *parsedInclude;
+		id statement;
+
+		[manager removeItemAtPath:root error:NULL];
+		[manager createDirectoryAtPath:root
+		    withIntermediateDirectories:YES attributes:nil error:NULL];
+		XCSFPPWrite(root, @"inc.h", @"INCLUDED\n");
+		XCSFPPWrite(root, @"nonl.h", @"NONL");
+		XCSFPPWrite(root, @"nested.h", @"#include \"inc.h\"\nBODY\n");
+		XCSFPPWrite(root, @"main.c",
+		    @"BEFORE\n#include \"inc.h\"\nAFTER\n");
+		XCSFPPWrite(root, @"angles.c", @"#include <inc.h>\nTAIL\n");
+		XCSFPPWrite(root, @"plain.c", @"ONE\nTWO\n");
+		XCSFPPWrite(root, @"nonl.c", @"#include \"nonl.h\"\nAFTER\n");
+		XCSFPPWrite(root, @"missing.c",
+		    @"#include \"missing.h\"\nAFTER\n");
+		XCSFPPWrite(root, @"import.c", @"#import \"inc.h\"\nTAIL\n");
+		XCSFPPWrite(root, @"spaces.c", @"  #include \"inc.h\"\nTAIL\n");
+		XCSFPPWrite(root, @"trailing.c",
+		    @"#include \"inc.h\" // c\nTAIL\n");
+		XCSFPPWrite(root, @"single.c", @"#include 'inc.h'\nTAIL\n");
+		XCSFPPWrite(root, @"nospace.c", @"#include\"inc.h\"\nTAIL\n");
+		XCSFPPWrite(root, @"hashspace.c", @"# include \"inc.h\"\nTAIL\n");
+		XCSFPPWrite(root, @"crlf.c",
+		    @"BEFORE\r\n#include \"inc.h\"\r\nAFTER\r\n");
+		XCSFPPWrite(root, @"cycle.h", @"#include \"cycle.h\"\nBODY\n");
+		XCSFPPWrite(root, @"cycle.c", @"#include \"cycle.h\"\nTAIL\n");
+
+		preprocessor = [XCSimpleFilePreprocessor preprocessor];
+		other = [XCSimpleFilePreprocessor preprocessor];
+		printf("singleton = <%s>\n", (preprocessor == other) ? "YES" : "NO");
+		TSTTPrintString("default.force",
+		    [preprocessor forceIncludedFilesToEndWithNewline] ? @"YES" :
+		    @"NO");
+		TSTTPrintCount("default.paths.count",
+		    [[preprocessor includeSearchPath] count]);
+
+		text = [[XCSimpleFilePreprocessorText alloc]
+		    initWithText:@"abc"];
+		crlf = [[XCSimpleFilePreprocessorText alloc]
+		    initWithText:@"def" lineEnding:@"\r\n"];
+		XCSFPPPrintString("text.text", [text text], root);
+		XCSFPPPrintString("crlf.text", [crlf text], root);
+
+		include = [[XCSimpleFilePreprocessorInclude alloc]
+		    initWithPathFragment:@"dir/file.h" lineNumber:7
+		    lineEnding:@"\n" isOptional:YES];
+		XCSFPPPrintString("include.pathFragment",
+		    [include pathFragment], root);
+		printf("include.lineNumber = <%ld>\n",
+		    (long)[include lineNumber]);
+		XCSFPPPrintString("include.lineEnding",
+		    [include lineEnding], root);
+		printf("include.isOptional = <%s>\n",
+		    [include isOptional] ? "YES" : "NO");
+
+		statements = @[text, include, crlf];
+		messages = @[@"e1", @"e2"];
+		parsed = [[XCSimpleFilePreprocessorParsedFile alloc]
+		    initWithStatements:statements errorMessages:messages];
+		TSTTPrintCount("parsedValue.statements.count",
+		    [[parsed statements] count]);
+		TSTTPrintCount("parsedValue.errors.count",
+		    [[parsed errorMessages] count]);
+		XCSFPPPrintString("parsedValue.error[0]",
+		    [[parsed errorMessages] objectAtIndex:0], root);
+		XCSFPPPrintString("parsedValue.error[1]",
+		    [[parsed errorMessages] objectAtIndex:1], root);
+		statement = [[parsed statements] objectAtIndex:0];
+		XCSFPPPrintString("statement[0].kind", XCSFPPKind(statement), root);
+		XCSFPPPrintString("statement.text",
+		    [(XCSimpleFilePreprocessorText *)statement text], root);
+		statement = [[parsed statements] objectAtIndex:1];
+		XCSFPPPrintString("statement[1].kind", XCSFPPKind(statement), root);
+		parsedInclude = (XCSimpleFilePreprocessorInclude *)statement;
+		XCSFPPPrintString("statement.pathFragment",
+		    [parsedInclude pathFragment], root);
+		printf("statement.lineNumber = <%ld>\n",
+		    (long)[parsedInclude lineNumber]);
+		XCSFPPPrintString("statement.lineEnding",
+		    [parsedInclude lineEnding], root);
+		printf("statement.isOptional = <%s>\n",
+		    [parsedInclude isOptional] ? "YES" : "NO");
+		statement = [[parsed statements] objectAtIndex:2];
+		XCSFPPPrintString("statement[2].kind", XCSFPPKind(statement), root);
+		XCSFPPPrintString("statement.text",
+		    [(XCSimpleFilePreprocessorText *)statement text], root);
+		XCSFPPPrintString("joined.text",
+		    [XCSimpleFilePreprocessorText
+		    joinedTextStatementFromStatements:statements], root);
+
+		XCSFPPPrintString("path.found",
+		    [preprocessor _pathToIncludedFileNamed:@"inc.h"
+		    usingSearchPath:@[root]], root);
+		XCSFPPPrintString("path.missing",
+		    [preprocessor _pathToIncludedFileNamed:@"missing.h"
+		    usingSearchPath:@[root]], root);
+		XCSFPPPrintString("path.no.paths",
+		    [preprocessor _pathToIncludedFileNamed:@"inc.h"
+		    usingSearchPath:@[]], root);
+
+		[preprocessor setIncludeSearchPath:@[root]];
+		TSTTPrintCount("paths.count",
+		    [[preprocessor includeSearchPath] count]);
+		XCSFPPPrintRun(preprocessor, root, @"main.c");
+		XCSFPPPrintRun(preprocessor, root, @"plain.c");
+		XCSFPPPrintRun(preprocessor, root, @"angles.c");
+		XCSFPPPrintRun(preprocessor, root, @"nonl.c");
+		XCSFPPPrintRun(preprocessor, root, @"missing.c");
+		XCSFPPPrintRun(preprocessor, root, @"import.c");
+		XCSFPPPrintRun(preprocessor, root, @"spaces.c");
+		XCSFPPPrintRun(preprocessor, root, @"trailing.c");
+		XCSFPPPrintRun(preprocessor, root, @"single.c");
+		XCSFPPPrintRun(preprocessor, root, @"nospace.c");
+		XCSFPPPrintRun(preprocessor, root, @"hashspace.c");
+		XCSFPPPrintRun(preprocessor, root, @"crlf.c");
+		XCSFPPPrintRun(preprocessor, root, @"cycle.c");
+
+		[preprocessor setForceIncludedFilesToEndWithNewline:YES];
+		printf("force = <YES>\n");
+		XCSFPPPrintRun(preprocessor, root, @"nonl.c");
+	}
+	return (0);
+}
+
 static int
 cmdTSPropertyListDictionary(void)
 {
@@ -3516,6 +3747,8 @@ main(int argc, char **argv)
 			return (cmdTSTimedTrace());
 		if (argc >= 2 && strcmp(argv[1], "tspropertylistdictionary") == 0)
 			return (cmdTSPropertyListDictionary());
+		if (argc >= 2 && strcmp(argv[1], "xcsfpp") == 0)
+			return (cmdXCSimpleFilePreprocessor());
 		if (argc >= 2 && strcmp(argv[1], "xcproducttypes") == 0)
 			return (cmdXCProductTypes());
 		if (argc >= 2 && strcmp(argv[1], "runtimevalues") == 0)

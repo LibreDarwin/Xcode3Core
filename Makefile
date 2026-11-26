@@ -63,6 +63,7 @@ PBXMODEL_OBJS := $(OBJDIR)/pbxmodel.o $(OBJDIR)/pbxproj.o \
 	$(OBJDIR)/DVTMacroDefinitionTable+XCMacroExpansionExtensions.o \
 	$(OBJDIR)/XCMacroExpansionScope.o $(OBJDIR)/XCObjectGraphPath.o \
 	$(OBJDIR)/XCStringList.o \
+	$(OBJDIR)/XCSimpleFilePreprocessor.o \
 	$(OBJDIR)/XCPropertyDefinition_SupportedVersionRange.o \
 	$(OBJDIR)/XCCompatibilityFeature.o \
 	$(OBJDIR)/PBXPlistArchiverAdditions.o \
@@ -227,6 +228,10 @@ $(OBJDIR)/XCPropertyDomainSpecification.o: Sources/DevToolsCore/BuildSystem/XCPr
 	@mkdir -p $(OBJDIR)
 	$(CC) $(OBJCFLAGS) -c -o $@ Sources/DevToolsCore/BuildSystem/XCPropertyDomainSpecification.m
 
+$(OBJDIR)/XCSimpleFilePreprocessor.o: Sources/DevToolsCore/BuildSystem/XCSimpleFilePreprocessor.m
+	@mkdir -p $(OBJDIR)
+	$(CC) $(OBJCFLAGS) -c -o $@ Sources/DevToolsCore/BuildSystem/XCSimpleFilePreprocessor.m
+
 $(OBJDIR)/DVTMacroDefinitionTable+XCMacroExpansionExtensions.o: Sources/DevToolsCore/BuildSystem/DVTMacroDefinitionTable+XCMacroExpansionExtensions.m
 	@mkdir -p $(OBJDIR)
 	$(CC) $(OBJCFLAGS) -c -o $@ Sources/DevToolsCore/BuildSystem/DVTMacroDefinitionTable+XCMacroExpansionExtensions.m
@@ -288,6 +293,7 @@ test: all
 	PBXMODEL=$(PBXMODEL) bash tools/tsfilemanager.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/tstimedtrace.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/tspropertylistdictionary.sh || ok=1; \
+	PBXMODEL=$(PBXMODEL) bash tools/xcsfpp.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/xcproducttypes.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/runtimevalues.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/buildconfigurations.sh || ok=1; \

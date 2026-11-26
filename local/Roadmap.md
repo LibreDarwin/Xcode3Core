@@ -150,10 +150,17 @@ only unless a real dependency appears.
       `TSRegularExpression`, `TSFileManager`, `TSTimedTrace`,
       `TSPropertyListDictionary`, and `NSString` BOM sniffing, each with an
       Apple oracle fixture; DevToolsCore undefined-symbol audit confirms all
-      referenced DevToolsSupport classes are covered; XcodePlugIns scaffolds
-      retained)
+       referenced DevToolsSupport classes are covered; XcodePlugIns scaffolds
+       retained)
+
+### 7) Runtime-only Xcode3Core API parity
+- [x] XCSimpleFilePreprocessor family (Apple `pbxmodel xcsfpp` oracle fixture;
+       statement/value objects, include search and recursive preprocessing,
+       parse/missing-file errors, newline forcing, cycle suppression)
+- [ ] XCProjectRename* value objects
 
 ## Methodology
+
 1. Extract class/method lists from Apple's DevToolsCore/Xcode3Core
 2. Dump behaviors from real projects
 3. Implement to match, test against corpus + difftest
