@@ -64,6 +64,7 @@ PBXMODEL_OBJS := $(OBJDIR)/pbxmodel.o $(OBJDIR)/pbxproj.o \
 	$(OBJDIR)/XCMacroExpansionScope.o $(OBJDIR)/XCObjectGraphPath.o \
 	$(OBJDIR)/XCStringList.o \
 	$(OBJDIR)/XCSimpleFilePreprocessor.o \
+	$(OBJDIR)/XCProjectRenameItem.o \
 	$(OBJDIR)/XCPropertyDefinition_SupportedVersionRange.o \
 	$(OBJDIR)/XCCompatibilityFeature.o \
 	$(OBJDIR)/PBXPlistArchiverAdditions.o \
@@ -232,6 +233,10 @@ $(OBJDIR)/XCSimpleFilePreprocessor.o: Sources/DevToolsCore/BuildSystem/XCSimpleF
 	@mkdir -p $(OBJDIR)
 	$(CC) $(OBJCFLAGS) -c -o $@ Sources/DevToolsCore/BuildSystem/XCSimpleFilePreprocessor.m
 
+$(OBJDIR)/XCProjectRenameItem.o: $(PROJECTMODEL)/XCProjectRenameItem.m
+	@mkdir -p $(OBJDIR)
+	$(CC) $(OBJCFLAGS) -c -o $@ $(PROJECTMODEL)/XCProjectRenameItem.m
+
 $(OBJDIR)/DVTMacroDefinitionTable+XCMacroExpansionExtensions.o: Sources/DevToolsCore/BuildSystem/DVTMacroDefinitionTable+XCMacroExpansionExtensions.m
 	@mkdir -p $(OBJDIR)
 	$(CC) $(OBJCFLAGS) -c -o $@ Sources/DevToolsCore/BuildSystem/DVTMacroDefinitionTable+XCMacroExpansionExtensions.m
@@ -294,6 +299,7 @@ test: all
 	PBXMODEL=$(PBXMODEL) bash tools/tstimedtrace.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/tspropertylistdictionary.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/xcsfpp.sh || ok=1; \
+	PBXMODEL=$(PBXMODEL) bash tools/xcprojectrename.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/xcproducttypes.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/runtimevalues.sh || ok=1; \
 	PBXMODEL=$(PBXMODEL) bash tools/buildconfigurations.sh || ok=1; \

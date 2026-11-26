@@ -157,7 +157,10 @@ only unless a real dependency appears.
 - [x] XCSimpleFilePreprocessor family (Apple `pbxmodel xcsfpp` oracle fixture;
        statement/value objects, include search and recursive preprocessing,
        parse/missing-file errors, newline forcing, cycle suppression)
-- [ ] XCProjectRename* value objects
+- [x] XCProjectRename* value objects (Apple `pbxmodel xcprojectrename` oracle fixture;
+       defaults/accessors, parent/child and build-configuration containers,
+       proposal replacement semantics, no-op validation/cancel/rename,
+       `XCProjectRenameBuildSettingItem.settingName`)
 
 ## Methodology
 

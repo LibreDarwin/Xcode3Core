@@ -53,6 +53,7 @@
 		1A2B3C4D0000000000000116 /* PBXArchiveBinding.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000111 /* PBXArchiveBinding.m */; };
 		1A2B3C4D0000000000000117 /* PBXPListArchiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000115 /* PBXPListArchiver.m */; };
 		1A2B3C4D000000000000011C /* XCSimpleFilePreprocessor.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D000000000000011D /* XCSimpleFilePreprocessor.m */; };
+		1A2B3C4D000000000000011F /* XCProjectRenameItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D0000000000000120 /* XCProjectRenameItem.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -157,6 +158,8 @@
 		1A2B3C4D0000000000000115 /* PBXPListArchiver.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PBXPListArchiver.m; sourceTree = "<group>"; };
 		1A2B3C4D000000000000011D /* XCSimpleFilePreprocessor.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XCSimpleFilePreprocessor.m; sourceTree = "<group>"; };
 		1A2B3C4D000000000000011E /* XCSimpleFilePreprocessor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XCSimpleFilePreprocessor.h; sourceTree = "<group>"; };
+		1A2B3C4D0000000000000120 /* XCProjectRenameItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XCProjectRenameItem.m; sourceTree = "<group>"; };
+		1A2B3C4D0000000000000121 /* XCProjectRenameItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XCProjectRenameItem.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -254,6 +257,7 @@
 				1A2B3C4D0000000000000104 /* PBXPlistArchiverAdditions.m */,
 				1A2B3C4D0000000000000111 /* PBXArchiveBinding.m */,
 				1A2B3C4D0000000000000115 /* PBXPListArchiver.m */,
+				1A2B3C4D0000000000000120 /* XCProjectRenameItem.m */,
 			);
 			path = ProjectModel;
 			sourceTree = "<group>";
@@ -363,6 +367,7 @@
 				1A2B3C4D0000000000000112 /* PBXArchivingBinding.h */,
 				1A2B3C4D0000000000000113 /* PBXUnarchivingBinding.h */,
 				1A2B3C4D0000000000000114 /* PBXPListArchiver.h */,
+				1A2B3C4D0000000000000121 /* XCProjectRenameItem.h */,
 			);
 			path = ProjectModel;
 			sourceTree = "<group>";
@@ -545,6 +550,7 @@
 				1A2B3C4D0000000000000116 /* PBXArchiveBinding.m in Sources */,
 				1A2B3C4D0000000000000117 /* PBXPListArchiver.m in Sources */,
 				1A2B3C4D000000000000011C /* XCSimpleFilePreprocessor.m in Sources */,
+				1A2B3C4D000000000000011F /* XCProjectRenameItem.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

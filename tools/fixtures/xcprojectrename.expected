@@ -1,0 +1,129 @@
+DEFAULTS
+XCProjectRenameItem parent=<nil> represented=<nil> renamer=<nil> renameable=<nil> project=<nil> target=<nil>
+XCProjectRenameItem type=<nil> fileDataType=<nil> current=<nil> proposed=<nil>
+XCProjectRenameItem attributedCurrent=<nil> attributedProposed=<nil> image=<nil> error=<nil>
+XCProjectRenameItem children=<nil> configurations=<nil> enabled=YES shouldRename=YES
+XCProjectRenameItem currentRange=<nil> proposedRange=<nil>
+XCProjectRenameFileItem parent=<nil> represented=<nil> renamer=<nil> renameable=<nil> project=<nil> target=<nil>
+XCProjectRenameFileItem type=<nil> fileDataType=<nil> current=<nil> proposed=<nil>
+XCProjectRenameFileItem attributedCurrent=<nil> attributedProposed=<nil> image=<nil> error=<nil>
+XCProjectRenameFileItem children=<nil> configurations=<nil> enabled=YES shouldRename=YES
+XCProjectRenameFileItem currentRange=<nil> proposedRange=<nil>
+XCProjectRenameXibItem parent=<nil> represented=<nil> renamer=<nil> renameable=<nil> project=<nil> target=<nil>
+XCProjectRenameXibItem type=<nil> fileDataType=<nil> current=<nil> proposed=<nil>
+XCProjectRenameXibItem attributedCurrent=<nil> attributedProposed=<nil> image=<nil> error=<nil>
+XCProjectRenameXibItem children=<nil> configurations=<nil> enabled=YES shouldRename=YES
+XCProjectRenameXibItem currentRange=<nil> proposedRange=<nil>
+XCProjectRenamePCHItem parent=<nil> represented=<nil> renamer=<nil> renameable=<nil> project=<nil> target=<nil>
+XCProjectRenamePCHItem type=<nil> fileDataType=<nil> current=<nil> proposed=<nil>
+XCProjectRenamePCHItem attributedCurrent=<nil> attributedProposed=<nil> image=<nil> error=<nil>
+XCProjectRenamePCHItem children=<nil> configurations=<nil> enabled=YES shouldRename=YES
+XCProjectRenamePCHItem currentRange=<nil> proposedRange=<nil>
+XCProjectRenameInfoPlistContentsItem parent=<nil> represented=<nil> renamer=<nil> renameable=<nil> project=<nil> target=<nil>
+XCProjectRenameInfoPlistContentsItem type=<nil> fileDataType=<nil> current=<nil> proposed=<nil>
+XCProjectRenameInfoPlistContentsItem attributedCurrent=<nil> attributedProposed=<nil> image=<nil> error=<nil>
+XCProjectRenameInfoPlistContentsItem children=<nil> configurations=<nil> enabled=YES shouldRename=YES
+XCProjectRenameInfoPlistContentsItem currentRange=<nil> proposedRange=<nil>
+XCProjectRenameInfoPlistItem parent=<nil> represented=<nil> renamer=<nil> renameable=<nil> project=<nil> target=<nil>
+XCProjectRenameInfoPlistItem type=<nil> fileDataType=<nil> current=<nil> proposed=<nil>
+XCProjectRenameInfoPlistItem attributedCurrent=<nil> attributedProposed=<nil> image=<nil> error=<nil>
+XCProjectRenameInfoPlistItem children=<nil> configurations=<nil> enabled=YES shouldRename=YES
+XCProjectRenameInfoPlistItem currentRange=<nil> proposedRange=<nil>
+XCProjectRenameProductItem parent=<nil> represented=<nil> renamer=<nil> renameable=<nil> project=<nil> target=<nil>
+XCProjectRenameProductItem type=<nil> fileDataType=<nil> current=<nil> proposed=<nil>
+XCProjectRenameProductItem attributedCurrent=<nil> attributedProposed=<nil> image=<nil> error=<nil>
+XCProjectRenameProductItem children=<nil> configurations=<nil> enabled=YES shouldRename=YES
+XCProjectRenameProductItem currentRange=<nil> proposedRange=<nil>
+XCProjectRenameBuildSettingItem parent=<nil> represented=<nil> renamer=<nil> renameable=<nil> project=<nil> target=<nil>
+XCProjectRenameBuildSettingItem type=<nil> fileDataType=<nil> current=<nil> proposed=<nil>
+XCProjectRenameBuildSettingItem attributedCurrent=<nil> attributedProposed=<nil> image=<nil> error=<nil>
+XCProjectRenameBuildSettingItem children=<nil> configurations=<nil> enabled=YES shouldRename=YES
+XCProjectRenameBuildSettingItem currentRange=<nil> proposedRange=<nil>
+XCProjectRenameBuildSettingItem.settingName = <<nil>>
+XCProjectRenameTargetItem parent=<nil> represented=<nil> renamer=<nil> renameable=<nil> project=<nil> target=<nil>
+XCProjectRenameTargetItem type=<nil> fileDataType=<nil> current=<nil> proposed=<nil>
+XCProjectRenameTargetItem attributedCurrent=<nil> attributedProposed=<nil> image=<nil> error=<nil>
+XCProjectRenameTargetItem children=<nil> configurations=<nil> enabled=YES shouldRename=YES
+XCProjectRenameTargetItem currentRange=<nil> proposedRange=<nil>
+XCProjectRenameProjectItem parent=<nil> represented=<nil> renamer=<nil> renameable=<nil> project=<nil> target=<nil>
+XCProjectRenameProjectItem type=<nil> fileDataType=<nil> current=<nil> proposed=<nil>
+XCProjectRenameProjectItem attributedCurrent=<nil> attributedProposed=<nil> image=<nil> error=<nil>
+XCProjectRenameProjectItem children=<nil> configurations=<nil> enabled=YES shouldRename=YES
+XCProjectRenameProjectItem currentRange=<nil> proposedRange=<nil>
+SETTERS
+setters parent=item:str:Parent represented=str:represented renamer=str:renamer renameable=str:renameable project=str:project target=str:target
+setters type=str:type fileDataType=str:fileDataType current=str:OldName.m proposed=<nil>
+setters attributedCurrent=attr:AttrCurrent attributedProposed=attr:AttrProposed image=image error=error:probe/7
+setters children=items[XCProjectRenameItem(current=str:Child, proposed=<nil>, parent=<nil>)] configurations=array[str:Debug, str:Release] enabled=NO shouldRename=NO
+setters currentRange=str:currentRange proposedRange=str:proposedRange
+NAME_FLOW
+name.currentOnly parent=<nil> represented=<nil> renamer=<nil> renameable=<nil> project=<nil> target=<nil>
+name.currentOnly type=<nil> fileDataType=<nil> current=str:OnlyCurrent proposed=<nil>
+name.currentOnly attributedCurrent=<nil> attributedProposed=<nil> image=<nil> error=<nil>
+name.currentOnly children=<nil> configurations=<nil> enabled=YES shouldRename=YES
+name.currentOnly currentRange=<nil> proposedRange=<nil>
+name.attrCurrent parent=<nil> represented=<nil> renamer=<nil> renameable=<nil> project=<nil> target=<nil>
+name.attrCurrent type=<nil> fileDataType=<nil> current=str:OnlyCurrent proposed=<nil>
+name.attrCurrent attributedCurrent=attr:OnlyAttrCurrent attributedProposed=<nil> image=<nil> error=<nil>
+name.attrCurrent children=<nil> configurations=<nil> enabled=YES shouldRename=YES
+name.attrCurrent currentRange=<nil> proposedRange=<nil>
+name.attrProposed parent=<nil> represented=<nil> renamer=<nil> renameable=<nil> project=<nil> target=<nil>
+name.attrProposed type=<nil> fileDataType=<nil> current=str:OnlyCurrent proposed=<nil>
+name.attrProposed attributedCurrent=attr:OnlyAttrCurrent attributedProposed=attr:OnlyAttrProposed image=<nil> error=<nil>
+name.attrProposed children=<nil> configurations=<nil> enabled=YES shouldRename=YES
+name.attrProposed currentRange=<nil> proposedRange=<nil>
+name.currentAgain parent=<nil> represented=<nil> renamer=<nil> renameable=<nil> project=<nil> target=<nil>
+name.currentAgain type=<nil> fileDataType=<nil> current=str:NewCurrent proposed=<nil>
+name.currentAgain attributedCurrent=attr:OnlyAttrCurrent attributedProposed=attr:OnlyAttrProposed image=<nil> error=<nil>
+name.currentAgain children=<nil> configurations=<nil> enabled=YES shouldRename=YES
+name.currentAgain currentRange=<nil> proposedRange=<nil>
+CHILDREN
+children.add = <items[XCProjectRenameItem(current=str:A, proposed=<nil>, parent=str:Tree), XCProjectRenameItem(current=str:B, proposed=<nil>, parent=str:Tree), XCProjectRenameItem(current=str:A, proposed=<nil>, parent=str:Tree)]>
+children.removeExisting = <items[XCProjectRenameItem(current=str:B, proposed=<nil>, parent=str:Tree)]>
+children.removeMissing = <items[XCProjectRenameItem(current=str:B, proposed=<nil>, parent=str:Tree)]>
+children.addNil = <exception:NSInvalidArgumentException>
+children.afterAddNil = <items[XCProjectRenameItem(current=str:B, proposed=<nil>, parent=str:Tree)]>
+children.removeNil = <ok>
+children.afterRemoveNil = <items[XCProjectRenameItem(current=str:B, proposed=<nil>, parent=str:Tree)]>
+configs.add = <array[str:Debug, str:Release, str:Profile]>
+configs.addNil = <exception:NSInvalidArgumentException>
+configs.afterAddNil = <array[str:Debug, str:Release, str:Profile]>
+configs.addArrayNil = <ok>
+configs.afterArrayNil = <array[str:Debug, str:Release, str:Profile]>
+UPDATE
+update.middle.proposed = <str:AlphaXGamma>
+update.middle.attr = <<nil>>
+update.missing.proposed = <str:AlphaBetaGamma>
+update.missing.attr = <<nil>>
+update.empty.proposed = <str:AlphaBetaGamma>
+update.empty.attr = <<nil>>
+update.repeated.proposed = <str:bXnXnX>
+update.repeated.attr = <<nil>>
+update.case.proposed = <str:Alpha>
+update.case.attr = <<nil>>
+update.full.proposed = <str:New.m>
+update.full.attr = <<nil>>
+update.prefixSuffix.proposed = <str:OldNewFile.m.m>
+update.prefixSuffix.attr = <<nil>>
+update.staleAttr.proposed = <str:AlphaX>
+update.staleAttr.attr = <attr:stale>
+update.nilProposed = <exception:NSInvalidArgumentException>
+update.nilProposed.proposed = <<nil>>
+update.nilFrom = <exception:NSInvalidArgumentException>
+update.nilFrom.proposed = <<nil>>
+update.after.proposed = <str:AlphaXGamma>
+update.afterAttr.proposed = <str:AlphaXGamma>
+update.afterCurrent.proposed = <str:AlphaXGamma>
+update.afterAttrCurrent.current = <str:Changed>
+update.afterAttrCurrent.proposed = <str:AlphaXGamma>
+OPERATIONS
+operations.validate = <ok>
+operations.cancel = <ok>
+operations.rename = <ok>
+operations.after parent=<nil> represented=<nil> renamer=<nil> renameable=<nil> project=<nil> target=<nil>
+operations.after type=<nil> fileDataType=<nil> current=<nil> proposed=<nil>
+operations.after attributedCurrent=<nil> attributedProposed=<nil> image=<nil> error=<nil>
+operations.after children=<nil> configurations=<nil> enabled=YES shouldRename=YES
+operations.after currentRange=<nil> proposedRange=<nil>
+SETTING_NAME
+setting.name = <str:PRODUCT_NAME>

@@ -36,6 +36,7 @@
 #import "DevToolsCore/XCProductTypeSpecification.h"
 #import "DevToolsCore/XCStringList.h"
 #import "DevToolsCore/BuildSystem/XCSimpleFilePreprocessor.h"
+#import "DevToolsCore/ProjectModel/XCProjectRenameItem.h"
 #import "DevToolsCore/BuildSystem/XCPropertyDefinition.h"
 #import "DevToolsCore/BuildSystem/XCPropertyDomainSpecification.h"
 #import "DevToolsCore/ProjectModel/pbxproj.h"
@@ -71,6 +72,7 @@ usage(void)
 	    "       pbxmodel tstimedtrace\n"
 	    "       pbxmodel tspropertylistdictionary\n"
 	    "       pbxmodel xcsfpp\n"
+	    "       pbxmodel xcprojectrename\n"
 	    "       pbxmodel xcproducttypes\n"
 	    "       pbxmodel runtimevalues\n"
 	    "       pbxmodel buildconfigurations\n"
@@ -3126,6 +3128,297 @@ cmdXCSimpleFilePreprocessor(void)
 	return (0);
 }
 
+static NSString *
+XCRPRRepr(id object)
+{
+	if (object == nil)
+		return (@"<nil>");
+	if ([object isKindOfClass:[XCProjectRenameItem class]])
+		return ([NSString stringWithFormat:@"item:%@",
+		    XCRPRRepr([(XCProjectRenameItem *)object currentName])]);
+	if ([object isKindOfClass:[NSAttributedString class]])
+		return ([NSString stringWithFormat:@"attr:%@", [object string]]);
+	if ([object isKindOfClass:[NSString class]])
+		return ([NSString stringWithFormat:@"str:%@", object]);
+	if ([object isKindOfClass:[NSNumber class]])
+		return ([NSString stringWithFormat:@"num:%@", object]);
+	if ([object isKindOfClass:[NSError class]])
+		return ([NSString stringWithFormat:@"error:%@/%ld", [object domain],
+		    (long)[object code]]);
+	if ([object isKindOfClass:[NSArray class]]) {
+		NSMutableArray *parts = [NSMutableArray array];
+
+		for (id item in object)
+			[parts addObject:XCRPRRepr(item)];
+		return ([NSString stringWithFormat:@"array[%@]",
+		    [parts componentsJoinedByString:@", "]]);
+	}
+	return ([NSString stringWithFormat:@"object:%@",
+	    NSStringFromClass([object class])]);
+}
+
+static NSString *
+XCRPRItemRepr(XCProjectRenameItem *item)
+{
+	return ([NSString stringWithFormat:
+	    @"%@(current=%@, proposed=%@, parent=%@)",
+	    NSStringFromClass([item class]), XCRPRRepr([item currentName]),
+	    XCRPRRepr([item proposedName]),
+	    XCRPRRepr([[item parent] currentName])]);
+}
+
+static NSString *
+XCRPRItemsRepr(id items)
+{
+	if (items == nil)
+		return (@"<nil>");
+	if (![items isKindOfClass:[NSArray class]])
+		return (XCRPRRepr(items));
+	NSMutableArray *parts = [NSMutableArray array];
+
+	for (XCProjectRenameItem *item in items)
+		[parts addObject:XCRPRItemRepr(item)];
+	return ([NSString stringWithFormat:@"items[%@]",
+	    [parts componentsJoinedByString:@", "]]);
+}
+
+static void
+XCRPRPrintState(NSString *label, XCProjectRenameItem *item)
+{
+	printf("%s parent=%s represented=%s renamer=%s renameable=%s project=%s target=%s\n",
+	    [label UTF8String], [XCRPRRepr([item parent]) UTF8String],
+	    [XCRPRRepr([item representedObject]) UTF8String],
+	    [XCRPRRepr([item renamer]) UTF8String],
+	    [XCRPRRepr([item renameableItem]) UTF8String],
+	    [XCRPRRepr([item project]) UTF8String],
+	    [XCRPRRepr([item target]) UTF8String]);
+	printf("%s type=%s fileDataType=%s current=%s proposed=%s\n",
+	    [label UTF8String], [XCRPRRepr([item type]) UTF8String],
+	    [XCRPRRepr([item fileDataType]) UTF8String],
+	    [XCRPRRepr([item currentName]) UTF8String],
+	    [XCRPRRepr([item proposedName]) UTF8String]);
+	printf("%s attributedCurrent=%s attributedProposed=%s image=%s error=%s\n",
+	    [label UTF8String],
+	    [XCRPRRepr([item attributedCurrentName]) UTF8String],
+	    [XCRPRRepr([item attributedProposedName]) UTF8String],
+	    [item image] != nil ? "image" : "<nil>",
+	    [XCRPRRepr([item error]) UTF8String]);
+	printf("%s children=%s configurations=%s enabled=%s shouldRename=%s\n",
+	    [label UTF8String], [XCRPRItemsRepr([item children]) UTF8String],
+	    [XCRPRRepr([item buildConfigurations]) UTF8String],
+	    [item enabled] ? "YES" : "NO", [item shouldRename] ? "YES" : "NO");
+	printf("%s currentRange=%s proposedRange=%s\n", [label UTF8String],
+	    [XCRPRRepr([item currentNameMatchRange]) UTF8String],
+	    [XCRPRRepr([item proposedNameMatchRange]) UTF8String]);
+}
+
+static void
+XCRPRTry(NSString *label, void (^block)(void))
+{
+	@try {
+		block();
+		printf("%s = <ok>\n", [label UTF8String]);
+	} @catch (NSException *exception) {
+		printf("%s = <exception:%s>\n", [label UTF8String],
+		    [[exception name] UTF8String]);
+	}
+}
+
+static int
+cmdXCProjectRename(void)
+{
+	@autoreleasepool {
+		NSArray *classes = @[
+		    @"XCProjectRenameItem", @"XCProjectRenameFileItem",
+		    @"XCProjectRenameXibItem", @"XCProjectRenamePCHItem",
+		    @"XCProjectRenameInfoPlistContentsItem",
+		    @"XCProjectRenameInfoPlistItem", @"XCProjectRenameProductItem",
+		    @"XCProjectRenameBuildSettingItem", @"XCProjectRenameTargetItem",
+		    @"XCProjectRenameProjectItem",
+		];
+
+		printf("DEFAULTS\n");
+		for (NSString *name in classes) {
+			XCProjectRenameItem *object =
+			    [[NSClassFromString(name) alloc] init];
+
+			XCRPRPrintState(name, object);
+			if ([object isKindOfClass:[XCProjectRenameBuildSettingItem class]])
+				printf("%s.settingName = <%s>\n", [name UTF8String],
+				    [XCRPRRepr([(XCProjectRenameBuildSettingItem *)
+					object settingName]) UTF8String]);
+		}
+
+		printf("SETTERS\n");
+		XCProjectRenameItem *item = [[XCProjectRenameItem alloc] init];
+		XCProjectRenameItem *parent = [[XCProjectRenameItem alloc] init];
+		XCProjectRenameItem *child = [[XCProjectRenameItem alloc] init];
+
+		[parent setCurrentName:@"Parent"];
+		[child setCurrentName:@"Child"];
+		[item setParent:parent];
+		[item setRepresentedObject:@"represented"];
+		[item setRenamer:(id)@"renamer"];
+		[item setRenameableItem:(id)@"renameable"];
+		[item setProject:(id)@"project"];
+		[item setTarget:(id)@"target"];
+		[item setType:@"type"];
+		[item setFileDataType:(id)@"fileDataType"];
+		[item setCurrentName:@"OldName.m"];
+		[item setAttributedCurrentName:[[NSAttributedString alloc]
+		    initWithString:@"AttrCurrent"]];
+		[item setAttributedProposedName:[[NSAttributedString alloc]
+		    initWithString:@"AttrProposed"]];
+		[item setImage:(id)@"image"];
+		[item setError:[NSError errorWithDomain:@"probe" code:7 userInfo:nil]];
+		[item setEnabled:NO];
+		[item setShouldRename:NO];
+		[item setBuildConfigurations:@[@"Debug", @"Release"]];
+		[item setChildren:@[child]];
+		[item setCurrentNameMatchRange:(id)@"currentRange"];
+		[item setProposedNameMatchRange:(id)@"proposedRange"];
+		XCRPRPrintState(@"setters", item);
+
+		printf("NAME_FLOW\n");
+		XCProjectRenameItem *flow = [[XCProjectRenameItem alloc] init];
+
+		[flow setCurrentName:@"OnlyCurrent"];
+		XCRPRPrintState(@"name.currentOnly", flow);
+		[flow setAttributedCurrentName:[[NSAttributedString alloc]
+		    initWithString:@"OnlyAttrCurrent"]];
+		XCRPRPrintState(@"name.attrCurrent", flow);
+		[flow setAttributedProposedName:[[NSAttributedString alloc]
+		    initWithString:@"OnlyAttrProposed"]];
+		XCRPRPrintState(@"name.attrProposed", flow);
+		[flow setCurrentName:@"NewCurrent"];
+		XCRPRPrintState(@"name.currentAgain", flow);
+
+		printf("CHILDREN\n");
+		XCProjectRenameItem *tree = [[XCProjectRenameItem alloc] init];
+		XCProjectRenameItem *childA = [[XCProjectRenameItem alloc] init];
+		XCProjectRenameItem *childB = [[XCProjectRenameItem alloc] init];
+
+		[tree setCurrentName:@"Tree"];
+		[childA setCurrentName:@"A"];
+		[childB setCurrentName:@"B"];
+		[tree addChild:childA];
+		[tree addChild:childB];
+		[tree addChild:childA];
+		printf("children.add = <%s>\n",
+		    [XCRPRItemsRepr([tree children]) UTF8String]);
+		[tree removeChild:childA];
+		printf("children.removeExisting = <%s>\n",
+		    [XCRPRItemsRepr([tree children]) UTF8String]);
+		[tree removeChild:childA];
+		printf("children.removeMissing = <%s>\n",
+		    [XCRPRItemsRepr([tree children]) UTF8String]);
+		XCRPRTry(@"children.addNil", ^{ [tree addChild:nil]; });
+		printf("children.afterAddNil = <%s>\n",
+		    [XCRPRItemsRepr([tree children]) UTF8String]);
+		XCRPRTry(@"children.removeNil", ^{ [tree removeChild:nil]; });
+		printf("children.afterRemoveNil = <%s>\n",
+		    [XCRPRItemsRepr([tree children]) UTF8String]);
+
+		XCProjectRenameItem *configs = [[XCProjectRenameItem alloc] init];
+
+		[configs addBuildConfiguration:@"Debug"];
+		[configs addBuildConfigurations:@[@"Release", @"Profile"]];
+		printf("configs.add = <%s>\n",
+		    [XCRPRRepr([configs buildConfigurations]) UTF8String]);
+		XCRPRTry(@"configs.addNil", ^{
+		    [configs addBuildConfiguration:nil];
+		});
+		printf("configs.afterAddNil = <%s>\n",
+		    [XCRPRRepr([configs buildConfigurations]) UTF8String]);
+		XCRPRTry(@"configs.addArrayNil", ^{
+		    [configs addBuildConfigurations:nil];
+		});
+		printf("configs.afterArrayNil = <%s>\n",
+		    [XCRPRRepr([configs buildConfigurations]) UTF8String]);
+
+		printf("UPDATE\n");
+		NSArray *updates = @[
+		    @[@"middle", @"AlphaBetaGamma", @"<nil>", @"X", @"Beta"],
+		    @[@"missing", @"AlphaBetaGamma", @"<nil>", @"X", @"Z"],
+		    @[@"empty", @"AlphaBetaGamma", @"<nil>", @"X", @""],
+		    @[@"repeated", @"banana", @"<nil>", @"X", @"a"],
+		    @[@"case", @"Alpha", @"<nil>", @"X", @"alpha"],
+		    @[@"full", @"Old.m", @"<nil>", @"New.m", @"Old.m"],
+		    @[@"prefixSuffix", @"OldFile.m", @"<nil>", @"NewFile.m", @"File"],
+		    @[@"staleAttr", @"AlphaBeta", @"stale", @"X", @"Beta"],
+		];
+		for (NSArray *entry in updates) {
+			XCProjectRenameItem *updateItem =
+			    [[XCProjectRenameItem alloc] init];
+
+			if (![entry[2] isEqualToString:@"<nil>"])
+				[updateItem setAttributedProposedName:
+				    [[NSAttributedString alloc]
+				    initWithString:entry[2]]];
+			[updateItem setCurrentName:entry[1]];
+			[updateItem updateProposedNameWith:entry[3] fromName:entry[4]];
+			printf("update.%s.proposed = <%s>\n", [entry[0] UTF8String],
+			    [XCRPRRepr([updateItem proposedName]) UTF8String]);
+			printf("update.%s.attr = <%s>\n", [entry[0] UTF8String],
+			    [XCRPRRepr([updateItem attributedProposedName]) UTF8String]);
+		}
+
+		XCProjectRenameItem *nilProposed =
+		    [[XCProjectRenameItem alloc] init];
+		[nilProposed setCurrentName:@"AlphaBeta"];
+		XCRPRTry(@"update.nilProposed", ^{
+		    [nilProposed updateProposedNameWith:nil fromName:@"Beta"];
+		});
+		printf("update.nilProposed.proposed = <%s>\n",
+		    [XCRPRRepr([nilProposed proposedName]) UTF8String]);
+		XCProjectRenameItem *nilFrom = [[XCProjectRenameItem alloc] init];
+
+		[nilFrom setCurrentName:@"AlphaBeta"];
+		XCRPRTry(@"update.nilFrom", ^{
+		    [nilFrom updateProposedNameWith:@"X" fromName:nil];
+		});
+		printf("update.nilFrom.proposed = <%s>\n",
+		    [XCRPRRepr([nilFrom proposedName]) UTF8String]);
+
+		XCProjectRenameItem *mutations = [[XCProjectRenameItem alloc] init];
+
+		[mutations setCurrentName:@"AlphaBetaGamma"];
+		[mutations updateProposedNameWith:@"X" fromName:@"Beta"];
+		printf("update.after.proposed = <%s>\n",
+		    [XCRPRRepr([mutations proposedName]) UTF8String]);
+		[mutations setAttributedProposedName:[[NSAttributedString alloc]
+		    initWithString:@"Y"]];
+		printf("update.afterAttr.proposed = <%s>\n",
+		    [XCRPRRepr([mutations proposedName]) UTF8String]);
+		[mutations setCurrentName:@"Changed"];
+		printf("update.afterCurrent.proposed = <%s>\n",
+		    [XCRPRRepr([mutations proposedName]) UTF8String]);
+		[mutations setAttributedCurrentName:[[NSAttributedString alloc]
+		    initWithString:@"AttrCurrent"]];
+		printf("update.afterAttrCurrent.current = <%s>\n",
+		    [XCRPRRepr([mutations currentName]) UTF8String]);
+		printf("update.afterAttrCurrent.proposed = <%s>\n",
+		    [XCRPRRepr([mutations proposedName]) UTF8String]);
+
+		printf("OPERATIONS\n");
+		XCProjectRenameItem *operations = [[XCProjectRenameItem alloc] init];
+
+		XCRPRTry(@"operations.validate", ^{ [operations validate]; });
+		XCRPRTry(@"operations.cancel", ^{ [operations cancel]; });
+		XCRPRTry(@"operations.rename", ^{ [operations rename]; });
+		XCRPRPrintState(@"operations.after", operations);
+
+		printf("SETTING_NAME\n");
+		XCProjectRenameBuildSettingItem *setting =
+		    [[XCProjectRenameBuildSettingItem alloc] init];
+
+		[setting setSettingName:@"PRODUCT_NAME"];
+		printf("setting.name = <%s>\n",
+		    [XCRPRRepr([setting settingName]) UTF8String]);
+	}
+	return (0);
+}
+
 static int
 cmdTSPropertyListDictionary(void)
 {
@@ -3749,6 +4042,8 @@ main(int argc, char **argv)
 			return (cmdTSPropertyListDictionary());
 		if (argc >= 2 && strcmp(argv[1], "xcsfpp") == 0)
 			return (cmdXCSimpleFilePreprocessor());
+		if (argc >= 2 && strcmp(argv[1], "xcprojectrename") == 0)
+			return (cmdXCProjectRename());
 		if (argc >= 2 && strcmp(argv[1], "xcproducttypes") == 0)
 			return (cmdXCProductTypes());
 		if (argc >= 2 && strcmp(argv[1], "runtimevalues") == 0)
